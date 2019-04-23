@@ -16,10 +16,17 @@ type Point struct {
 	Y int `json:"y"`
 }
 
+func (p Point) Add(p2 Point) Point {
+	return Point{
+		X: p.X + p2.X,
+		Y: p.Y + p2.Y,
+	}
+}
+
 //Target represents a location where input can be placed on a meme
 type Target struct {
-	FriendlyName string  `json:"friendly_name"`
-	TopLeft      Point   `json:"top_left"`
+	FriendlyName string  `json:"friendly_name" mapstructure:"friendly_name"`
+	TopLeft      Point   `json:"top_left" mapstructure:"top_left"`
 	Size         Point   `json:"size"`
 	Deltas       []Point `json:"deltas"` //must be length 4
 }
@@ -29,6 +36,19 @@ type Template struct {
 	Size    Point    `json:"size"`
 	Targets []Target `json:"targets"`
 	File    string   `json:"file"`
+}
+
+//TargetInput represents the input for a specific target
+type TargetInput struct {
+	FileName string `json:"file_name,omitempty"`
+	//TODO: add base64 image, url
+	//TODO: add modifiers
+}
+
+//Input represents a meme creation request input
+type Input struct {
+	TemplateName string        `json:"template_name,omitempty"`
+	TargetInputs []TargetInput `json:"target_inputs,omitempty"`
 }
 
 //LoadConfig loads config
@@ -43,5 +63,6 @@ func LoadConfig() (*Config, error) {
 
 	err = viper.UnmarshalKey("templates", &c.Templates)
 
+	//TODO make sure all template images exist
 	return &c, err
 }
