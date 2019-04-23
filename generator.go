@@ -26,17 +26,19 @@ type Generator struct {
 
 //OpLog represents the log of an operation
 type OpLog struct {
-	Step   int
-	Op     Operation
-	Time   time.Duration
-	Output string
+	Step   int           `json:"step,omitempty"`
+	Op     Operation     `json:"op,omitempty"`
+	Time   time.Duration `json:"time,omitempty"`
+	Output string        `json:"output,omitempty"`
+	File   string        `json:"file,omitempty"`
 }
 
 //Meme is a meme
 type Meme struct {
-	UUID        string
-	CurrentStep int
-	OpLog       []OpLog
+	UUID        string  `json:"uuid,omitempty"`
+	CurrentStep int     `json:"current_step,omitempty"`
+	OpLog       []OpLog `json:"op_log,omitempty"`
+	ResultFile  string  `json:"file,omitempty"`
 }
 
 //Process makes a meme
@@ -47,8 +49,7 @@ func (g *Generator) Process(input Input) (*Meme, error) {
 		return nil, fmt.Errorf("template %s does not exist", templateName)
 	}
 
-	m := Meme{UUID: uuid.NewV4().String()}
-	resultFile := template.File
+	m := Meme{UUID: uuid.NewV4().String(), ResultFile: template.File}
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := input.TargetInputs[step]
@@ -64,7 +65,7 @@ func (g *Generator) Process(input Input) (*Meme, error) {
 		if err != nil {
 			return &m, err
 		}
-		resultFile, err = m.composite(distortedFile, resultFile, target.TopLeft)
+		m.ResultFile, err = m.composite(distortedFile, m.ResultFile, target.TopLeft)
 		if err != nil {
 			return &m, err
 		}
@@ -89,7 +90,7 @@ func (m *Meme) shrinkToSize(fileName string, destSize Point) (string, error) {
 	}
 	cmd := exec.Command("convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output)})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
 }
 
@@ -109,7 +110,7 @@ func (m *Meme) distort(fileName string, payload DistortPayload) (string, error) 
 	}
 	cmd := exec.Command("convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output)})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
 }
 
@@ -127,7 +128,7 @@ func (m *Meme) composite(fileNameA, fileNameB string, topLeft Point) (string, er
 	}
 	cmd := exec.Command("composite", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output)})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
 }
 
