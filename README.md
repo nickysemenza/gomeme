@@ -45,3 +45,5 @@ composite -geometry  +19+42 step2.png templates/office_copy.jpg composite.png
 * cache each step
 * concurrently run steps and then combine at the end
 * tracing
+* gRPC
+* UI

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 //Operation is a step
@@ -50,6 +51,7 @@ func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 		return nil, fmt.Errorf("template %s does not exist", templateName)
 	}
 
+	//TODO: ensure length of input is right
 	m := Meme{UUID: uuid.NewV4().String(), ResultFile: template.File}
 	for step, target := range template.Targets {
 		m.CurrentStep = step
@@ -93,7 +95,7 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 		fmt.Sprintf("%dx%d!", destSize.X, destSize.Y), //todo: opt to not stretch
 		dest,
 	}
-	cmd := exec.CommandContext(ctx, "convert", args...)
+	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
@@ -113,7 +115,7 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 		payload.ToIMString(),
 		dest,
 	}
-	cmd := exec.CommandContext(ctx, "convert", args...)
+	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
@@ -131,7 +133,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 		fileNameB,
 		dest,
 	}
-	cmd := exec.CommandContext(ctx, "composite", args...)
+	cmd := runCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
@@ -174,4 +176,12 @@ func (p *Point) BuildBase() DistortPayload {
 			{P1: Point{p.X, p.Y}, P2: Point{p.X, p.Y}},
 		},
 	}
+}
+
+func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
+	log.WithFields(log.Fields{
+		"command": name,
+		"args":    arg,
+	}).Info("Running IM command")
+	return exec.CommandContext(ctx, name, arg...)
 }
