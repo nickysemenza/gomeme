@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -42,7 +43,7 @@ type Meme struct {
 }
 
 //Process makes a meme
-func (g *Generator) Process(input Input) (*Meme, error) {
+func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 	templateName := input.TemplateName
 	template, ok := g.Config.Templates[templateName]
 	if !ok {
@@ -53,7 +54,11 @@ func (g *Generator) Process(input Input) (*Meme, error) {
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := input.TargetInputs[step]
-		shrunkFile, err := m.shrinkToSize(input.FileName, target.Size)
+		fileName, err := input.GetFile(ctx)
+		if err != nil {
+			return &m, err
+		}
+		shrunkFile, err := m.shrinkToSize(ctx, fileName, target.Size)
 		if err != nil {
 			return &m, err
 		}
@@ -61,11 +66,11 @@ func (g *Generator) Process(input Input) (*Meme, error) {
 		dist := target.Size.BuildBase()
 		// spew.Dump(dist.ToIMString())
 		dist.applyDelta(target.Deltas)
-		distortedFile, err := m.distort(shrunkFile, dist)
+		distortedFile, err := m.distort(ctx, shrunkFile, dist)
 		if err != nil {
 			return &m, err
 		}
-		m.ResultFile, err = m.composite(distortedFile, m.ResultFile, target.TopLeft)
+		m.ResultFile, err = m.composite(ctx, distortedFile, m.ResultFile, target.TopLeft)
 		if err != nil {
 			return &m, err
 		}
@@ -78,7 +83,7 @@ func (m *Meme) genFile(op Operation) string {
 	return fmt.Sprintf("tmp/%s-%d-%s.png", m.UUID, m.CurrentStep, op)
 }
 
-func (m *Meme) shrinkToSize(fileName string, destSize Point) (string, error) {
+func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {
 	op := OpShrink
 	dest := m.genFile(op)
 	t := time.Now()
@@ -88,13 +93,13 @@ func (m *Meme) shrinkToSize(fileName string, destSize Point) (string, error) {
 		fmt.Sprintf("%dx%d!", destSize.X, destSize.Y), //todo: opt to not stretch
 		dest,
 	}
-	cmd := exec.Command("convert", args...)
+	cmd := exec.CommandContext(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
 }
 
-func (m *Meme) distort(fileName string, payload DistortPayload) (string, error) {
+func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayload) (string, error) {
 	op := OpDistort
 	dest := m.genFile(op)
 	t := time.Now()
@@ -108,14 +113,14 @@ func (m *Meme) distort(fileName string, payload DistortPayload) (string, error) 
 		payload.ToIMString(),
 		dest,
 	}
-	cmd := exec.Command("convert", args...)
+	cmd := exec.CommandContext(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
 }
 
 /// composites A onto B, given the top-left corner position of A
-func (m *Meme) composite(fileNameA, fileNameB string, topLeft Point) (string, error) {
+func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLeft Point) (string, error) {
 	op := OpComposite
 	dest := m.genFile(op)
 	t := time.Now()
@@ -126,7 +131,7 @@ func (m *Meme) composite(fileNameA, fileNameB string, topLeft Point) (string, er
 		fileNameB,
 		dest,
 	}
-	cmd := exec.Command("composite", args...)
+	cmd := exec.CommandContext(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
 	return dest, err
@@ -159,6 +164,7 @@ func (d *DistortPayload) ToIMString() string {
 	return strings.Join(cps, "  ")
 }
 
+//BuildBase creates a base distortion payload that's effectively a noop
 func (p *Point) BuildBase() DistortPayload {
 	return DistortPayload{
 		ControlPoints: []ControlPointDelta{

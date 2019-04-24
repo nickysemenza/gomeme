@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+
+	"github.com/nickysemenza/gomeme/util"
 )
 
 //Config contains all templates, as well as config data
@@ -16,6 +20,7 @@ type Point struct {
 	Y int `json:"y"`
 }
 
+//Add returns a new Point that's the result of all the values being added.
 func (p Point) Add(p2 Point) Point {
 	return Point{
 		X: p.X + p2.X,
@@ -41,8 +46,20 @@ type Template struct {
 //TargetInput represents the input for a specific target
 type TargetInput struct {
 	FileName string `json:"file_name,omitempty"`
+	URL      string
 	//TODO: add base64 image, url
 	//TODO: add modifiers
+}
+
+//GetFile returns a filename representing the contents of the input
+func (t *TargetInput) GetFile(ctx context.Context) (string, error) {
+	switch {
+	case t.FileName != "":
+		return t.FileName, nil
+	case t.URL != "":
+		return util.DownloadImage(ctx, t.URL)
+	}
+	return "", errors.New("could not get file from input")
 }
 
 //Input represents a meme creation request input
