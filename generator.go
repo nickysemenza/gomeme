@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -67,7 +68,10 @@ func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 
 		dist := target.Size.BuildBase()
 		// spew.Dump(dist.ToIMString())
-		dist.applyDelta(target.Deltas)
+		err = dist.applyDelta(target.Deltas)
+		if err != nil {
+			return &m, err
+		}
 		distortedFile, err := m.distort(ctx, shrunkFile, dist)
 		if err != nil {
 			return &m, err
@@ -150,11 +154,18 @@ type DistortPayload struct {
 	ControlPoints []ControlPointDelta //size 4
 }
 
-func (d *DistortPayload) applyDelta(delta []Point) {
-	//todo: check both are len 4
+func (d *DistortPayload) applyDelta(delta []Point) error {
+	switch {
+	case len(delta) == 0:
+		return nil // nopp
+	case len(delta) != 4:
+		return errors.New("must specify 0 or 4 deltas")
+	}
+
 	for x := range d.ControlPoints {
 		d.ControlPoints[x].P2 = d.ControlPoints[x].P2.Add(delta[x])
 	}
+	return nil
 }
 
 //ToIMString generates a string for imagemagick

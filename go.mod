@@ -10,4 +10,5 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/viper v1.3.2
+	github.com/stretchr/testify v1.2.2
 )
