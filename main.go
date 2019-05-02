@@ -28,35 +28,19 @@ func main() {
 }
 func newMeme(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
 	decoder := json.NewDecoder(r.Body)
+
 	var input1 Input
 	err := decoder.Decode(&input1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// input1 := Input{
-	// 	TemplateName: "office1",
-	// 	TargetInputs: []TargetInput{TargetInput{FileName: "in1.png"}, TargetInput{FileName: "in1.png"}},
-	// }
-
 	meme, err := gg.Process(ctx, input1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// spew.Dump(meme, err)
-
-	// js, err := json.Marshal(meme)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.Write(js)
 
 	var ImageTemplate = `<!DOCTYPE html>
     <html lang="en"><head></head>
@@ -84,8 +68,6 @@ func buildRouter() *chi.Mux {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
 	})
-
-	// fs := http.FileServer(http.Dir("/Users/nickysemenza/dev/gomeme/tmp"))
 
 	r.Handle("/tmp/{res}", http.StripPrefix("/tmp/", http.FileServer(http.Dir("tmp/"))))
 
