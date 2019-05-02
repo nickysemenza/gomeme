@@ -1,11 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import ProtoTest from "./ProtoTest";
 
 const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
+        <ProtoTest />
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
@@ -21,6 +23,6 @@ const App: React.FC = () => {
       </header>
     </div>
   );
-}
+};
 
 export default App;

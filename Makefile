@@ -1,6 +1,6 @@
-OUT_DIR = "./ui"
+OUT_DIR = "./ui/src/"
 PROTOC_GEN_TS_PATH ="./ui/node_modules/.bin/protoc-gen-ts"
-
+SED = "gsed" # GNU sed on macOS
 run: 
 	go run .
 protogen:
@@ -10,3 +10,6 @@ protogen:
 		--ts_out="service=true:$(OUT_DIR)" \
 		--go_out=plugins=grpc:api \
 		proto/*.proto
+	
+	$(SED) -i '10i //@ts-ignore' ui/src/proto/meme_pb.js
+	$(SED) -i '1i /* eslint-disable */' ui/src/proto/meme_pb.js
