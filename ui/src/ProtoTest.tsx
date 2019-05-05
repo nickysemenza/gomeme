@@ -1,7 +1,8 @@
 import * as React from "react";
 
 import { GetTemplatesParams, Template } from "./proto/meme_pb";
-import { getAPIClient } from "./util";
+import { getAPIClient, buildURL } from "./util";
+import { Button, Image, Table } from "react-bootstrap";
 interface State {
   templates: Template[];
 }
@@ -28,12 +29,19 @@ class ProtoTest extends React.Component<Props, State> {
     const { templates } = this.state;
     return (
       <div>
-        {templates.map(t => (
-          <div>
-            <h1>{t.getName()}</h1>
-            <p>{t.getUrl()}</p>
-          </div>
-        ))}
+        <Table>
+          {templates.map(t => (
+            <tr>
+              <td>
+                <Button>hi</Button>
+              </td>
+              <td>{t.getName()}</td>
+              <td>
+                <Image width="200px" src={buildURL(t.getUrl())} />
+              </td>
+            </tr>
+          ))}
+        </Table>
       </div>
     );
   };

@@ -129,6 +129,7 @@ func (s *Server) buildRouter() *chi.Mux {
 	})
 
 	r.Handle("/tmp/{res}", http.StripPrefix("/tmp/", http.FileServer(http.Dir("tmp/"))))
+	r.Handle("/templates/{res}", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
 
 	r.Post("/meme", newMeme)
 
