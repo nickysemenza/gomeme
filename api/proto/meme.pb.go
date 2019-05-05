@@ -24,6 +24,241 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type GetTemplatesParams struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetTemplatesParams) Reset()         { *m = GetTemplatesParams{} }
+func (m *GetTemplatesParams) String() string { return proto.CompactTextString(m) }
+func (*GetTemplatesParams) ProtoMessage()    {}
+func (*GetTemplatesParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{0}
+}
+
+func (m *GetTemplatesParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetTemplatesParams.Unmarshal(m, b)
+}
+func (m *GetTemplatesParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetTemplatesParams.Marshal(b, m, deterministic)
+}
+func (m *GetTemplatesParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTemplatesParams.Merge(m, src)
+}
+func (m *GetTemplatesParams) XXX_Size() int {
+	return xxx_messageInfo_GetTemplatesParams.Size(m)
+}
+func (m *GetTemplatesParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetTemplatesParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetTemplatesParams proto.InternalMessageInfo
+
+type Target struct {
+	FriendlyName         string   `protobuf:"bytes,1,opt,name=FriendlyName,proto3" json:"FriendlyName,omitempty"`
+	TopLeft              *Point   `protobuf:"bytes,2,opt,name=TopLeft,proto3" json:"TopLeft,omitempty"`
+	Size                 *Point   `protobuf:"bytes,3,opt,name=Size,proto3" json:"Size,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Target) Reset()         { *m = Target{} }
+func (m *Target) String() string { return proto.CompactTextString(m) }
+func (*Target) ProtoMessage()    {}
+func (*Target) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{1}
+}
+
+func (m *Target) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Target.Unmarshal(m, b)
+}
+func (m *Target) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Target.Marshal(b, m, deterministic)
+}
+func (m *Target) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target.Merge(m, src)
+}
+func (m *Target) XXX_Size() int {
+	return xxx_messageInfo_Target.Size(m)
+}
+func (m *Target) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target proto.InternalMessageInfo
+
+func (m *Target) GetFriendlyName() string {
+	if m != nil {
+		return m.FriendlyName
+	}
+	return ""
+}
+
+func (m *Target) GetTopLeft() *Point {
+	if m != nil {
+		return m.TopLeft
+	}
+	return nil
+}
+
+func (m *Target) GetSize() *Point {
+	if m != nil {
+		return m.Size
+	}
+	return nil
+}
+
+type Point struct {
+	X                    int32    `protobuf:"varint,1,opt,name=X,proto3" json:"X,omitempty"`
+	Y                    int32    `protobuf:"varint,2,opt,name=Y,proto3" json:"Y,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Point) Reset()         { *m = Point{} }
+func (m *Point) String() string { return proto.CompactTextString(m) }
+func (*Point) ProtoMessage()    {}
+func (*Point) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{2}
+}
+
+func (m *Point) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Point.Unmarshal(m, b)
+}
+func (m *Point) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Point.Marshal(b, m, deterministic)
+}
+func (m *Point) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Point.Merge(m, src)
+}
+func (m *Point) XXX_Size() int {
+	return xxx_messageInfo_Point.Size(m)
+}
+func (m *Point) XXX_DiscardUnknown() {
+	xxx_messageInfo_Point.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Point proto.InternalMessageInfo
+
+func (m *Point) GetX() int32 {
+	if m != nil {
+		return m.X
+	}
+	return 0
+}
+
+func (m *Point) GetY() int32 {
+	if m != nil {
+		return m.Y
+	}
+	return 0
+}
+
+type Template struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Size                 *Point   `protobuf:"bytes,2,opt,name=Size,proto3" json:"Size,omitempty"`
+	Targets              *Target  `protobuf:"bytes,3,opt,name=Targets,proto3" json:"Targets,omitempty"`
+	URL                  string   `protobuf:"bytes,4,opt,name=URL,proto3" json:"URL,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Template) Reset()         { *m = Template{} }
+func (m *Template) String() string { return proto.CompactTextString(m) }
+func (*Template) ProtoMessage()    {}
+func (*Template) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{3}
+}
+
+func (m *Template) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Template.Unmarshal(m, b)
+}
+func (m *Template) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Template.Marshal(b, m, deterministic)
+}
+func (m *Template) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Template.Merge(m, src)
+}
+func (m *Template) XXX_Size() int {
+	return xxx_messageInfo_Template.Size(m)
+}
+func (m *Template) XXX_DiscardUnknown() {
+	xxx_messageInfo_Template.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Template proto.InternalMessageInfo
+
+func (m *Template) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Template) GetSize() *Point {
+	if m != nil {
+		return m.Size
+	}
+	return nil
+}
+
+func (m *Template) GetTargets() *Target {
+	if m != nil {
+		return m.Targets
+	}
+	return nil
+}
+
+func (m *Template) GetURL() string {
+	if m != nil {
+		return m.URL
+	}
+	return ""
+}
+
+type TemplateList struct {
+	Templates            []*Template `protobuf:"bytes,1,rep,name=Templates,proto3" json:"Templates,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
+}
+
+func (m *TemplateList) Reset()         { *m = TemplateList{} }
+func (m *TemplateList) String() string { return proto.CompactTextString(m) }
+func (*TemplateList) ProtoMessage()    {}
+func (*TemplateList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{4}
+}
+
+func (m *TemplateList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TemplateList.Unmarshal(m, b)
+}
+func (m *TemplateList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TemplateList.Marshal(b, m, deterministic)
+}
+func (m *TemplateList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TemplateList.Merge(m, src)
+}
+func (m *TemplateList) XXX_Size() int {
+	return xxx_messageInfo_TemplateList.Size(m)
+}
+func (m *TemplateList) XXX_DiscardUnknown() {
+	xxx_messageInfo_TemplateList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TemplateList proto.InternalMessageInfo
+
+func (m *TemplateList) GetTemplates() []*Template {
+	if m != nil {
+		return m.Templates
+	}
+	return nil
+}
+
 type Ping struct {
 	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -35,7 +270,7 @@ func (m *Ping) Reset()         { *m = Ping{} }
 func (m *Ping) String() string { return proto.CompactTextString(m) }
 func (*Ping) ProtoMessage()    {}
 func (*Ping) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{0}
+	return fileDescriptor_3f8205b5f9f06099, []int{5}
 }
 
 func (m *Ping) XXX_Unmarshal(b []byte) error {
@@ -64,19 +299,37 @@ func (m *Ping) GetMessage() string {
 }
 
 func init() {
+	proto.RegisterType((*GetTemplatesParams)(nil), "GetTemplatesParams")
+	proto.RegisterType((*Target)(nil), "Target")
+	proto.RegisterType((*Point)(nil), "Point")
+	proto.RegisterType((*Template)(nil), "Template")
+	proto.RegisterType((*TemplateList)(nil), "TemplateList")
 	proto.RegisterType((*Ping)(nil), "Ping")
 }
 
 func init() { proto.RegisterFile("proto/meme.proto", fileDescriptor_3f8205b5f9f06099) }
 
 var fileDescriptor_3f8205b5f9f06099 = []byte{
-	// 96 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x28, 0x28, 0xca, 0x2f,
-	0xc9, 0xd7, 0xcf, 0x4d, 0xcd, 0x4d, 0xd5, 0x03, 0x33, 0x95, 0x14, 0xb8, 0x58, 0x02, 0x32, 0xf3,
-	0xd2, 0x85, 0x24, 0xb8, 0xd8, 0x73, 0x53, 0x8b, 0x8b, 0x13, 0xd3, 0x53, 0x25, 0x18, 0x15, 0x18,
-	0x35, 0x38, 0x83, 0x60, 0x5c, 0x23, 0x05, 0x2e, 0x66, 0xc7, 0x00, 0x4f, 0x21, 0x49, 0x2e, 0x76,
-	0xf7, 0xd4, 0x12, 0xb0, 0x5a, 0x56, 0x3d, 0x10, 0x25, 0x05, 0xa1, 0x94, 0x18, 0x92, 0xd8, 0xc0,
-	0x46, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x01, 0x25, 0x46, 0x5e, 0x00, 0x00, 0x00,
+	// 295 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x51, 0xc1, 0x4e, 0xc2, 0x40,
+	0x10, 0x65, 0x69, 0x4b, 0x65, 0xa8, 0x09, 0x19, 0x3d, 0xac, 0x9c, 0xea, 0x7a, 0x90, 0xd3, 0x9a,
+	0xa0, 0x89, 0x67, 0x2f, 0x12, 0x13, 0x62, 0x9a, 0x15, 0x0d, 0x1c, 0xd7, 0x38, 0x92, 0x1a, 0x96,
+	0x92, 0xee, 0x5e, 0xf4, 0xeb, 0x0d, 0x5b, 0x17, 0x4b, 0x38, 0xcd, 0xbc, 0x37, 0xcd, 0x7b, 0xaf,
+	0xfb, 0x60, 0xb8, 0xad, 0x2b, 0x57, 0xdd, 0x18, 0x32, 0x24, 0xfd, 0x2a, 0xce, 0x01, 0xa7, 0xe4,
+	0xe6, 0x64, 0xb6, 0x6b, 0xed, 0xc8, 0x16, 0xba, 0xd6, 0xc6, 0x8a, 0x2f, 0xe8, 0xcd, 0x75, 0xbd,
+	0x22, 0x87, 0x02, 0xb2, 0xc7, 0xba, 0xa4, 0xcd, 0xc7, 0xfa, 0xfb, 0x59, 0x1b, 0xe2, 0x2c, 0x67,
+	0xe3, 0xbe, 0x3a, 0xe0, 0x30, 0x87, 0x74, 0x5e, 0x6d, 0x67, 0xf4, 0xe9, 0x78, 0x37, 0x67, 0xe3,
+	0xc1, 0xa4, 0x27, 0x8b, 0xaa, 0xdc, 0x38, 0x15, 0x68, 0x1c, 0x41, 0xfc, 0x52, 0xfe, 0x10, 0x8f,
+	0x0e, 0xce, 0x9e, 0x13, 0x57, 0x90, 0x78, 0x88, 0x19, 0xb0, 0x85, 0xd7, 0x4f, 0x14, 0x5b, 0xec,
+	0xd0, 0xd2, 0xcb, 0x25, 0x8a, 0x2d, 0x45, 0x05, 0x27, 0x21, 0x23, 0x22, 0xc4, 0xad, 0x28, 0x7e,
+	0xdf, 0x1b, 0x74, 0x8f, 0x0d, 0xf0, 0x12, 0xd2, 0xe6, 0x67, 0xec, 0x9f, 0x7f, 0x2a, 0x1b, 0xac,
+	0x02, 0x8f, 0x43, 0x88, 0x5e, 0xd5, 0x8c, 0xc7, 0x5e, 0x71, 0xb7, 0x8a, 0x7b, 0xc8, 0x82, 0xe1,
+	0xac, 0xb4, 0x0e, 0xaf, 0xa1, 0xbf, 0x7f, 0x24, 0xce, 0xf2, 0x68, 0x3c, 0x98, 0xf4, 0x65, 0x60,
+	0xd4, 0xff, 0x4d, 0xe4, 0x10, 0x17, 0xe5, 0x66, 0x85, 0x1c, 0x52, 0x43, 0xd6, 0xea, 0x55, 0x08,
+	0x1a, 0xe0, 0xe4, 0x0d, 0xa2, 0x87, 0xe2, 0x09, 0x2f, 0x20, 0x9d, 0x92, 0xf3, 0xdf, 0x26, 0x72,
+	0x37, 0x46, 0xcd, 0x10, 0x1d, 0xbc, 0x83, 0xac, 0x5d, 0x0a, 0x9e, 0xc9, 0xe3, 0x8e, 0x46, 0xa7,
+	0xb2, 0x1d, 0x50, 0x74, 0xde, 0x7b, 0xbe, 0xd1, 0xdb, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x34,
+	0x7b, 0x4f, 0x09, 0xe5, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -92,6 +345,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type APIClient interface {
 	GetPing(ctx context.Context, in *Ping, opts ...grpc.CallOption) (*Ping, error)
+	GetTemplates(ctx context.Context, in *GetTemplatesParams, opts ...grpc.CallOption) (*TemplateList, error)
 }
 
 type aPIClient struct {
@@ -111,9 +365,19 @@ func (c *aPIClient) GetPing(ctx context.Context, in *Ping, opts ...grpc.CallOpti
 	return out, nil
 }
 
+func (c *aPIClient) GetTemplates(ctx context.Context, in *GetTemplatesParams, opts ...grpc.CallOption) (*TemplateList, error) {
+	out := new(TemplateList)
+	err := c.cc.Invoke(ctx, "/API/GetTemplates", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APIServer is the server API for API service.
 type APIServer interface {
 	GetPing(context.Context, *Ping) (*Ping, error)
+	GetTemplates(context.Context, *GetTemplatesParams) (*TemplateList, error)
 }
 
 // UnimplementedAPIServer can be embedded to have forward compatible implementations.
@@ -122,6 +386,9 @@ type UnimplementedAPIServer struct {
 
 func (*UnimplementedAPIServer) GetPing(ctx context.Context, req *Ping) (*Ping, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPing not implemented")
+}
+func (*UnimplementedAPIServer) GetTemplates(ctx context.Context, req *GetTemplatesParams) (*TemplateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTemplates not implemented")
 }
 
 func RegisterAPIServer(s *grpc.Server, srv APIServer) {
@@ -146,6 +413,24 @@ func _API_GetPing_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _API_GetTemplates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTemplatesParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).GetTemplates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/API/GetTemplates",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).GetTemplates(ctx, req.(*GetTemplatesParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _API_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "API",
 	HandlerType: (*APIServer)(nil),
@@ -153,6 +438,10 @@ var _API_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPing",
 			Handler:    _API_GetPing_Handler,
+		},
+		{
+			MethodName: "GetTemplates",
+			Handler:    _API_GetTemplates_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

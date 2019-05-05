@@ -2,6 +2,31 @@ syntax = "proto3";
 
 service API {
     rpc GetPing(Ping) returns (Ping) {}
+    rpc GetTemplates(GetTemplatesParams) returns (TemplateList) {}
+}
+
+message GetTemplatesParams {}
+
+message Target {
+    string FriendlyName = 1;
+    Point TopLeft = 2;
+    Point  Size = 3;
+}
+
+message Point {
+    int32 X = 1;
+    int32 Y = 2;
+}
+
+message Template {
+    string Name = 1;
+    Point Size = 2;
+    Target Targets = 3;
+    string URL = 4;
+}
+
+message TemplateList {
+    repeated Template Templates = 1;
 }
 
 message Ping {

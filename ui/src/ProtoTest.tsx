@@ -1,19 +1,41 @@
 import * as React from "react";
 
-import { APIClient } from "./proto/meme_pb_service";
-import { Ping } from "./proto/meme_pb";
-class ProtoTest extends React.Component {
-  componentWillMount = () => {
-    const client = new APIClient("http://localhost:3333");
-    const req = new Ping();
-    req.setMessage("hellooo");
-    client.getPing(req, (err, reply) => {
+import { GetTemplatesParams, Template } from "./proto/meme_pb";
+import { getAPIClient } from "./util";
+interface State {
+  templates: Template[];
+}
+interface Props {}
+class ProtoTest extends React.Component<Props, State> {
+  state: State = {
+    templates: []
+  };
+  componentDidMount = () => {
+    const req = new GetTemplatesParams();
+    getAPIClient().getTemplates(req, (err, reply) => {
       console.log({ err, reply });
       if (reply) {
-        console.log(reply.getMessage());
+        const list = reply.getTemplatesList();
+        this.setState({ templates: list });
+        // for (let x in list) {
+        // this.SetSt
+        // console.log(list[x].toObject());
+        // }
       }
     });
   };
-  render = () => <h1>hi</h1>;
+  render = () => {
+    const { templates } = this.state;
+    return (
+      <div>
+        {templates.map(t => (
+          <div>
+            <h1>{t.getName()}</h1>
+            <p>{t.getUrl()}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
 }
 export default ProtoTest;

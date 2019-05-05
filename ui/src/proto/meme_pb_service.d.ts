@@ -13,9 +13,19 @@ type APIGetPing = {
   readonly responseType: typeof proto_meme_pb.Ping;
 };
 
+type APIGetTemplates = {
+  readonly methodName: string;
+  readonly service: typeof API;
+  readonly requestStream: false;
+  readonly responseStream: false;
+  readonly requestType: typeof proto_meme_pb.GetTemplatesParams;
+  readonly responseType: typeof proto_meme_pb.TemplateList;
+};
+
 export class API {
   static readonly serviceName: string;
   static readonly GetPing: APIGetPing;
+  static readonly GetTemplates: APIGetTemplates;
 }
 
 export type ServiceError = { message: string, code: number; metadata: grpc.Metadata }
@@ -58,6 +68,15 @@ export class APIClient {
   getPing(
     requestMessage: proto_meme_pb.Ping,
     callback: (error: ServiceError|null, responseMessage: proto_meme_pb.Ping|null) => void
+  ): UnaryResponse;
+  getTemplates(
+    requestMessage: proto_meme_pb.GetTemplatesParams,
+    metadata: grpc.Metadata,
+    callback: (error: ServiceError|null, responseMessage: proto_meme_pb.TemplateList|null) => void
+  ): UnaryResponse;
+  getTemplates(
+    requestMessage: proto_meme_pb.GetTemplatesParams,
+    callback: (error: ServiceError|null, responseMessage: proto_meme_pb.TemplateList|null) => void
   ): UnaryResponse;
 }
 

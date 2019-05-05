@@ -19,6 +19,15 @@ API.GetPing = {
   responseType: proto_meme_pb.Ping
 };
 
+API.GetTemplates = {
+  methodName: "GetTemplates",
+  service: API,
+  requestStream: false,
+  responseStream: false,
+  requestType: proto_meme_pb.GetTemplatesParams,
+  responseType: proto_meme_pb.TemplateList
+};
+
 exports.API = API;
 
 function APIClient(serviceHost, options) {
@@ -31,6 +40,37 @@ APIClient.prototype.getPing = function getPing(requestMessage, metadata, callbac
     callback = arguments[1];
   }
   var client = grpc.unary(API.GetPing, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          var err = new Error(response.statusMessage);
+          err.code = response.status;
+          err.metadata = response.trailers;
+          callback(err, null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+  return {
+    cancel: function () {
+      callback = null;
+      client.close();
+    }
+  };
+};
+
+APIClient.prototype.getTemplates = function getTemplates(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  var client = grpc.unary(API.GetTemplates, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,

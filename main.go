@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/nickysemenza/gomeme/api"
+	"github.com/nickysemenza/gomeme/generator"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
@@ -18,7 +19,7 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 )
 
-var gg *Generator
+var gg *generator.Generator
 
 //Server is a HTTP server
 type Server struct {
@@ -28,19 +29,19 @@ type Server struct {
 func main() {
 
 	ctx := context.Background()
-	config, err := LoadConfig()
+	config, err := generator.LoadConfig()
 	spew.Dump(err)
 	spew.Dump(config, err)
 
 	wg := sync.WaitGroup{}
 
-	go api.ServegRPC(ctx, &wg)
-
-	g := Generator{config}
+	g := generator.Generator{config}
 	gg = &g
 
-	grpcServer := api.NewServer()
+	grpcServer := api.NewServer(&g)
 	wrappedGrpc := grpcweb.WrapServer(grpcServer)
+
+	go api.ServegRPC(ctx, &wg, grpcServer)
 
 	s := Server{wrappedGrpc}
 	r := s.buildRouter()
@@ -74,7 +75,7 @@ func newMeme(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	decoder := json.NewDecoder(r.Body)
 
-	var input1 Input
+	var input1 generator.Input
 	err := decoder.Decode(&input1)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
