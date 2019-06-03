@@ -2,7 +2,8 @@ import * as React from "react";
 
 import { GetTemplatesParams, Template } from "./proto/meme_pb";
 import { getAPIClient, buildURL } from "./util";
-import { Button, Image, Table } from "react-bootstrap";
+import { Image, Table } from "react-bootstrap";
+import CreateMeme from "./components/CreateMeme";
 interface State {
   templates: Template[];
 }
@@ -18,29 +19,29 @@ class ProtoTest extends React.Component<Props, State> {
       if (reply) {
         const list = reply.getTemplatesList();
         this.setState({ templates: list });
-        // for (let x in list) {
-        // this.SetSt
-        // console.log(list[x].toObject());
-        // }
       }
     });
   };
+
   render = () => {
     const { templates } = this.state;
     return (
       <div>
         <Table>
-          {templates.map(t => (
-            <tr>
-              <td>
-                <Button>hi</Button>
-              </td>
-              <td>{t.getName()}</td>
-              <td>
-                <Image width="200px" src={buildURL(t.getUrl())} />
-              </td>
-            </tr>
-          ))}
+          <tbody>
+            {templates.map(t => (
+              <tr key={t.getName()}>
+                <td />
+                <td>{t.getName()}</td>
+                <td>
+                  <Image width="200px" src={buildURL(t.getUrl())} />
+                </td>
+                <td>
+                  <CreateMeme template={t} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       </div>
     );

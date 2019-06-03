@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
@@ -63,22 +64,27 @@ func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 		}
 		shrunkFile, err := m.shrinkToSize(ctx, fileName, target.Size)
 		if err != nil {
-			return &m, err
+			return &m, errors.Wrap(err, "failed to shrink")
 		}
 
 		dist := target.Size.BuildBase()
 		// spew.Dump(dist.ToIMString())
 		err = dist.applyDelta(target.Deltas)
 		if err != nil {
-			return &m, err
+			return &m, errors.Wrap(err, "failed to apply delta")
 		}
 		distortedFile, err := m.distort(ctx, shrunkFile, dist)
 		if err != nil {
-			return &m, err
+			return &m, errors.Wrap(err, "failed to distort")
 		}
-		m.ResultFile, err = m.composite(ctx, distortedFile, m.ResultFile, target.TopLeft)
+		compositedFile, err := m.composite(ctx, distortedFile, m.ResultFile, target.TopLeft)
 		if err != nil {
-			return &m, err
+			return &m, errors.Wrap(err, "failed to composite")
+		}
+		m.ResultFile = fmt.Sprintf("tmp/%s.png", m.UUID)
+		fmt.Println(compositedFile)
+		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
+			return &m, errors.Wrap(err, "failed to copy")
 		}
 		// spew.Dump(dist.ToIMString())
 
@@ -143,6 +149,14 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 	return dest, err
 }
 
+func (m *Meme) cpFile(ctx context.Context, fileNameA, fileNameB string) error {
+	spew.Dump("aaa", fileNameA, fileNameB)
+	args := []string{fileNameA, fileNameB}
+	cmd := runCommand(ctx, "cp", args...)
+	_, err := cmd.CombinedOutput()
+	return err
+}
+
 //ControlPointDelta represents the delta between 2 control points
 type ControlPointDelta struct {
 	P1 Point
@@ -193,6 +207,6 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	log.WithFields(log.Fields{
 		"command": name,
 		"args":    arg,
-	}).Info("Running IM command")
+	}).Info("Running command")
 	return exec.CommandContext(ctx, name, arg...)
 }

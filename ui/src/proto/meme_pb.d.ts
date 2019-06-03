@@ -3,6 +3,76 @@
 
 import * as jspb from "google-protobuf";
 
+export class Meme extends jspb.Message {
+  getUuid(): string;
+  setUuid(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Meme.AsObject;
+  static toObject(includeInstance: boolean, msg: Meme): Meme.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: Meme, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Meme;
+  static deserializeBinaryFromReader(message: Meme, reader: jspb.BinaryReader): Meme;
+}
+
+export namespace Meme {
+  export type AsObject = {
+    uuid: string,
+  }
+}
+
+export class CreateMemeParams extends jspb.Message {
+  getTemplatename(): string;
+  setTemplatename(value: string): void;
+
+  clearTargetinputsList(): void;
+  getTargetinputsList(): Array<TargetInput>;
+  setTargetinputsList(value: Array<TargetInput>): void;
+  addTargetinputs(value?: TargetInput, index?: number): TargetInput;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateMemeParams.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateMemeParams): CreateMemeParams.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: CreateMemeParams, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateMemeParams;
+  static deserializeBinaryFromReader(message: CreateMemeParams, reader: jspb.BinaryReader): CreateMemeParams;
+}
+
+export namespace CreateMemeParams {
+  export type AsObject = {
+    templatename: string,
+    targetinputsList: Array<TargetInput.AsObject>,
+  }
+}
+
+export class TargetInput extends jspb.Message {
+  getFilename(): string;
+  setFilename(value: string): void;
+
+  getUrl(): string;
+  setUrl(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TargetInput.AsObject;
+  static toObject(includeInstance: boolean, msg: TargetInput): TargetInput.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: TargetInput, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TargetInput;
+  static deserializeBinaryFromReader(message: TargetInput, reader: jspb.BinaryReader): TargetInput;
+}
+
+export namespace TargetInput {
+  export type AsObject = {
+    filename: string,
+    url: string,
+  }
+}
+
 export class GetTemplatesParams extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetTemplatesParams.AsObject;
@@ -84,10 +154,10 @@ export class Template extends jspb.Message {
   getSize(): Point | undefined;
   setSize(value?: Point): void;
 
-  hasTargets(): boolean;
-  clearTargets(): void;
-  getTargets(): Target | undefined;
-  setTargets(value?: Target): void;
+  clearTargetsList(): void;
+  getTargetsList(): Array<Target>;
+  setTargetsList(value: Array<Target>): void;
+  addTargets(value?: Target, index?: number): Target;
 
   getUrl(): string;
   setUrl(value: string): void;
@@ -106,7 +176,7 @@ export namespace Template {
   export type AsObject = {
     name: string,
     size?: Point.AsObject,
-    targets?: Target.AsObject,
+    targetsList: Array<Target.AsObject>,
     url: string,
   }
 }

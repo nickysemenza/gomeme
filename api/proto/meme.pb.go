@@ -24,6 +24,139 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type Meme struct {
+	UUID                 string   `protobuf:"bytes,1,opt,name=UUID,proto3" json:"UUID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Meme) Reset()         { *m = Meme{} }
+func (m *Meme) String() string { return proto.CompactTextString(m) }
+func (*Meme) ProtoMessage()    {}
+func (*Meme) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{0}
+}
+
+func (m *Meme) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Meme.Unmarshal(m, b)
+}
+func (m *Meme) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Meme.Marshal(b, m, deterministic)
+}
+func (m *Meme) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Meme.Merge(m, src)
+}
+func (m *Meme) XXX_Size() int {
+	return xxx_messageInfo_Meme.Size(m)
+}
+func (m *Meme) XXX_DiscardUnknown() {
+	xxx_messageInfo_Meme.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Meme proto.InternalMessageInfo
+
+func (m *Meme) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
+type CreateMemeParams struct {
+	TemplateName         string         `protobuf:"bytes,1,opt,name=TemplateName,proto3" json:"TemplateName,omitempty"`
+	TargetInputs         []*TargetInput `protobuf:"bytes,2,rep,name=TargetInputs,proto3" json:"TargetInputs,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *CreateMemeParams) Reset()         { *m = CreateMemeParams{} }
+func (m *CreateMemeParams) String() string { return proto.CompactTextString(m) }
+func (*CreateMemeParams) ProtoMessage()    {}
+func (*CreateMemeParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{1}
+}
+
+func (m *CreateMemeParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateMemeParams.Unmarshal(m, b)
+}
+func (m *CreateMemeParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateMemeParams.Marshal(b, m, deterministic)
+}
+func (m *CreateMemeParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateMemeParams.Merge(m, src)
+}
+func (m *CreateMemeParams) XXX_Size() int {
+	return xxx_messageInfo_CreateMemeParams.Size(m)
+}
+func (m *CreateMemeParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateMemeParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateMemeParams proto.InternalMessageInfo
+
+func (m *CreateMemeParams) GetTemplateName() string {
+	if m != nil {
+		return m.TemplateName
+	}
+	return ""
+}
+
+func (m *CreateMemeParams) GetTargetInputs() []*TargetInput {
+	if m != nil {
+		return m.TargetInputs
+	}
+	return nil
+}
+
+type TargetInput struct {
+	FileName             string   `protobuf:"bytes,1,opt,name=FileName,proto3" json:"FileName,omitempty"`
+	URL                  string   `protobuf:"bytes,2,opt,name=URL,proto3" json:"URL,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *TargetInput) Reset()         { *m = TargetInput{} }
+func (m *TargetInput) String() string { return proto.CompactTextString(m) }
+func (*TargetInput) ProtoMessage()    {}
+func (*TargetInput) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3f8205b5f9f06099, []int{2}
+}
+
+func (m *TargetInput) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TargetInput.Unmarshal(m, b)
+}
+func (m *TargetInput) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TargetInput.Marshal(b, m, deterministic)
+}
+func (m *TargetInput) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TargetInput.Merge(m, src)
+}
+func (m *TargetInput) XXX_Size() int {
+	return xxx_messageInfo_TargetInput.Size(m)
+}
+func (m *TargetInput) XXX_DiscardUnknown() {
+	xxx_messageInfo_TargetInput.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TargetInput proto.InternalMessageInfo
+
+func (m *TargetInput) GetFileName() string {
+	if m != nil {
+		return m.FileName
+	}
+	return ""
+}
+
+func (m *TargetInput) GetURL() string {
+	if m != nil {
+		return m.URL
+	}
+	return ""
+}
+
 type GetTemplatesParams struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -34,7 +167,7 @@ func (m *GetTemplatesParams) Reset()         { *m = GetTemplatesParams{} }
 func (m *GetTemplatesParams) String() string { return proto.CompactTextString(m) }
 func (*GetTemplatesParams) ProtoMessage()    {}
 func (*GetTemplatesParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{0}
+	return fileDescriptor_3f8205b5f9f06099, []int{3}
 }
 
 func (m *GetTemplatesParams) XXX_Unmarshal(b []byte) error {
@@ -68,7 +201,7 @@ func (m *Target) Reset()         { *m = Target{} }
 func (m *Target) String() string { return proto.CompactTextString(m) }
 func (*Target) ProtoMessage()    {}
 func (*Target) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{1}
+	return fileDescriptor_3f8205b5f9f06099, []int{4}
 }
 
 func (m *Target) XXX_Unmarshal(b []byte) error {
@@ -122,7 +255,7 @@ func (m *Point) Reset()         { *m = Point{} }
 func (m *Point) String() string { return proto.CompactTextString(m) }
 func (*Point) ProtoMessage()    {}
 func (*Point) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{2}
+	return fileDescriptor_3f8205b5f9f06099, []int{5}
 }
 
 func (m *Point) XXX_Unmarshal(b []byte) error {
@@ -158,20 +291,20 @@ func (m *Point) GetY() int32 {
 }
 
 type Template struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
-	Size                 *Point   `protobuf:"bytes,2,opt,name=Size,proto3" json:"Size,omitempty"`
-	Targets              *Target  `protobuf:"bytes,3,opt,name=Targets,proto3" json:"Targets,omitempty"`
-	URL                  string   `protobuf:"bytes,4,opt,name=URL,proto3" json:"URL,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Name                 string    `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	Size                 *Point    `protobuf:"bytes,2,opt,name=Size,proto3" json:"Size,omitempty"`
+	Targets              []*Target `protobuf:"bytes,3,rep,name=Targets,proto3" json:"Targets,omitempty"`
+	URL                  string    `protobuf:"bytes,4,opt,name=URL,proto3" json:"URL,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *Template) Reset()         { *m = Template{} }
 func (m *Template) String() string { return proto.CompactTextString(m) }
 func (*Template) ProtoMessage()    {}
 func (*Template) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{3}
+	return fileDescriptor_3f8205b5f9f06099, []int{6}
 }
 
 func (m *Template) XXX_Unmarshal(b []byte) error {
@@ -206,7 +339,7 @@ func (m *Template) GetSize() *Point {
 	return nil
 }
 
-func (m *Template) GetTargets() *Target {
+func (m *Template) GetTargets() []*Target {
 	if m != nil {
 		return m.Targets
 	}
@@ -231,7 +364,7 @@ func (m *TemplateList) Reset()         { *m = TemplateList{} }
 func (m *TemplateList) String() string { return proto.CompactTextString(m) }
 func (*TemplateList) ProtoMessage()    {}
 func (*TemplateList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{4}
+	return fileDescriptor_3f8205b5f9f06099, []int{7}
 }
 
 func (m *TemplateList) XXX_Unmarshal(b []byte) error {
@@ -270,7 +403,7 @@ func (m *Ping) Reset()         { *m = Ping{} }
 func (m *Ping) String() string { return proto.CompactTextString(m) }
 func (*Ping) ProtoMessage()    {}
 func (*Ping) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3f8205b5f9f06099, []int{5}
+	return fileDescriptor_3f8205b5f9f06099, []int{8}
 }
 
 func (m *Ping) XXX_Unmarshal(b []byte) error {
@@ -299,6 +432,9 @@ func (m *Ping) GetMessage() string {
 }
 
 func init() {
+	proto.RegisterType((*Meme)(nil), "Meme")
+	proto.RegisterType((*CreateMemeParams)(nil), "CreateMemeParams")
+	proto.RegisterType((*TargetInput)(nil), "TargetInput")
 	proto.RegisterType((*GetTemplatesParams)(nil), "GetTemplatesParams")
 	proto.RegisterType((*Target)(nil), "Target")
 	proto.RegisterType((*Point)(nil), "Point")
@@ -310,26 +446,32 @@ func init() {
 func init() { proto.RegisterFile("proto/meme.proto", fileDescriptor_3f8205b5f9f06099) }
 
 var fileDescriptor_3f8205b5f9f06099 = []byte{
-	// 295 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x51, 0xc1, 0x4e, 0xc2, 0x40,
-	0x10, 0x65, 0x69, 0x4b, 0x65, 0xa8, 0x09, 0x19, 0x3d, 0xac, 0x9c, 0xea, 0x7a, 0x90, 0xd3, 0x9a,
-	0xa0, 0x89, 0x67, 0x2f, 0x12, 0x13, 0x62, 0x9a, 0x15, 0x0d, 0x1c, 0xd7, 0x38, 0x92, 0x1a, 0x96,
-	0x92, 0xee, 0x5e, 0xf4, 0xeb, 0x0d, 0x5b, 0x17, 0x4b, 0x38, 0xcd, 0xbc, 0x37, 0xcd, 0x7b, 0xaf,
-	0xfb, 0x60, 0xb8, 0xad, 0x2b, 0x57, 0xdd, 0x18, 0x32, 0x24, 0xfd, 0x2a, 0xce, 0x01, 0xa7, 0xe4,
-	0xe6, 0x64, 0xb6, 0x6b, 0xed, 0xc8, 0x16, 0xba, 0xd6, 0xc6, 0x8a, 0x2f, 0xe8, 0xcd, 0x75, 0xbd,
-	0x22, 0x87, 0x02, 0xb2, 0xc7, 0xba, 0xa4, 0xcd, 0xc7, 0xfa, 0xfb, 0x59, 0x1b, 0xe2, 0x2c, 0x67,
-	0xe3, 0xbe, 0x3a, 0xe0, 0x30, 0x87, 0x74, 0x5e, 0x6d, 0x67, 0xf4, 0xe9, 0x78, 0x37, 0x67, 0xe3,
-	0xc1, 0xa4, 0x27, 0x8b, 0xaa, 0xdc, 0x38, 0x15, 0x68, 0x1c, 0x41, 0xfc, 0x52, 0xfe, 0x10, 0x8f,
-	0x0e, 0xce, 0x9e, 0x13, 0x57, 0x90, 0x78, 0x88, 0x19, 0xb0, 0x85, 0xd7, 0x4f, 0x14, 0x5b, 0xec,
-	0xd0, 0xd2, 0xcb, 0x25, 0x8a, 0x2d, 0x45, 0x05, 0x27, 0x21, 0x23, 0x22, 0xc4, 0xad, 0x28, 0x7e,
-	0xdf, 0x1b, 0x74, 0x8f, 0x0d, 0xf0, 0x12, 0xd2, 0xe6, 0x67, 0xec, 0x9f, 0x7f, 0x2a, 0x1b, 0xac,
-	0x02, 0x8f, 0x43, 0x88, 0x5e, 0xd5, 0x8c, 0xc7, 0x5e, 0x71, 0xb7, 0x8a, 0x7b, 0xc8, 0x82, 0xe1,
-	0xac, 0xb4, 0x0e, 0xaf, 0xa1, 0xbf, 0x7f, 0x24, 0xce, 0xf2, 0x68, 0x3c, 0x98, 0xf4, 0x65, 0x60,
-	0xd4, 0xff, 0x4d, 0xe4, 0x10, 0x17, 0xe5, 0x66, 0x85, 0x1c, 0x52, 0x43, 0xd6, 0xea, 0x55, 0x08,
-	0x1a, 0xe0, 0xe4, 0x0d, 0xa2, 0x87, 0xe2, 0x09, 0x2f, 0x20, 0x9d, 0x92, 0xf3, 0xdf, 0x26, 0x72,
-	0x37, 0x46, 0xcd, 0x10, 0x1d, 0xbc, 0x83, 0xac, 0x5d, 0x0a, 0x9e, 0xc9, 0xe3, 0x8e, 0x46, 0xa7,
-	0xb2, 0x1d, 0x50, 0x74, 0xde, 0x7b, 0xbe, 0xd1, 0xdb, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x34,
-	0x7b, 0x4f, 0x09, 0xe5, 0x01, 0x00, 0x00,
+	// 386 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x52, 0x4d, 0x6f, 0xda, 0x40,
+	0x10, 0xc5, 0xd8, 0xc6, 0x30, 0xb8, 0x12, 0x9d, 0xf6, 0xe0, 0xfa, 0xe4, 0x6e, 0x0f, 0xe5, 0xb4,
+	0xad, 0x68, 0xa5, 0x1e, 0x7a, 0xaa, 0x5a, 0x81, 0x90, 0x68, 0x64, 0x6d, 0x40, 0x82, 0xa3, 0xa3,
+	0x4c, 0x88, 0x23, 0xfc, 0x21, 0x7b, 0x73, 0x48, 0x4e, 0xf9, 0xe9, 0x91, 0xd7, 0x2c, 0x5e, 0xc2,
+	0xc9, 0xf3, 0xde, 0x8e, 0xde, 0x3c, 0xbf, 0x19, 0x98, 0x94, 0x55, 0x21, 0x8b, 0x6f, 0x19, 0x65,
+	0xc4, 0x55, 0xc9, 0x42, 0x70, 0xfe, 0x53, 0x46, 0x88, 0xe0, 0x6c, 0x36, 0xcb, 0x7f, 0x81, 0x15,
+	0x59, 0xd3, 0x91, 0x50, 0x35, 0xbb, 0x87, 0xc9, 0xdf, 0x8a, 0x12, 0x49, 0x4d, 0x47, 0x9c, 0x54,
+	0x49, 0x56, 0x23, 0x03, 0x7f, 0x4d, 0x59, 0x79, 0x48, 0x24, 0x5d, 0x25, 0x19, 0x1d, 0xfb, 0xcf,
+	0x38, 0xfc, 0x0e, 0xfe, 0x3a, 0xa9, 0xf6, 0x24, 0x97, 0x79, 0xf9, 0x28, 0xeb, 0xa0, 0x1f, 0xd9,
+	0xd3, 0xf1, 0xcc, 0xe7, 0x06, 0x29, 0xce, 0x3a, 0xd8, 0x6f, 0x18, 0x1b, 0x18, 0x43, 0x18, 0xce,
+	0xd3, 0x83, 0x39, 0xe0, 0x84, 0x71, 0x02, 0xf6, 0x46, 0xac, 0x82, 0xbe, 0xa2, 0x9b, 0x92, 0x7d,
+	0x04, 0x5c, 0x90, 0xd4, 0x0e, 0xea, 0xd6, 0x28, 0x7b, 0x80, 0x41, 0x2b, 0xd9, 0x58, 0x9e, 0x57,
+	0x29, 0xe5, 0xb7, 0x87, 0x27, 0xd3, 0xb2, 0xc9, 0x61, 0x04, 0xde, 0xba, 0x28, 0x57, 0x74, 0x27,
+	0x95, 0xf2, 0x78, 0x36, 0xe0, 0x71, 0x91, 0xe6, 0x52, 0x68, 0x1a, 0x43, 0x70, 0xae, 0xd3, 0x67,
+	0x0a, 0xec, 0xb3, 0x67, 0xc5, 0xb1, 0x2f, 0xe0, 0x2a, 0x88, 0x3e, 0x58, 0x5b, 0xa5, 0xef, 0x0a,
+	0x6b, 0xdb, 0xa0, 0x9d, 0x92, 0x73, 0x85, 0xb5, 0x63, 0x05, 0x0c, 0xb5, 0xc7, 0x26, 0x6d, 0xc3,
+	0x8a, 0xaa, 0x4f, 0x03, 0xfa, 0x97, 0x03, 0xf0, 0x33, 0x78, 0xed, 0xcf, 0xd4, 0x81, 0xad, 0xc2,
+	0xf4, 0x8e, 0x61, 0x0a, 0xcd, 0xeb, 0x5c, 0x9c, 0x2e, 0x97, 0x5f, 0xdd, 0xaa, 0x56, 0x69, 0x2d,
+	0xf1, 0x2b, 0x8c, 0x4e, 0x21, 0x05, 0x96, 0x92, 0x19, 0x71, 0xcd, 0x88, 0xee, 0x8d, 0x45, 0xe0,
+	0xc4, 0x69, 0xbe, 0xc7, 0x00, 0xbc, 0x8c, 0xea, 0x3a, 0xd9, 0x6b, 0xa3, 0x1a, 0xce, 0x5e, 0x2c,
+	0xb0, 0xff, 0xc4, 0x4b, 0xfc, 0x04, 0xde, 0x82, 0xa4, 0x6a, 0x76, 0x79, 0xf3, 0x09, 0xdb, 0x0f,
+	0xeb, 0xe1, 0x4f, 0xf0, 0xcd, 0xad, 0xe0, 0x07, 0x7e, 0xb9, 0xa4, 0xf0, 0x1d, 0x37, 0x1d, 0xb2,
+	0x1e, 0x4e, 0x01, 0xba, 0x93, 0xc3, 0xf7, 0xfc, 0xed, 0xfd, 0x85, 0x2e, 0x6f, 0x00, 0xeb, 0xdd,
+	0x0c, 0xd4, 0xfd, 0xfe, 0x78, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x71, 0x6b, 0xd4, 0xbd, 0xd3, 0x02,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -346,6 +488,7 @@ const _ = grpc.SupportPackageIsVersion4
 type APIClient interface {
 	GetPing(ctx context.Context, in *Ping, opts ...grpc.CallOption) (*Ping, error)
 	GetTemplates(ctx context.Context, in *GetTemplatesParams, opts ...grpc.CallOption) (*TemplateList, error)
+	CreateMeme(ctx context.Context, in *CreateMemeParams, opts ...grpc.CallOption) (*Meme, error)
 }
 
 type aPIClient struct {
@@ -374,10 +517,20 @@ func (c *aPIClient) GetTemplates(ctx context.Context, in *GetTemplatesParams, op
 	return out, nil
 }
 
+func (c *aPIClient) CreateMeme(ctx context.Context, in *CreateMemeParams, opts ...grpc.CallOption) (*Meme, error) {
+	out := new(Meme)
+	err := c.cc.Invoke(ctx, "/API/CreateMeme", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APIServer is the server API for API service.
 type APIServer interface {
 	GetPing(context.Context, *Ping) (*Ping, error)
 	GetTemplates(context.Context, *GetTemplatesParams) (*TemplateList, error)
+	CreateMeme(context.Context, *CreateMemeParams) (*Meme, error)
 }
 
 // UnimplementedAPIServer can be embedded to have forward compatible implementations.
@@ -389,6 +542,9 @@ func (*UnimplementedAPIServer) GetPing(ctx context.Context, req *Ping) (*Ping, e
 }
 func (*UnimplementedAPIServer) GetTemplates(ctx context.Context, req *GetTemplatesParams) (*TemplateList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTemplates not implemented")
+}
+func (*UnimplementedAPIServer) CreateMeme(ctx context.Context, req *CreateMemeParams) (*Meme, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMeme not implemented")
 }
 
 func RegisterAPIServer(s *grpc.Server, srv APIServer) {
@@ -431,6 +587,24 @@ func _API_GetTemplates_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _API_CreateMeme_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMemeParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).CreateMeme(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/API/CreateMeme",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).CreateMeme(ctx, req.(*CreateMemeParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _API_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "API",
 	HandlerType: (*APIServer)(nil),
@@ -442,6 +616,10 @@ var _API_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTemplates",
 			Handler:    _API_GetTemplates_Handler,
+		},
+		{
+			MethodName: "CreateMeme",
+			Handler:    _API_CreateMeme_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

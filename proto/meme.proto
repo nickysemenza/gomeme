@@ -3,8 +3,20 @@ syntax = "proto3";
 service API {
     rpc GetPing(Ping) returns (Ping) {}
     rpc GetTemplates(GetTemplatesParams) returns (TemplateList) {}
+    rpc CreateMeme(CreateMemeParams) returns (Meme) {}
+}
+message Meme {
+    string UUID = 1;
+}
+message CreateMemeParams {
+    string TemplateName = 1;
+    repeated TargetInput TargetInputs = 2; 
 }
 
+message TargetInput {
+    string FileName = 1;
+    string URL = 2;
+}
 message GetTemplatesParams {}
 
 message Target {
@@ -21,7 +33,7 @@ message Point {
 message Template {
     string Name = 1;
     Point Size = 2;
-    Target Targets = 3;
+    repeated Target Targets = 3;
     string URL = 4;
 }
 

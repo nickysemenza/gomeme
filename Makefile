@@ -1,8 +1,7 @@
 OUT_DIR = "./ui/src/"
 PROTOC_GEN_TS_PATH ="./ui/node_modules/.bin/protoc-gen-ts"
 SED = "gsed" # GNU sed on macOS
-run: 
-	go run .
+
 protogen:
 	protoc \
 		--plugin="protoc-gen-ts=$(PROTOC_GEN_TS_PATH)" \
@@ -13,3 +12,12 @@ protogen:
 	
 	$(SED) -i '10i //@ts-ignore' ui/src/proto/meme_pb.js
 	$(SED) -i '1i /* eslint-disable */' ui/src/proto/meme_pb.js
+
+GOBUILD= CGO_ENABLED=0 go build -o gomeme
+
+build:
+	$(GOBUILD)
+dev: build
+	./gomeme
+dev-ui:
+	cd ui && yarn run start

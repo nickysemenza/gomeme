@@ -28,6 +28,15 @@ API.GetTemplates = {
   responseType: proto_meme_pb.TemplateList
 };
 
+API.CreateMeme = {
+  methodName: "CreateMeme",
+  service: API,
+  requestStream: false,
+  responseStream: false,
+  requestType: proto_meme_pb.CreateMemeParams,
+  responseType: proto_meme_pb.Meme
+};
+
 exports.API = API;
 
 function APIClient(serviceHost, options) {
@@ -71,6 +80,37 @@ APIClient.prototype.getTemplates = function getTemplates(requestMessage, metadat
     callback = arguments[1];
   }
   var client = grpc.unary(API.GetTemplates, {
+    request: requestMessage,
+    host: this.serviceHost,
+    metadata: metadata,
+    transport: this.options.transport,
+    debug: this.options.debug,
+    onEnd: function (response) {
+      if (callback) {
+        if (response.status !== grpc.Code.OK) {
+          var err = new Error(response.statusMessage);
+          err.code = response.status;
+          err.metadata = response.trailers;
+          callback(err, null);
+        } else {
+          callback(null, response.message);
+        }
+      }
+    }
+  });
+  return {
+    cancel: function () {
+      callback = null;
+      client.close();
+    }
+  };
+};
+
+APIClient.prototype.createMeme = function createMeme(requestMessage, metadata, callback) {
+  if (arguments.length === 2) {
+    callback = arguments[1];
+  }
+  var client = grpc.unary(API.CreateMeme, {
     request: requestMessage,
     host: this.serviceHost,
     metadata: metadata,
