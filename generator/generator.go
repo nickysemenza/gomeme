@@ -165,17 +165,10 @@ type ControlPointDelta struct {
 
 //DistortPayload is the payload to the distort function
 type DistortPayload struct {
-	ControlPoints []ControlPointDelta //size 4
+	ControlPoints [4]ControlPointDelta
 }
 
-func (d *DistortPayload) applyDelta(delta []Point) error {
-	switch {
-	case len(delta) == 0:
-		return nil // nopp
-	case len(delta) != 4:
-		return errors.New("must specify 0 or 4 deltas")
-	}
-
+func (d *DistortPayload) applyDelta(delta [4]Point) error {
 	for x := range d.ControlPoints {
 		d.ControlPoints[x].P2 = d.ControlPoints[x].P2.Add(delta[x])
 	}
@@ -194,7 +187,7 @@ func (d *DistortPayload) ToIMString() string {
 //BuildBase creates a base distortion payload that's effectively a noop
 func (p *Point) BuildBase() DistortPayload {
 	return DistortPayload{
-		ControlPoints: []ControlPointDelta{
+		ControlPoints: [4]ControlPointDelta{
 			{P1: Point{}, P2: Point{}},
 			{P1: Point{X: 0, Y: p.Y}, P2: Point{X: 0, Y: p.Y}},
 			{P1: Point{X: p.X, Y: 0}, P2: Point{X: p.X, Y: 0}},

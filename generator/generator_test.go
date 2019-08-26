@@ -7,18 +7,15 @@ import (
 )
 
 func TestApplyDelta(t *testing.T) {
-	original := DistortPayload{ControlPoints: []ControlPointDelta{
+	original := DistortPayload{ControlPoints: [4]ControlPointDelta{
 		{P1: Point{}, P2: Point{}},
 		{P1: Point{}, P2: Point{}},
 		{P1: Point{}, P2: Point{}},
 		{P1: Point{}, P2: Point{}},
 	}}
-	d1 := []Point{Point{2, 4}, Point{}, Point{3, 0}, Point{}}
-	d2 := []Point{Point{}, Point{}, Point{}}
+	d1 := [4]Point{Point{2, 4}, Point{}, Point{3, 0}, Point{}}
 
-	require.Nil(t, original.applyDelta([]Point{}))
-	require.Error(t, original.applyDelta(d2))
-	require.Nil(t, original.applyDelta(d1))
+	original.applyDelta(d1)
 
 	require.EqualValues(t, d1[0], original.ControlPoints[0].P2)
 }

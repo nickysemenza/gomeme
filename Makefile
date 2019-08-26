@@ -21,3 +21,5 @@ dev: build
 	./gomeme
 dev-ui:
 	cd ui && yarn run start
+test:
+	go test -race -cover ./...
