@@ -9,7 +9,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-chi/cors v1.0.0
-	github.com/go-chi/render v1.0.1
+	github.com/go-chi/render v1.0.1 // indirect
 	github.com/golang/mock v1.3.0 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/google/btree v1.0.0 // indirect
@@ -20,7 +20,7 @@ require (
 	github.com/improbable-eng/grpc-web v0.9.5
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
-	github.com/opentracing/opentracing-go v1.1.0
+	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/rs/cors v1.6.0 // indirect
