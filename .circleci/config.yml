@@ -37,7 +37,7 @@ jobs:
             docker run --entrypoint="./gomeme" nicky/gomeme
   test-server:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.16
     steps:
       - checkout
       - run: go build ./...

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import { Template, CreateMemeParams, TargetInput } from "../proto/meme_pb";
 import { getAPIClient } from "../util";
-import { Button } from "react-bootstrap";
 
 interface TemplateTargeForm {
   url: string;
@@ -18,8 +17,7 @@ const CreateMeme: React.SFC<Props> = ({ template }) => {
     const fetchDetails = () => {
       let t = template.getTargetsList();
       let targets: TemplateTargeForm[] = new Array(t.length).fill({
-        url:
-          "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
+        url: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
       });
       console.log({ targets });
       setTargets(targets);
@@ -31,7 +29,7 @@ const CreateMeme: React.SFC<Props> = ({ template }) => {
     const req = new CreateMemeParams();
     req.setTemplatename(template.getName());
     req.setTargetinputsList(
-      targets.map(t => {
+      targets.map((t) => {
         let input = new TargetInput();
         input.setUrl(t.url);
         return input;
@@ -48,11 +46,11 @@ const CreateMeme: React.SFC<Props> = ({ template }) => {
   return (
     <div>
       <pre>{JSON.stringify(targets, null, 2)}</pre>
-      <Button onClick={makeMeme}>
+      <button onClick={makeMeme}>
         <span role="img" aria-label="ok">
           👌
         </span>
-      </Button>
+      </button>
     </div>
   );
 };

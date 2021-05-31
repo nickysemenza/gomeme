@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import { GetTemplatesParams, Template } from "./proto/meme_pb";
 import { getAPIClient, buildURL } from "./util";
-import { Image, Table } from "react-bootstrap";
 import CreateMeme from "./components/CreateMeme";
 
 interface Props {}
@@ -25,14 +24,14 @@ const ProtoTest: React.SFC<Props> = () => {
 
   return (
     <div>
-      <Table>
+      <table className="table-auto">
         <tbody>
-          {templates.map(t => (
+          {templates.map((t) => (
             <tr key={t.getName()}>
               <td />
               <td>{t.getName()}</td>
               <td>
-                <Image width="200px" src={buildURL(t.getUrl())} />
+                <img style={{ width: "200px" }} src={buildURL(t.getUrl())} />
               </td>
               <td>
                 <CreateMeme template={t} />
@@ -40,7 +39,7 @@ const ProtoTest: React.SFC<Props> = () => {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
     </div>
   );
 };
