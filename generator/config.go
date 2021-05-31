@@ -1,12 +1,9 @@
 package generator
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/viper"
-
-	"github.com/nickysemenza/gomeme/util"
 )
 
 //Config contains all templates, as well as config data
@@ -43,30 +40,30 @@ type Template struct {
 	File    string   `json:"file"`
 }
 
-//TargetInput represents the input for a specific target
-type TargetInput struct {
-	FileName string `json:"file_name,omitempty"`
-	URL      string
-	//TODO: add base64 image, url
-	//TODO: add modifiers
-}
+// //TargetInput represents the input for a specific target
+// type TargetInput struct {
+// 	FileName string `json:"file_name,omitempty"`
+// 	URL      string
+// 	//TODO: add base64 image, url
+// 	//TODO: add modifiers
+// }
 
-//GetFile returns a filename representing the contents of the input
-func (t *TargetInput) GetFile(ctx context.Context) (string, error) {
-	switch {
-	case t.FileName != "":
-		return t.FileName, nil
-	case t.URL != "":
-		return util.DownloadImage(ctx, t.URL)
-	}
-	return "", fmt.Errorf("could not get file from input: %v", t)
-}
+// //GetFile returns a filename representing the contents of the input
+// func (t *TargetInput) GetFile(ctx context.Context) (string, error) {
+// 	switch {
+// 	case t.FileName != "":
+// 		return t.FileName, nil
+// 	case t.URL != "":
+// 		return util.DownloadImage(ctx, t.URL)
+// 	}
+// 	return "", fmt.Errorf("could not get file from input: %v", t)
+// }
 
-//Input represents a meme creation request input
-type Input struct {
-	TemplateName string        `json:"template_name,omitempty"`
-	TargetInputs []TargetInput `json:"target_inputs,omitempty"`
-}
+// //Input represents a meme creation request input
+// type Input struct {
+// 	TemplateName string        `json:"template_name,omitempty"`
+// 	TargetInputs []TargetInput `json:"target_inputs,omitempty"`
+// }
 
 //LoadConfig loads config
 func LoadConfig() (*Config, error) {

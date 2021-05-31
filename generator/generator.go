@@ -7,6 +7,9 @@ import (
 	"strings"
 	"time"
 
+	pb "github.com/nickysemenza/gomeme/api/proto"
+	"github.com/nickysemenza/gomeme/util"
+
 	"github.com/davecgh/go-spew/spew"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
@@ -45,7 +48,7 @@ type Meme struct {
 }
 
 //Process makes a meme
-func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
+func (g *Generator) Process(ctx context.Context, input pb.CreateMemeParams) (*Meme, error) {
 	templateName := input.TemplateName
 	template, ok := g.Config.Templates[templateName]
 	if !ok {
@@ -53,11 +56,15 @@ func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 	}
 
 	//TODO: ensure length of input is right
-	m := Meme{UUID: uuid.NewV4().String(), ResultFile: template.File}
+	m := Meme{
+		UUID:       fmt.Sprintf("%d-%s", time.Now().Unix(), uuid.NewV4().String()),
+		ResultFile: template.File,
+	}
+
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := input.TargetInputs[step]
-		fileName, err := input.GetFile(ctx)
+		fileName, err := GetFile(ctx, *input)
 		if err != nil {
 			return &m, err
 		}
@@ -201,4 +208,14 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 		"args":    arg,
 	}).Info("Running command")
 	return exec.CommandContext(ctx, name, arg...)
+}
+
+func GetFile(ctx context.Context, t pb.TargetInput) (string, error) {
+	switch {
+	case t.FileName != "":
+		return t.FileName, nil
+	case t.URL != "":
+		return util.DownloadImage(ctx, t.URL)
+	}
+	return "", fmt.Errorf("could not get file from input: %v", t)
 }

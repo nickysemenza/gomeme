@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"html/template"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -35,7 +32,7 @@ func main() {
 
 	wg := sync.WaitGroup{}
 
-	g := generator.Generator{config}
+	g := generator.Generator{Config: config}
 	gg = &g
 
 	grpcServer := api.NewServer(&g)
@@ -71,36 +68,36 @@ func NewGrpcWebMiddleware(grpcWeb *grpcweb.WrappedGrpcServer) *GrpcWebMiddleware
 	return &GrpcWebMiddleware{grpcWeb}
 }
 
-func newMeme(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	decoder := json.NewDecoder(r.Body)
+// func newMeme(w http.ResponseWriter, r *http.Request) {
+// 	ctx := r.Context()
+// 	decoder := json.NewDecoder(r.Body)
 
-	var input1 generator.Input
-	err := decoder.Decode(&input1)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	meme, err := gg.Process(ctx, input1)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// 	var input1 pb.Input
+// 	err := decoder.Decode(&input1)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+// 	meme, err := gg.Process(ctx, input1)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
 
-	var ImageTemplate = `<!DOCTYPE html>
-    <html lang="en"><head></head>
-	<body><img style="width: 400px" src="{{.Image}}"></body>`
+// 	var ImageTemplate = `<!DOCTYPE html>
+//     <html lang="en"><head></head>
+// 	<body><img style="width: 400px" src="{{.Image}}"></body>`
 
-	if tmpl, err := template.New("image").Parse(ImageTemplate); err != nil {
-		log.Println("unable to parse image template.")
-	} else {
-		data := map[string]interface{}{"Image": meme.ResultFile}
-		if err = tmpl.Execute(w, data); err != nil {
-			log.Println("unable to execute template.")
-		}
-	}
+// 	if tmpl, err := template.New("image").Parse(ImageTemplate); err != nil {
+// 		log.Println("unable to parse image template.")
+// 	} else {
+// 		data := map[string]interface{}{"Image": meme.ResultFile}
+// 		if err = tmpl.Execute(w, data); err != nil {
+// 			log.Println("unable to execute template.")
+// 		}
+// 	}
 
-}
+// }
 
 func (s *Server) buildRouter() *chi.Mux {
 	r := chi.NewRouter()
@@ -131,7 +128,7 @@ func (s *Server) buildRouter() *chi.Mux {
 	r.Handle("/tmp/{res}", http.StripPrefix("/tmp/", http.FileServer(http.Dir("tmp/"))))
 	r.Handle("/templates/{res}", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
 
-	r.Post("/meme", newMeme)
+	// r.Post("/meme", newMeme)
 
 	return r
 

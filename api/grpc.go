@@ -41,13 +41,13 @@ func (s *Server) GetTemplates(ctx context.Context, _ *pb.GetTemplatesParams) (*p
 
 //CreateMeme makes a meme
 func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.Meme, error) {
-	input := generator.Input{TemplateName: in.GetTemplateName()}
-	for _, i := range in.GetTargetInputs() {
-		input.TargetInputs = append(input.TargetInputs, generator.TargetInput{
-			FileName: i.GetFileName(),
-			URL:      i.GetURL()})
-	}
-	meme, err := s.g.Process(ctx, input)
+	// input := generator.Input{TemplateName: in.GetTemplateName()}
+	// for _, i := range in.GetTargetInputs() {
+	// 	input.TargetInputs = append(input.TargetInputs, generator.TargetInput{
+	// 		FileName: i.GetFileName(),
+	// 		URL:      i.GetURL()})
+	// }
+	meme, err := s.g.Process(ctx, *in)
 	if err != nil {
 		err = fmt.Errorf("failed to generate meme: %w", err)
 		fmt.Println(err)

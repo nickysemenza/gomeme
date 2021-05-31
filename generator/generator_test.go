@@ -13,7 +13,7 @@ func TestApplyDelta(t *testing.T) {
 		{P1: Point{}, P2: Point{}},
 		{P1: Point{}, P2: Point{}},
 	}}
-	d1 := [4]Point{Point{2, 4}, Point{}, Point{3, 0}, Point{}}
+	d1 := [4]Point{{2, 4}, {}, {3, 0}, {}}
 
 	original.applyDelta(d1)
 
