@@ -10,7 +10,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	pb "github.com/nickysemenza/gomeme/api/proto"
 	"github.com/nickysemenza/gomeme/generator"
-	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
 
@@ -50,7 +49,7 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	}
 	meme, err := s.g.Process(ctx, input)
 	if err != nil {
-		err = errors.Wrap(err, "failed to generate meme")
+		err = fmt.Errorf("failed to generate meme: %w", err)
 		fmt.Println(err)
 		return nil, err
 	}

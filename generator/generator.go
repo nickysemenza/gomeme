@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )
@@ -64,27 +63,27 @@ func (g *Generator) Process(ctx context.Context, input Input) (*Meme, error) {
 		}
 		shrunkFile, err := m.shrinkToSize(ctx, fileName, target.Size)
 		if err != nil {
-			return &m, errors.Wrap(err, "failed to shrink")
+			return &m, fmt.Errorf("failed to shrink: %w", err)
 		}
 
 		dist := target.Size.BuildBase()
 		// spew.Dump(dist.ToIMString())
 		err = dist.applyDelta(target.Deltas)
 		if err != nil {
-			return &m, errors.Wrap(err, "failed to apply delta")
+			return &m, fmt.Errorf("failed to apply delta: %w", err)
 		}
 		distortedFile, err := m.distort(ctx, shrunkFile, dist)
 		if err != nil {
-			return &m, errors.Wrap(err, "failed to distort")
+			return &m, fmt.Errorf("failed to distort: %w", err)
 		}
 		compositedFile, err := m.composite(ctx, distortedFile, m.ResultFile, target.TopLeft)
 		if err != nil {
-			return &m, errors.Wrap(err, "failed to composite")
+			return &m, fmt.Errorf("failed to composite: %w", err)
 		}
 		m.ResultFile = fmt.Sprintf("tmp/%s.png", m.UUID)
 		fmt.Println(compositedFile)
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
-			return &m, errors.Wrap(err, "failed to copy")
+			return &m, fmt.Errorf("failed to copy: %w", err)
 		}
 		// spew.Dump(dist.ToIMString())
 

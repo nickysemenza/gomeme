@@ -2,8 +2,8 @@ package generator
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 
 	"github.com/nickysemenza/gomeme/util"
@@ -59,7 +59,7 @@ func (t *TargetInput) GetFile(ctx context.Context) (string, error) {
 	case t.URL != "":
 		return util.DownloadImage(ctx, t.URL)
 	}
-	return "", errors.New("could not get file from input")
+	return "", fmt.Errorf("could not get file from input: %v", t)
 }
 
 //Input represents a meme creation request input
@@ -74,7 +74,7 @@ func LoadConfig() (*Config, error) {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		return nil, errors.Wrap(err, "error config file")
+		return nil, fmt.Errorf("error config file: %w", err)
 	}
 	c := Config{}
 

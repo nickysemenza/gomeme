@@ -14,7 +14,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -24,19 +23,19 @@ func DownloadImage(ctx context.Context, url string) (string, error) {
 
 	response, err := http.Get(url)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to download image")
+		return "", fmt.Errorf("failed to download image: %w", err)
 	}
 	defer response.Body.Close()
 
 	file, err := os.Create(fileName)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create file")
+		return "", fmt.Errorf("failed to create file: %w", err)
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to write image to file")
+		return "", fmt.Errorf("failed to write image to file: %w", err)
 	}
 
 	return fileName, nil
@@ -55,7 +54,7 @@ func ImageFromFile(fileName string) (image.Image, error) {
 	// and type of image it is as a string. We expect "png"
 	imageData, _, err := image.Decode(ImageFromFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode image")
+		return nil, fmt.Errorf("failed to decode image: %w", err)
 	}
 	return imageData, nil
 
