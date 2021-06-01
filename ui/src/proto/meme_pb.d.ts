@@ -4,8 +4,8 @@
 import * as jspb from "google-protobuf";
 
 export class Meme extends jspb.Message {
-  getUuid(): string;
-  setUuid(value: string): void;
+  getId(): string;
+  setId(value: string): void;
 
   getUrl(): string;
   setUrl(value: string): void;
@@ -22,7 +22,7 @@ export class Meme extends jspb.Message {
 
 export namespace Meme {
   export type AsObject = {
-    uuid: string,
+    id: string,
     url: string,
   }
 }

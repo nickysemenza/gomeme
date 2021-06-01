@@ -9,7 +9,7 @@ service API {
     rpc CreateMeme(CreateMemeParams) returns (Meme) {}
 }
 message Meme {
-    string UUID = 1;
+    string ID = 1;
     string URL = 2;
 }
 message CreateMemeParams {

@@ -248,7 +248,7 @@ proto.Meme.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Meme.toObject = function(includeInstance, msg) {
   var f, obj = {
-    uuid: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     url: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
@@ -288,7 +288,7 @@ proto.Meme.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setUuid(value);
+      msg.setId(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
@@ -323,7 +323,7 @@ proto.Meme.prototype.serializeBinary = function() {
  */
 proto.Meme.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getUuid();
+  f = message.getId();
   if (f.length > 0) {
     writer.writeString(
       1,
@@ -341,10 +341,10 @@ proto.Meme.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string UUID = 1;
+ * optional string ID = 1;
  * @return {string}
  */
-proto.Meme.prototype.getUuid = function() {
+proto.Meme.prototype.getId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
@@ -353,7 +353,7 @@ proto.Meme.prototype.getUuid = function() {
  * @param {string} value
  * @return {!proto.Meme} returns this
  */
-proto.Meme.prototype.setUuid = function(value) {
+proto.Meme.prototype.setId = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 

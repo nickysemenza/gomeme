@@ -58,7 +58,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
     getAPIClient().createMeme(req, (err, reply) => {
       console.log(JSON.stringify({ err, reply }));
       if (reply) {
-        console.log("created", reply.getUuid(), reply.getUrl());
+        console.log("created", reply.getId(), reply.getUrl());
         onCreate(reply);
         setRes(reply);
       }

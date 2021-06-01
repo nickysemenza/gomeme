@@ -3,15 +3,16 @@ package generator
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"os/exec"
 	"strings"
 	"time"
 
 	pb "github.com/nickysemenza/gomeme/proto"
 	"github.com/nickysemenza/gomeme/util"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/davecgh/go-spew/spew"
-	uuid "github.com/satori/go.uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -41,7 +42,7 @@ type OpLog struct {
 
 //Meme is a meme
 type Meme struct {
-	UUID        string  `json:"uuid,omitempty"`
+	ID          string  `json:"id,omitempty"`
 	CurrentStep int     `json:"current_step,omitempty"`
 	OpLog       []OpLog `json:"op_log,omitempty"`
 	ResultFile  string  `json:"file,omitempty"`
@@ -56,8 +57,10 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	}
 
 	//TODO: ensure length of input is right
+
+	t := time.Now()
 	m := Meme{
-		UUID:       fmt.Sprintf("%d-%s", time.Now().Unix(), uuid.NewV4().String()),
+		ID:         ulid.MustNew(ulid.Timestamp(t), ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)).String(),
 		ResultFile: template.File,
 	}
 
@@ -109,7 +112,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 			}
 		}
 
-		m.ResultFile = fmt.Sprintf("tmp/%s-final.png", m.UUID)
+		m.ResultFile = fmt.Sprintf("tmp/%s-final.png", m.ID)
 		fmt.Println(compositedFile)
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
 			return &m, fmt.Errorf("Process: failed to copy: %w", err)
@@ -120,7 +123,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	return &m, nil
 }
 func (m *Meme) genFile(op Operation) string {
-	return fmt.Sprintf("tmp/%s-%d-%s.png", m.UUID, m.CurrentStep, op)
+	return fmt.Sprintf("tmp/%s-%d-%s.png", m.ID, m.CurrentStep, op)
 }
 
 func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {

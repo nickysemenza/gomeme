@@ -55,8 +55,8 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	}
 	spew.Dump(meme)
 	return &pb.Meme{
-		UUID: meme.UUID,
-		URL:  fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile),
+		ID:  meme.ID,
+		URL: fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile),
 	}, nil
 }
 
