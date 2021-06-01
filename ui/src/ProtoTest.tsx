@@ -27,8 +27,12 @@ const ProtoTest: React.SFC<Props> = () => {
   return (
     <div>
       <div>
-        {" "}
-        {resURL && <img src={resURL} alt="generated" className="w-80" />}
+        <h1 className="font-bold text-lg text-gray-600">gomeme</h1>
+        <p>
+          gomeme is a meme generator, power by ImageMagick. It holds a list of
+          templates, with a schema specifying how to shove images into the
+          memes.
+        </p>
       </div>
       <table className="table-fixed border border-collapse border-green-800">
         <thead>
@@ -44,13 +48,13 @@ const ProtoTest: React.SFC<Props> = () => {
               <td className="border border-green-60">{t.getName()}</td>
               <td className="border border-green-60">
                 <img
-                  className="w-100"
-                  style={{ width: "200px" }}
+                  className="w-50"
+                  // style={{ width: "200px" }}
                   src={buildURL(t.getUrl())}
                   alt="generated"
                 />
               </td>
-              <td className="w-80 border border-green-60">
+              <td className="border border-green-60">
                 <CreateMeme
                   template={t}
                   onCreate={(meme) => {

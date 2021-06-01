@@ -36,6 +36,9 @@ export class CreateMemeParams extends jspb.Message {
   setTargetinputsList(value: Array<TargetInput>): void;
   addTargetinputs(value?: TargetInput, index?: number): TargetInput;
 
+  getDebug(): boolean;
+  setDebug(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CreateMemeParams.AsObject;
   static toObject(includeInstance: boolean, msg: CreateMemeParams): CreateMemeParams.AsObject;
@@ -50,6 +53,7 @@ export namespace CreateMemeParams {
   export type AsObject = {
     templatename: string,
     targetinputsList: Array<TargetInput.AsObject>,
+    debug: boolean,
   }
 }
 

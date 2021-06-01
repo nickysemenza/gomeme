@@ -49,6 +49,7 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	meme, err := s.g.Process(ctx, in)
 	if err != nil {
 		err = fmt.Errorf("failed to generate meme: %w", err)
+		spew.Dump(meme.OpLog)
 		fmt.Println(err)
 		return nil, err
 	}

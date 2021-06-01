@@ -24,11 +24,26 @@ type Point struct {
 	Y int `json:"y"`
 }
 
+func (p Point) Comma() string {
+	return fmt.Sprintf("%d,%d", p.X, p.Y)
+}
+func (p Point) Dim() string {
+	return fmt.Sprintf("%dx%d", p.X, p.Y)
+}
+
 //Add returns a new Point that's the result of all the values being added.
 func (p Point) Add(p2 Point) Point {
 	return Point{
 		X: p.X + p2.X,
 		Y: p.Y + p2.Y,
+	}
+}
+
+// Sub is the oppose of Add
+func (p Point) Sub(p2 Point) Point {
+	return Point{
+		X: p.X - p2.X,
+		Y: p.Y - p2.Y,
 	}
 }
 
@@ -46,31 +61,6 @@ type Template struct {
 	Targets []Target `json:"targets"`
 	File    string   `json:"file"`
 }
-
-// //TargetInput represents the input for a specific target
-// type TargetInput struct {
-// 	FileName string `json:"file_name,omitempty"`
-// 	URL      string
-// 	//TODO: add base64 image, url
-// 	//TODO: add modifiers
-// }
-
-// //GetFile returns a filename representing the contents of the input
-// func (t *TargetInput) GetFile(ctx context.Context) (string, error) {
-// 	switch {
-// 	case t.FileName != "":
-// 		return t.FileName, nil
-// 	case t.URL != "":
-// 		return util.DownloadImage(ctx, t.URL)
-// 	}
-// 	return "", fmt.Errorf("could not get file from input: %v", t)
-// }
-
-// //Input represents a meme creation request input
-// type Input struct {
-// 	TemplateName string        `json:"template_name,omitempty"`
-// 	TargetInputs []TargetInput `json:"target_inputs,omitempty"`
-// }
 
 //LoadConfig loads config
 func LoadConfig() (*Config, error) {

@@ -48,8 +48,8 @@ type Meme struct {
 }
 
 //Process makes a meme
-func (g *Generator) Process(ctx context.Context, input *pb.CreateMemeParams) (*Meme, error) {
-	templateName := input.TemplateName
+func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Meme, error) {
+	templateName := req.TemplateName
 	template, ok := g.Config.Templates[templateName]
 	if !ok {
 		return nil, fmt.Errorf("Process: template %s does not exist", templateName)
@@ -63,7 +63,7 @@ func (g *Generator) Process(ctx context.Context, input *pb.CreateMemeParams) (*M
 
 	for step, target := range template.Targets {
 		m.CurrentStep = step
-		input := input.TargetInputs[step]
+		input := req.TargetInputs[step]
 		fileName, err := GetFile(ctx, input)
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to get file: %w", err)
@@ -87,6 +87,28 @@ func (g *Generator) Process(ctx context.Context, input *pb.CreateMemeParams) (*M
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to composite: %w", err)
 		}
+
+		if req.Debug {
+			//debug overlay
+			bounding, err := m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, nil)
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to add bounding: %w", err)
+			}
+			compositedFile, err = m.composite(ctx, bounding, compositedFile, Point{})
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to composite: %w", err)
+			}
+
+			bounding, err = m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, &target.Deltas)
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to add bounding: %w", err)
+			}
+			compositedFile, err = m.composite(ctx, bounding, compositedFile, Point{})
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to composite: %w", err)
+			}
+		}
+
 		m.ResultFile = fmt.Sprintf("tmp/%s-final.png", m.UUID)
 		fmt.Println(compositedFile)
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
@@ -129,6 +151,53 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 		"-distort",
 		"Perspective",
 		payload.ToIMString(),
+		dest,
+	}
+	cmd := runCommand(ctx, "convert", args...)
+	output, err := cmd.CombinedOutput()
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
+	return dest, err
+}
+
+func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDimensions Point, deltas *[4]Point) (string, error) {
+	op := OpDistort
+	dest := m.genFile(op)
+	t := time.Now()
+
+	// CCW
+	points := [4]Point{
+		topLeft,
+		{X: topLeft.X, Y: bottomRight.Y},
+		bottomRight,
+		{X: bottomRight.X, Y: topLeft.Y},
+	}
+	color := "blue"
+	if deltas != nil {
+		color = "red"
+		d2 := *deltas
+		points[0] = points[0].Add(d2[0])
+		points[1] = points[1].Add(d2[1])
+		// these are weird since distort deltas don't go in same direction...
+		points[2] = points[2].Add(d2[3])
+		points[3] = points[3].Add(d2[2])
+
+	}
+
+	args := []string{
+		"-size",
+		fileDimensions.Dim(),
+		"xc:transparent",
+		"-fill",
+		"transparent",
+		"-stroke",
+		color,
+		"-draw",
+		fmt.Sprintf(`polyline %s %s %s %s %s`,
+			points[0].Comma(),
+			points[1].Comma(),
+			points[2].Comma(),
+			points[3].Comma(),
+			points[0].Comma()),
 		dest,
 	}
 	cmd := runCommand(ctx, "convert", args...)

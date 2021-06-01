@@ -417,7 +417,8 @@ proto.CreateMemeParams.toObject = function(includeInstance, msg) {
   var f, obj = {
     templatename: jspb.Message.getFieldWithDefault(msg, 1, ""),
     targetinputsList: jspb.Message.toObjectList(msg.getTargetinputsList(),
-    proto.TargetInput.toObject, includeInstance)
+    proto.TargetInput.toObject, includeInstance),
+    debug: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
   };
 
   if (includeInstance) {
@@ -463,6 +464,10 @@ proto.CreateMemeParams.deserializeBinaryFromReader = function(msg, reader) {
       reader.readMessage(value,proto.TargetInput.deserializeBinaryFromReader);
       msg.addTargetinputs(value);
       break;
+    case 3:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setDebug(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -505,6 +510,13 @@ proto.CreateMemeParams.serializeBinaryToWriter = function(message, writer) {
       2,
       f,
       proto.TargetInput.serializeBinaryToWriter
+    );
+  }
+  f = message.getDebug();
+  if (f) {
+    writer.writeBool(
+      3,
+      f
     );
   }
 };
@@ -563,6 +575,24 @@ proto.CreateMemeParams.prototype.addTargetinputs = function(opt_value, opt_index
  */
 proto.CreateMemeParams.prototype.clearTargetinputsList = function() {
   return this.setTargetinputsList([]);
+};
+
+
+/**
+ * optional bool Debug = 3;
+ * @return {boolean}
+ */
+proto.CreateMemeParams.prototype.getDebug = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 3, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.CreateMemeParams} returns this
+ */
+proto.CreateMemeParams.prototype.setDebug = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 3, value);
 };
 
 
