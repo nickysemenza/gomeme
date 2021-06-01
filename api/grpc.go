@@ -3,19 +3,17 @@ package api
 import (
 	"context"
 	"fmt"
-	"log"
-	"net"
-	"sync"
 
 	"github.com/davecgh/go-spew/spew"
-	pb "github.com/nickysemenza/gomeme/api/proto"
 	"github.com/nickysemenza/gomeme/generator"
+	pb "github.com/nickysemenza/gomeme/proto"
 	"google.golang.org/grpc"
 )
 
 //Server conforms to interface for proto generated stubs
 type Server struct {
 	g *generator.Generator
+	pb.UnimplementedAPIServer
 }
 
 //GetPing responds to a ping message
@@ -47,14 +45,17 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	// 		FileName: i.GetFileName(),
 	// 		URL:      i.GetURL()})
 	// }
-	meme, err := s.g.Process(ctx, *in)
+	meme, err := s.g.Process(ctx, in)
 	if err != nil {
 		err = fmt.Errorf("failed to generate meme: %w", err)
 		fmt.Println(err)
 		return nil, err
 	}
 	spew.Dump(meme)
-	return &pb.Meme{UUID: meme.UUID}, nil
+	return &pb.Meme{
+		UUID: meme.UUID,
+		URL:  fmt.Sprintf("http://%s:%d/%s", s.g.Config.Listen.Host, s.g.Config.Listen.HTTPPort, meme.ResultFile),
+	}, nil
 }
 
 //NewServer makes a server
@@ -62,20 +63,4 @@ func NewServer(g *generator.Generator) *grpc.Server {
 	grpcServer := grpc.NewServer()
 	pb.RegisterAPIServer(grpcServer, &Server{g: g})
 	return grpcServer
-}
-
-//ServegRPC runs an gRPC server
-func ServegRPC(ctx context.Context, wg *sync.WaitGroup, grpcServer *grpc.Server) {
-	lis, err := net.Listen("tcp", ":9090")
-	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	go grpcServer.Serve(lis)
-
-	<-ctx.Done()
-	log.Printf("[grpc] shutdown")
-	grpcServer.GracefulStop()
-	wg.Done()
-
 }

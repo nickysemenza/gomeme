@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/nickysemenza/gomeme/api/proto"
+	pb "github.com/nickysemenza/gomeme/proto"
 	"github.com/nickysemenza/gomeme/util"
 
 	"github.com/davecgh/go-spew/spew"
@@ -48,11 +48,11 @@ type Meme struct {
 }
 
 //Process makes a meme
-func (g *Generator) Process(ctx context.Context, input pb.CreateMemeParams) (*Meme, error) {
+func (g *Generator) Process(ctx context.Context, input *pb.CreateMemeParams) (*Meme, error) {
 	templateName := input.TemplateName
 	template, ok := g.Config.Templates[templateName]
 	if !ok {
-		return nil, fmt.Errorf("template %s does not exist", templateName)
+		return nil, fmt.Errorf("Process: template %s does not exist", templateName)
 	}
 
 	//TODO: ensure length of input is right
@@ -64,33 +64,33 @@ func (g *Generator) Process(ctx context.Context, input pb.CreateMemeParams) (*Me
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := input.TargetInputs[step]
-		fileName, err := GetFile(ctx, *input)
+		fileName, err := GetFile(ctx, input)
 		if err != nil {
-			return &m, err
+			return &m, fmt.Errorf("Process: failed to get file: %w", err)
 		}
 		shrunkFile, err := m.shrinkToSize(ctx, fileName, target.Size)
 		if err != nil {
-			return &m, fmt.Errorf("failed to shrink: %w", err)
+			return &m, fmt.Errorf("Process: failed to shrink: %w", err)
 		}
 
 		dist := target.Size.BuildBase()
 		// spew.Dump(dist.ToIMString())
 		err = dist.applyDelta(target.Deltas)
 		if err != nil {
-			return &m, fmt.Errorf("failed to apply delta: %w", err)
+			return &m, fmt.Errorf("Process: failed to apply delta: %w", err)
 		}
 		distortedFile, err := m.distort(ctx, shrunkFile, dist)
 		if err != nil {
-			return &m, fmt.Errorf("failed to distort: %w", err)
+			return &m, fmt.Errorf("Process: failed to distort: %w", err)
 		}
 		compositedFile, err := m.composite(ctx, distortedFile, m.ResultFile, target.TopLeft)
 		if err != nil {
-			return &m, fmt.Errorf("failed to composite: %w", err)
+			return &m, fmt.Errorf("Process: failed to composite: %w", err)
 		}
-		m.ResultFile = fmt.Sprintf("tmp/%s.png", m.UUID)
+		m.ResultFile = fmt.Sprintf("tmp/%s-final.png", m.UUID)
 		fmt.Println(compositedFile)
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
-			return &m, fmt.Errorf("failed to copy: %w", err)
+			return &m, fmt.Errorf("Process: failed to copy: %w", err)
 		}
 		// spew.Dump(dist.ToIMString())
 
@@ -210,12 +210,19 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	return exec.CommandContext(ctx, name, arg...)
 }
 
-func GetFile(ctx context.Context, t pb.TargetInput) (string, error) {
-	switch {
-	case t.FileName != "":
-		return t.FileName, nil
-	case t.URL != "":
-		return util.DownloadImage(ctx, t.URL)
+func GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
+	switch t.Kind {
+	case pb.TargetInput_B64:
+		image, err := util.ImageFromBase64(t.Value)
+		if err != nil {
+			return "", err
+		}
+		return util.SaveImage(image)
+	case pb.TargetInput_URL:
+		return util.DownloadImage(ctx, t.Value)
+
+		// case t.FileName != "":
+		// 	return t.FileName, nil
 	}
 	return "", fmt.Errorf("could not get file from input: %v", t)
 }

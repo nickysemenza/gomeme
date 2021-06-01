@@ -9,6 +9,13 @@ import (
 //Config contains all templates, as well as config data
 type Config struct {
 	Templates map[string]Template `json:"templates"`
+	Listen    Listen
+}
+
+type Listen struct {
+	Host     string
+	HTTPPort int
+	GRPCPort int
 }
 
 //Point represents an x,y coordinate

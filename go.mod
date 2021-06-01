@@ -8,7 +8,6 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.0
-	github.com/golang/protobuf v1.5.2
 	github.com/improbable-eng/grpc-web v0.14.0
 	github.com/klauspost/compress v1.12.3 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
@@ -27,6 +26,7 @@ require (
 	golang.org/x/sys v0.0.0-20210531080801-fdfd190a6549 // indirect
 	google.golang.org/genproto v0.0.0-20210524171403-669157292da3 // indirect
 	google.golang.org/grpc v1.38.0
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect

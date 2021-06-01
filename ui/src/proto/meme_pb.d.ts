@@ -7,6 +7,9 @@ export class Meme extends jspb.Message {
   getUuid(): string;
   setUuid(value: string): void;
 
+  getUrl(): string;
+  setUrl(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Meme.AsObject;
   static toObject(includeInstance: boolean, msg: Meme): Meme.AsObject;
@@ -20,6 +23,7 @@ export class Meme extends jspb.Message {
 export namespace Meme {
   export type AsObject = {
     uuid: string,
+    url: string,
   }
 }
 
@@ -50,11 +54,11 @@ export namespace CreateMemeParams {
 }
 
 export class TargetInput extends jspb.Message {
-  getFilename(): string;
-  setFilename(value: string): void;
+  getValue(): string;
+  setValue(value: string): void;
 
-  getUrl(): string;
-  setUrl(value: string): void;
+  getKind(): TargetInput.KindMap[keyof TargetInput.KindMap];
+  setKind(value: TargetInput.KindMap[keyof TargetInput.KindMap]): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TargetInput.AsObject;
@@ -68,9 +72,16 @@ export class TargetInput extends jspb.Message {
 
 export namespace TargetInput {
   export type AsObject = {
-    filename: string,
-    url: string,
+    value: string,
+    kind: TargetInput.KindMap[keyof TargetInput.KindMap],
   }
+
+  export interface KindMap {
+    B64: 0;
+    URL: 1;
+  }
+
+  export const Kind: KindMap;
 }
 
 export class GetTemplatesParams extends jspb.Message {

@@ -8,6 +8,8 @@ interface Props {}
 const ProtoTest: React.SFC<Props> = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
 
+  const [resURL, setResURL] = useState("");
+
   useEffect(() => {
     const fetchMemes = () => {
       const req = new GetTemplatesParams();
@@ -24,17 +26,37 @@ const ProtoTest: React.SFC<Props> = () => {
 
   return (
     <div>
-      <table className="table-auto">
+      <div>
+        {" "}
+        {resURL && <img src={resURL} alt="generated" className="w-80" />}
+      </div>
+      <table className="table-fixed">
+        <thead>
+          <tr>
+            <th className="w-1/4">name</th>
+            <th className="w-1/4">template</th>
+            <th className="w-1/2">input</th>
+          </tr>
+        </thead>
         <tbody>
           {templates.map((t) => (
             <tr key={t.getName()}>
-              <td />
               <td>{t.getName()}</td>
               <td>
-                <img style={{ width: "200px" }} src={buildURL(t.getUrl())} />
+                <img
+                  className="w-100"
+                  style={{ width: "200px" }}
+                  src={buildURL(t.getUrl())}
+                  alt="generated"
+                />
               </td>
-              <td>
-                <CreateMeme template={t} />
+              <td className="w-80">
+                <CreateMeme
+                  template={t}
+                  onCreate={(meme) => {
+                    setResURL(meme.getUrl());
+                  }}
+                />
               </td>
             </tr>
           ))}

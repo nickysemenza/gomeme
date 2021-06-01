@@ -2,14 +2,19 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"net"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/nickysemenza/gomeme/api"
 	"github.com/nickysemenza/gomeme/generator"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -20,15 +25,24 @@ var gg *generator.Generator
 
 //Server is a HTTP server
 type Server struct {
-	G *grpcweb.WrappedGrpcServer
+	G      *grpcweb.WrappedGrpcServer
+	Listen generator.Listen
 }
 
 func main() {
 
+	viper.SetDefault("LISTEN_HOST", "localhost")
+	viper.AutomaticEnv()
+
+	l := generator.Listen{Host: viper.GetString("LISTEN_HOST"), HTTPPort: 3333, GRPCPort: 9090}
+	s := Server{Listen: l}
+
 	ctx := context.Background()
 	config, err := generator.LoadConfig()
-	spew.Dump(err)
-	spew.Dump(config, err)
+	if err != nil {
+		log.Fatal(err)
+	}
+	config.Listen = l
 
 	wg := sync.WaitGroup{}
 
@@ -36,14 +50,31 @@ func main() {
 	gg = &g
 
 	grpcServer := api.NewServer(&g)
-	wrappedGrpc := grpcweb.WrapServer(grpcServer)
 
-	go api.ServegRPC(ctx, &wg, grpcServer)
+	s.G = grpcweb.WrapServer(grpcServer)
 
-	s := Server{wrappedGrpc}
+	go s.servegRPC(ctx, &wg, grpcServer)
+
 	r := s.buildRouter()
 
-	http.ListenAndServe(":3333", r)
+	fmt.Printf("starting http: %v", l)
+	http.ListenAndServe(fmt.Sprintf("%s:%d", l.Host, l.HTTPPort), r)
+
+}
+
+//ServegRPC runs an gRPC server
+func (s *Server) servegRPC(ctx context.Context, wg *sync.WaitGroup, grpcServer *grpc.Server) {
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Listen.Host, s.Listen.GRPCPort))
+	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	go grpcServer.Serve(lis)
+
+	<-ctx.Done()
+	log.Printf("[grpc] shutdown")
+	grpcServer.GracefulStop()
+	wg.Done()
 
 }
 
@@ -121,15 +152,33 @@ func (s *Server) buildRouter() *chi.Mux {
 
 	r.Use(NewGrpcWebMiddleware(s.G).Handler)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/hi", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hi"))
 	})
 
 	r.Handle("/tmp/{res}", http.StripPrefix("/tmp/", http.FileServer(http.Dir("tmp/"))))
 	r.Handle("/templates/{res}", http.StripPrefix("/templates/", http.FileServer(http.Dir("templates/"))))
+	// r.PathPre("/", http.FileServer(http.Dir("ui/build")))
+
+	FileServer(r)
 
 	// r.Post("/meme", newMeme)
 
 	return r
 
+}
+
+// FileServer is serving static files.
+// https://github.com/go-chi/chi/issues/403
+func FileServer(router *chi.Mux) {
+	root := "ui/build"
+	fs := http.FileServer(http.Dir(root))
+
+	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := os.Stat(root + r.RequestURI); os.IsNotExist(err) {
+			http.StripPrefix(r.RequestURI, fs).ServeHTTP(w, r)
+		} else {
+			fs.ServeHTTP(w, r)
+		}
+	})
 }

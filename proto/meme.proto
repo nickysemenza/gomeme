@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+option go_package = "github.com/nickysemenza/gomeme/proto";
+
+
 service API {
     rpc GetPing(Ping) returns (Ping) {}
     rpc GetTemplates(GetTemplatesParams) returns (TemplateList) {}
@@ -7,6 +10,7 @@ service API {
 }
 message Meme {
     string UUID = 1;
+    string URL = 2;
 }
 message CreateMemeParams {
     string TemplateName = 1;
@@ -14,8 +18,12 @@ message CreateMemeParams {
 }
 
 message TargetInput {
-    string FileName = 1;
-    string URL = 2;
+    string value = 1;
+    enum Kind {
+        B64 = 0;
+        URL = 1;
+    }
+    Kind kind = 2;
 }
 message GetTemplatesParams {}
 
