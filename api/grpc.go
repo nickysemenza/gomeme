@@ -7,6 +7,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gomeme/generator"
 	pb "github.com/nickysemenza/gomeme/proto"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
@@ -54,7 +55,7 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	spew.Dump(meme)
 	return &pb.Meme{
 		UUID: meme.UUID,
-		URL:  fmt.Sprintf("http://%s:%d/%s", s.g.Config.Listen.Host, s.g.Config.Listen.HTTPPort, meme.ResultFile),
+		URL:  fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile),
 	}, nil
 }
 

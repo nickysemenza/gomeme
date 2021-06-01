@@ -12,7 +12,9 @@ RUN make build
 
 FROM debian:buster-slim
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y imagemagick
+RUN apt-get update && apt-get install -y imagemagick ca-certificates
+RUN update-ca-certificates
+
 
 COPY --from=go-builder src/gomeme/gomeme /
 COPY --from=ui-builder /work/ui/build /ui/build

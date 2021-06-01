@@ -32,6 +32,7 @@ type Server struct {
 func main() {
 
 	viper.SetDefault("LISTEN_HOST", "localhost")
+	viper.SetDefault("BASE_API", "http://localhost:3333")
 	viper.AutomaticEnv()
 
 	l := generator.Listen{Host: viper.GetString("LISTEN_HOST"), HTTPPort: 3333, GRPCPort: 9090}
@@ -98,37 +99,6 @@ func (m *GrpcWebMiddleware) Handler(next http.Handler) http.Handler {
 func NewGrpcWebMiddleware(grpcWeb *grpcweb.WrappedGrpcServer) *GrpcWebMiddleware {
 	return &GrpcWebMiddleware{grpcWeb}
 }
-
-// func newMeme(w http.ResponseWriter, r *http.Request) {
-// 	ctx := r.Context()
-// 	decoder := json.NewDecoder(r.Body)
-
-// 	var input1 pb.Input
-// 	err := decoder.Decode(&input1)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-// 	meme, err := gg.Process(ctx, input1)
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	var ImageTemplate = `<!DOCTYPE html>
-//     <html lang="en"><head></head>
-// 	<body><img style="width: 400px" src="{{.Image}}"></body>`
-
-// 	if tmpl, err := template.New("image").Parse(ImageTemplate); err != nil {
-// 		log.Println("unable to parse image template.")
-// 	} else {
-// 		data := map[string]interface{}{"Image": meme.ResultFile}
-// 		if err = tmpl.Execute(w, data); err != nil {
-// 			log.Println("unable to execute template.")
-// 		}
-// 	}
-
-// }
 
 func (s *Server) buildRouter() *chi.Mux {
 	r := chi.NewRouter()
