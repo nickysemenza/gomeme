@@ -78,7 +78,10 @@ func SaveImage(i image.Image) (string, error) {
 //ImageToBase64String converts an image to a base65 encoded png
 func ImageToBase64String(img image.Image) (string, error) {
 	var buff bytes.Buffer
-	png.Encode(&buff, img)
+	err := png.Encode(&buff, img)
+	if err != nil {
+		return "", err
+	}
 	data := base64.StdEncoding.EncodeToString(buff.Bytes())
 	return fmt.Sprintf("data:image/png;base64,%s", data), nil
 }

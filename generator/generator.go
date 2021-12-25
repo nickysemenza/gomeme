@@ -282,6 +282,7 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	return exec.CommandContext(ctx, name, arg...)
 }
 
+// GetFile fetches the file from base64 payload or frmo url
 func GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
 	switch t.Kind {
 	case pb.TargetInput_B64:

@@ -61,6 +61,7 @@ const ProtoTest: React.SFC<Props> = () => {
                     setResURL(meme.getUrl());
                   }}
                 />
+                {resURL}
               </td>
             </tr>
           ))}

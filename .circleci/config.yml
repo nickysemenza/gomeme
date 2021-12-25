@@ -47,7 +47,7 @@ jobs:
           path: .
   test-ui:
     docker:
-      - image: node:10.13.0
+      - image: node:17
     working_directory: ~/gomeme/ui
     steps:
       - checkout:
