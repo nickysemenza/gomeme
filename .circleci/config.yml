@@ -1,40 +1,40 @@
 version: 2
 jobs:
-  build-docker:
-    #https://github.com/builtinnya/circleci-2.0-beta-docker-example/blob/master/.circleci/config.yml
-    working_directory: /app
-    docker:
-      - image: docker:17.05.0-ce-git
-    steps:
-      - checkout
-      - setup_remote_docker
-      - restore_cache:
-          keys:
-            - v1-{{ .Branch }}
-      - run:
-          name: Load Docker image layer cache
-          command: |
-            set +o pipefail
-            docker load -i /caches/app.tar | true
-      - run:
-          name: Build application Docker image
-          command: |
-            docker build --cache-from=app -t nicky/gomeme .
-      - run:
-          name: Save Docker image layer cache
-          command: |
-            mkdir -p /caches
-            docker save -o /caches/app.tar nicky/gomeme
-      - save_cache:
-          key: v1-{{ .Branch }}-{{ epoch }}
-          paths:
-            - /caches/app.tar
-      - deploy:
-          name: Push application Docker image
-          command: |
-            docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
-            docker push nicky/gomeme:latest
-            docker run --entrypoint="./gomeme" nicky/gomeme
+  # build-docker:
+  #   #https://github.com/builtinnya/circleci-2.0-beta-docker-example/blob/master/.circleci/config.yml
+  #   working_directory: /app
+  #   docker:
+  #     - image: docker:17.05.0-ce-git
+  #   steps:
+  #     - checkout
+  #     - setup_remote_docker
+  #     - restore_cache:
+  #         keys:
+  #           - v1-{{ .Branch }}
+  #     - run:
+  #         name: Load Docker image layer cache
+  #         command: |
+  #           set +o pipefail
+  #           docker load -i /caches/app.tar | true
+  #     - run:
+  #         name: Build application Docker image
+  #         command: |
+  #           docker build --cache-from=app -t nicky/gomeme .
+  #     - run:
+  #         name: Save Docker image layer cache
+  #         command: |
+  #           mkdir -p /caches
+  #           docker save -o /caches/app.tar nicky/gomeme
+  #     - save_cache:
+  #         key: v1-{{ .Branch }}-{{ epoch }}
+  #         paths:
+  #           - /caches/app.tar
+  #     - deploy:
+  #         name: Push application Docker image
+  #         command: |
+  #           docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+  #           docker push nicky/gomeme:latest
+  #           docker run --entrypoint="./gomeme" nicky/gomeme
   test-server:
     docker:
       - image: circleci/golang:1.16
@@ -64,7 +64,7 @@ workflows:
     jobs:
       - test-server
       - test-ui
-      - build-docker:
-          requires:
-            - test-ui
-            - test-server
+      # - build-docker:
+      #     requires:
+      #       - test-ui
+      #       - test-server
