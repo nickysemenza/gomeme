@@ -25,3 +25,9 @@ dev-ui:
 	cd ui && yarn run start
 test:
 	go test -race -cover ./...
+
+bin/golangci-lint:
+	@mkdir -p $(dir $@)
+	go build -o $@ ./vendor/github.com/golangci/golangci-lint/cmd/golangci-lint
+lint-go: bin/golangci-lint
+	bin/golangci-lint run || (echo "lint failed"; exit 1)

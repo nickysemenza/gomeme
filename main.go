@@ -21,8 +21,6 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 )
 
-var gg *generator.Generator
-
 //Server is a HTTP server
 type Server struct {
 	G      *grpcweb.WrappedGrpcServer
@@ -35,7 +33,7 @@ func main() {
 	viper.SetDefault("BASE_API", "http://localhost:3333")
 	viper.AutomaticEnv()
 
-	l := generator.Listen{Host: viper.GetString("LISTEN_HOST"), HTTPPort: 3333, GRPCPort: 9090}
+	l := generator.Listen{Host: viper.GetString("LISTEN_HOST"), HTTPPort: 3333, GRPCPort: 9091}
 	s := Server{Listen: l}
 
 	ctx := context.Background()
@@ -48,7 +46,6 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	g := generator.Generator{Config: config}
-	gg = &g
 
 	grpcServer := api.NewServer(&g)
 
@@ -59,7 +56,7 @@ func main() {
 	r := s.buildRouter()
 
 	fmt.Printf("starting http: %v", l)
-	http.ListenAndServe(fmt.Sprintf("%s:%d", l.Host, l.HTTPPort), r)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", l.Host, l.HTTPPort), r))
 
 }
 
@@ -70,6 +67,7 @@ func (s *Server) servegRPC(ctx context.Context, wg *sync.WaitGroup, grpcServer *
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+	//nolint:errcheck
 	go grpcServer.Serve(lis)
 
 	<-ctx.Done()
@@ -123,6 +121,7 @@ func (s *Server) buildRouter() *chi.Mux {
 	r.Use(NewGrpcWebMiddleware(s.G).Handler)
 
 	r.Get("/hi", func(w http.ResponseWriter, r *http.Request) {
+		//nolint: errcheck
 		w.Write([]byte("hi"))
 	})
 

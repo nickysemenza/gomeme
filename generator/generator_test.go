@@ -15,7 +15,8 @@ func TestApplyDelta(t *testing.T) {
 	}}
 	d1 := [4]Point{{2, 4}, {}, {3, 0}, {}}
 
-	original.applyDelta(d1)
+	err := original.applyDelta(d1)
+	require.NoError(t, err)
 
 	require.EqualValues(t, d1[0], original.ControlPoints[0].P2)
 }

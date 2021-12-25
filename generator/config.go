@@ -12,6 +12,7 @@ type Config struct {
 	Listen    Listen
 }
 
+// Listen contains the port and address to listen on
 type Listen struct {
 	Host     string
 	HTTPPort int
@@ -24,9 +25,12 @@ type Point struct {
 	Y int `json:"y"`
 }
 
+// Comma prints the point as csv
 func (p Point) Comma() string {
 	return fmt.Sprintf("%d,%d", p.X, p.Y)
 }
+
+// Dim prints the point as dimension
 func (p Point) Dim() string {
 	return fmt.Sprintf("%dx%d", p.X, p.Y)
 }
