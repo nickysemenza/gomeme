@@ -5,35 +5,54 @@ import {
   CreateMemeParams,
   TargetInput,
   Meme,
+  ImageInput,
+  TextInput,
 } from "../proto/meme_pb";
 import { getAPIClient, buildURL } from "../util";
 import update from "immutability-helper";
 import { b64 } from "./b64placeholder";
+import { HexColorPicker } from "react-colorful";
+
 interface TargetForm {
-  value: string;
-  kind: TargetInput.KindMap[keyof TargetInput.KindMap];
+  image?: ImageInput;
+  text?: TextInput;
+  kind: "image" | "text";
 }
+// type TargetForm = ImageInput | TextInput;
 
 interface Props {
   template: Template;
   onCreate: (meme: Meme) => void;
   debug: boolean;
 }
+const getRandomColor = (): string => {
+  const colors = [
+    "#9859e0",
+    "#14cca4",
+    "#4188cc",
+    "#9af77e",
+    "#ba030f",
+    "#74b6cc",
+    "#f9b3f4",
+    "#e133f4",
+    "#f22e7f",
+  ];
+
+  return colors[Math.floor(Math.random() * colors.length)];
+};
 const getRandom = (): TargetForm => {
+  let image1 = new ImageInput();
+  image1.setUrl(b64);
+  let image2 = new ImageInput();
+  image2.setUrl(b64);
+  let text1 = new TextInput();
+  text1.setText("cat");
+  text1.setColor(getRandomColor());
+
   const items: TargetForm[] = [
-    {
-      value:
-        "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-      kind: TargetInput.Kind.URL,
-    },
-    {
-      kind: TargetInput.Kind.B64,
-      value: b64,
-    },
-    {
-      kind: TargetInput.Kind.TEXT,
-      value: "cat",
-    },
+    { image: image1, kind: "image" },
+    { image: image2, kind: "image" },
+    { text: text1, kind: "text" },
   ];
   return items[Math.floor(Math.random() * items.length)];
 };
@@ -57,8 +76,12 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
     req.setTargetinputsList(
       targets.map((t) => {
         let input = new TargetInput();
-        input.setKind(t.kind);
-        input.setValue(t.value);
+        // input.set
+        // input.setKind(t.kind);
+        // input.setValue(t.value);
+
+        input.setImageinput(t.image);
+        input.setTextinput(t.text);
 
         return input;
       })
@@ -80,24 +103,31 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
       {/* <pre className="w-8">{JSON.stringify(targets, null, 2)}</pre> */}
       <div className="flex flex-col">
         {targets.map((t, x) => (
-          <div key={x} className="w-92">
+          <div key={x} className="w-full">
             <h2 className="font-bold">target {x + 1}</h2>
-            <div className="flex flex-row">
+            <div className="flex flex-row p-1 m-1">
               <div className="w-1/2">
                 <input
                   className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  value={t.value}
+                  value={t.text?.getText() || t.image?.getUrl() || ""}
                   onChange={(v) => {
                     setTargets(
                       update(targets, {
                         [x]: {
-                          value: { $set: v.target.value },
-                          kind: {
-                            $set: v.target.value.startsWith("http")
-                              ? TargetInput.Kind.URL
-                              : v.target.value.startsWith("data:")
-                              ? TargetInput.Kind.B64
-                              : TargetInput.Kind.TEXT,
+                          $apply: (curr) => {
+                            let image =
+                              v.target.value.startsWith("http") ||
+                              v.target.value.startsWith("data:image");
+                            if (image) {
+                              let i = curr.image || new ImageInput();
+                              i.setUrl(v.target.value);
+                              return { image: i, kind: "image" };
+                            } else {
+                              let i = curr.text || new TextInput();
+                              if (i.getColor() === "") i.setColor("#9859e0");
+                              i.setText(v.target.value);
+                              return { text: i, kind: "text" };
+                            }
                           },
                         },
                       })
@@ -106,8 +136,25 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
                 ></input>
               </div>
               <div>
-                {t.kind !== TargetInput.Kind.TEXT && (
-                  <img src={t.value} alt="" className="h-40" />
+                {t.text && (
+                  <HexColorPicker
+                    color={t.text.getColor()}
+                    onChange={(v) => {
+                      setTargets(
+                        update(targets, {
+                          [x]: {
+                            $apply: (curr) => {
+                              if (curr.text) curr.text.setColor(v);
+                              return curr;
+                            },
+                          },
+                        })
+                      );
+                    }}
+                  />
+                )}
+                {t.image && (
+                  <img src={t.image.getUrl()} alt="" className="h-40" />
                 )}
               </div>
             </div>

@@ -105,10 +105,10 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		var fileName string
 		var err error
 
-		if input.Kind == pb.TargetInput_TEXT {
-			fileName, err = m.makeText(ctx, input.Value, target.Size)
-		} else {
-			fileName, err = m.GetFile(ctx, input)
+		if text := input.GetTextInput(); text != nil {
+			fileName, err = m.makeText(ctx, text.Text, text.Color, target.Size)
+		} else if img := input.GetImageInput(); img != nil {
+			fileName, err = m.GetFile(ctx, img)
 		}
 
 		if err != nil {
@@ -271,16 +271,19 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 	return dest, err
 }
 
-func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, error) {
+func (m *Meme) makeText(ctx context.Context, text, color string, hint Point) (string, error) {
 	op := pb.Operation_Text
 	dest := m.genFile(op)
 	t := time.Now()
 
+	if color == "" {
+		color = "orange"
+	}
 	args := []string{
 		"-background",
 		"transparent",
 		"-fill",
-		"orange",
+		color,
 		"-font",
 		m.g.Config.Font,
 		// "-pointsize",
@@ -393,19 +396,18 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 }
 
 // GetFile fetches the file from base64 payload or frmo url
-func (m *Meme) GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
+func (m *Meme) GetFile(ctx context.Context, t *pb.ImageInput) (string, error) {
 
-	switch t.Kind {
-	case pb.TargetInput_B64:
-		image, err := util.ImageFromBase64(t.Value)
+	if strings.HasPrefix(t.URL, "data:") {
+
+		image, err := util.ImageFromBase64(t.URL)
 		if err != nil {
 			return "", err
 		}
 		return util.SaveImage(image)
-	case pb.TargetInput_URL:
-		return util.DownloadImage(ctx, t.Value)
-	case pb.TargetInput_TEXT:
-		return "", nil
+	} else if strings.HasPrefix(t.URL, "http") {
+		return util.DownloadImage(ctx, t.URL)
+	} else {
+		return "", fmt.Errorf("could not get file from input: %v", t)
 	}
-	return "", fmt.Errorf("could not get file from input: %v", t)
 }

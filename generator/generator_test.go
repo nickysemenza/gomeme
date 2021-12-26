@@ -35,7 +35,7 @@ func TestMakeText(t *testing.T) {
 	m := Meme{}
 	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
 	ctx := context.Background()
-	file, err := m.makeText(ctx, "hello", Point{200, 200})
+	file, err := m.makeText(ctx, "hello", "", Point{200, 200})
 	require.NoError(t, err, m.OpLog)
 	i, err := util.LoadImage(file)
 	require.NoError(t, err)

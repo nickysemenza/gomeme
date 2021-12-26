@@ -15,6 +15,11 @@ export class Meme extends jspb.Message {
   setOplogList(value: Array<OpLog>): void;
   addOplog(value?: OpLog, index?: number): OpLog;
 
+  hasParams(): boolean;
+  clearParams(): void;
+  getParams(): CreateMemeParams | undefined;
+  setParams(value?: CreateMemeParams): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Meme.AsObject;
   static toObject(includeInstance: boolean, msg: Meme): Meme.AsObject;
@@ -30,6 +35,7 @@ export namespace Meme {
     id: string,
     url: string,
     oplogList: Array<OpLog.AsObject>,
+    params?: CreateMemeParams.AsObject,
   }
 }
 
@@ -65,13 +71,62 @@ export namespace CreateMemeParams {
   }
 }
 
+export class TextInput extends jspb.Message {
+  getText(): string;
+  setText(value: string): void;
+
+  getColor(): string;
+  setColor(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TextInput.AsObject;
+  static toObject(includeInstance: boolean, msg: TextInput): TextInput.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: TextInput, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TextInput;
+  static deserializeBinaryFromReader(message: TextInput, reader: jspb.BinaryReader): TextInput;
+}
+
+export namespace TextInput {
+  export type AsObject = {
+    text: string,
+    color: string,
+  }
+}
+
+export class ImageInput extends jspb.Message {
+  getUrl(): string;
+  setUrl(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ImageInput.AsObject;
+  static toObject(includeInstance: boolean, msg: ImageInput): ImageInput.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ImageInput, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ImageInput;
+  static deserializeBinaryFromReader(message: ImageInput, reader: jspb.BinaryReader): ImageInput;
+}
+
+export namespace ImageInput {
+  export type AsObject = {
+    url: string,
+  }
+}
+
 export class TargetInput extends jspb.Message {
-  getValue(): string;
-  setValue(value: string): void;
+  hasTextinput(): boolean;
+  clearTextinput(): void;
+  getTextinput(): TextInput | undefined;
+  setTextinput(value?: TextInput): void;
 
-  getKind(): TargetInput.KindMap[keyof TargetInput.KindMap];
-  setKind(value: TargetInput.KindMap[keyof TargetInput.KindMap]): void;
+  hasImageinput(): boolean;
+  clearImageinput(): void;
+  getImageinput(): ImageInput | undefined;
+  setImageinput(value?: ImageInput): void;
 
+  getInputCase(): TargetInput.InputCase;
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TargetInput.AsObject;
   static toObject(includeInstance: boolean, msg: TargetInput): TargetInput.AsObject;
@@ -84,17 +139,15 @@ export class TargetInput extends jspb.Message {
 
 export namespace TargetInput {
   export type AsObject = {
-    value: string,
-    kind: TargetInput.KindMap[keyof TargetInput.KindMap],
+    textinput?: TextInput.AsObject,
+    imageinput?: ImageInput.AsObject,
   }
 
-  export interface KindMap {
-    B64: 0;
-    URL: 1;
-    TEXT: 2;
+  export enum InputCase {
+    INPUT_NOT_SET = 0,
+    TEXTINPUT = 1,
+    IMAGEINPUT = 2,
   }
-
-  export const Kind: KindMap;
 }
 
 export class GetTemplatesParams extends jspb.Message {

@@ -12,20 +12,33 @@ message Meme {
     string ID = 1;
     string URL = 2;
     repeated OpLog OpLog = 3;
+    CreateMemeParams params = 4;
 }
 message CreateMemeParams {
     string TemplateName = 1;
     repeated TargetInput TargetInputs = 2; 
     optional bool Debug = 3;
 }
+message TextInput {
+    string Text = 1;
+    string Color = 2;
+
+}
+message ImageInput {
+    string URL = 1;
+}
 message TargetInput {
-    string value = 1;
-    enum Kind {
-        B64 = 0; // base64 encoded image
-        URL = 1; // url
-        TEXT = 2; // any text
+    oneof input {
+        TextInput TextInput = 1;
+        ImageInput ImageInput = 2;
     }
-    Kind kind = 2;
+    // string value = 1;
+    // enum Kind {
+    //     B64 = 0; // base64 encoded image
+    //     URL = 1; // url
+    //     TEXT = 2; // any text
+    // }
+    // Kind kind = 2;
 }
 message GetTemplatesParams {}
 
