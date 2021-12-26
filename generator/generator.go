@@ -48,10 +48,10 @@ type Generator struct {
 
 //Meme is a meme
 type Meme struct {
-	ID          string     `json:"id,omitempty"`
-	CurrentStep int32      `json:"current_step,omitempty"`
-	OpLog       []pb.OpLog `json:"op_log,omitempty"`
-	ResultFile  string     `json:"file,omitempty"`
+	ID          string      `json:"id,omitempty"`
+	CurrentStep int32       `json:"current_step,omitempty"`
+	OpLog       []*pb.OpLog `json:"op_log,omitempty"`
+	ResultFile  string      `json:"file,omitempty"`
 }
 
 // GetMemeURL returns the full url
@@ -176,9 +176,9 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 		fmt.Sprintf("%s!", destSize.Dim()), //todo: opt to not stretch
 		dest,
 	}
-	cmd := runCommand(ctx, "convert", args...)
+	cmd := runCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
@@ -205,9 +205,9 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 		payload.ToIMString(),
 		dest,
 	}
-	cmd := runCommand(ctx, "convert", args...)
+	cmd := runCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
@@ -258,9 +258,9 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 			points[0].Comma()),
 		dest,
 	}
-	cmd := runCommand(ctx, "convert", args...)
+	cmd := runCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
@@ -281,7 +281,7 @@ func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, e
 		"-fill",
 		"orange",
 		"-font",
-		"Helvetica",
+		"Lato-Regular",
 		// "-pointsize",
 		// "20",
 		"-size",
@@ -291,9 +291,9 @@ func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, e
 		"caption:" + text,
 		dest,
 	}
-	cmd := runCommand(ctx, "convert", args...)
+	cmd := runCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
@@ -317,7 +317,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 	}
 	cmd := runCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),

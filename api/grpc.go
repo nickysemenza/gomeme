@@ -58,8 +58,9 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	}
 	spew.Dump(meme)
 	return &pb.Meme{
-		ID:  meme.ID,
-		URL: s.g.GetMemeURL(meme),
+		ID:    meme.ID,
+		URL:   s.g.GetMemeURL(meme),
+		OpLog: meme.OpLog,
 	}, nil
 }
 

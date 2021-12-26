@@ -6,7 +6,7 @@ import {
   TargetInput,
   Meme,
 } from "../proto/meme_pb";
-import { getAPIClient } from "../util";
+import { getAPIClient, buildURL } from "../util";
 import update from "immutability-helper";
 import { b64 } from "./b64placeholder";
 interface TargetForm {
@@ -19,23 +19,33 @@ interface Props {
   onCreate: (meme: Meme) => void;
   debug: boolean;
 }
+const getRandom = (): TargetForm => {
+  const items: TargetForm[] = [
+    {
+      value:
+        "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
+      kind: TargetInput.Kind.URL,
+    },
+    {
+      kind: TargetInput.Kind.B64,
+      value: b64,
+    },
+    {
+      kind: TargetInput.Kind.TEXT,
+      value: "cat",
+    },
+  ];
+  return items[Math.floor(Math.random() * items.length)];
+};
 const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
   const [targets, setTargets] = useState<TargetForm[]>([]);
   const [res, setRes] = useState<Meme>();
   useEffect(() => {
     const fetchDetails = () => {
       let t = template.getTargetsList();
-      let targets: TargetForm[] = new Array(t.length).fill({
-        value:
-          "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-        kind: TargetInput.Kind.URL,
-      });
-
-      targets[0] = {
-        kind: TargetInput.Kind.B64,
-        value: b64,
-      };
-      console.log({ targets });
+      let targets: TargetForm[] = Array.from({ length: t.length }, () =>
+        getRandom()
+      );
       setTargets(targets);
     };
     fetchDetails();
@@ -70,34 +80,42 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
       {/* <pre className="w-8">{JSON.stringify(targets, null, 2)}</pre> */}
       <div className="flex flex-col">
         {targets.map((t, x) => (
-          <div key={x} className="w-64">
+          <div key={x} className="w-92">
             <h2 className="font-bold">target {x + 1}</h2>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={t.value}
-              onChange={(v) => {
-                setTargets(
-                  update(targets, {
-                    [x]: {
-                      value: { $set: v.target.value },
-                      kind: {
-                        $set: v.target.value.startsWith("http")
-                          ? TargetInput.Kind.URL
-                          : v.target.value.startsWith("data:")
-                          ? TargetInput.Kind.B64
-                          : TargetInput.Kind.TEXT,
-                      },
-                    },
-                  })
-                );
-              }}
-            ></input>
-            {t.kind !== TargetInput.Kind.TEXT && <img src={t.value} alt="" />}
+            <div className="flex flex-row">
+              <div className="w-1/2">
+                <input
+                  className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  value={t.value}
+                  onChange={(v) => {
+                    setTargets(
+                      update(targets, {
+                        [x]: {
+                          value: { $set: v.target.value },
+                          kind: {
+                            $set: v.target.value.startsWith("http")
+                              ? TargetInput.Kind.URL
+                              : v.target.value.startsWith("data:")
+                              ? TargetInput.Kind.B64
+                              : TargetInput.Kind.TEXT,
+                          },
+                        },
+                      })
+                    );
+                  }}
+                ></input>
+              </div>
+              <div>
+                {t.kind !== TargetInput.Kind.TEXT && (
+                  <img src={t.value} alt="" className="h-40" />
+                )}
+              </div>
+            </div>
             {/* {t.kind === "b64" && <img src={t.value} />} */}
           </div>
         ))}
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded "
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded"
           onClick={makeMeme}
         >
           make meme 👌
@@ -105,6 +123,20 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
       </div>
       <div>
         {res && <img src={res.getUrl()} alt="generated" className="w-72" />}
+        <div>
+          {res &&
+            debug &&
+            res.getOplogList().map((o) => (
+              <div className="border border-orange-600 flex">
+                <img src={buildURL(o.getFile())} className="w-24" alt="" />
+                {/* {o.getFile()} */}
+                <div className="flex flex-col">
+                  {o.getOp()}
+                  {o.getDuration()}
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

@@ -284,7 +284,8 @@ proto.Meme.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     url: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    oplogList: (f = jspb.Message.getRepeatedField(msg, 3)) == null ? undefined : f
+    oplogList: jspb.Message.toObjectList(msg.getOplogList(),
+    proto.OpLog.toObject, includeInstance)
   };
 
   if (includeInstance) {
@@ -330,10 +331,9 @@ proto.Meme.deserializeBinaryFromReader = function(msg, reader) {
       msg.setUrl(value);
       break;
     case 3:
-      var values = /** @type {!Array<!proto.Operation>} */ (reader.isDelimited() ? reader.readPackedEnum() : [reader.readEnum()]);
-      for (var i = 0; i < values.length; i++) {
-        msg.addOplog(values[i]);
-      }
+      var value = new proto.OpLog;
+      reader.readMessage(value,proto.OpLog.deserializeBinaryFromReader);
+      msg.addOplog(value);
       break;
     default:
       reader.skipField();
@@ -380,9 +380,10 @@ proto.Meme.serializeBinaryToWriter = function(message, writer) {
   }
   f = message.getOplogList();
   if (f.length > 0) {
-    writer.writePackedEnum(
+    writer.writeRepeatedMessage(
       3,
-      f
+      f,
+      proto.OpLog.serializeBinaryToWriter
     );
   }
 };
@@ -425,30 +426,31 @@ proto.Meme.prototype.setUrl = function(value) {
 
 
 /**
- * repeated Operation OpLog = 3;
- * @return {!Array<!proto.Operation>}
+ * repeated OpLog OpLog = 3;
+ * @return {!Array<!proto.OpLog>}
  */
 proto.Meme.prototype.getOplogList = function() {
-  return /** @type {!Array<!proto.Operation>} */ (jspb.Message.getRepeatedField(this, 3));
+  return /** @type{!Array<!proto.OpLog>} */ (
+    jspb.Message.getRepeatedWrapperField(this, proto.OpLog, 3));
 };
 
 
 /**
- * @param {!Array<!proto.Operation>} value
+ * @param {!Array<!proto.OpLog>} value
  * @return {!proto.Meme} returns this
- */
+*/
 proto.Meme.prototype.setOplogList = function(value) {
-  return jspb.Message.setField(this, 3, value || []);
+  return jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
 
 
 /**
- * @param {!proto.Operation} value
+ * @param {!proto.OpLog=} opt_value
  * @param {number=} opt_index
- * @return {!proto.Meme} returns this
+ * @return {!proto.OpLog}
  */
-proto.Meme.prototype.addOplog = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 3, value, opt_index);
+proto.Meme.prototype.addOplog = function(opt_value, opt_index) {
+  return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.OpLog, opt_index);
 };
 
 

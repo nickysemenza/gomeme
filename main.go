@@ -133,14 +133,14 @@ func (s *Server) buildRouter() *chi.Mux {
 		meme, err := s.generator.ProcessBase64Payload(ctx, b)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
+			_, _ = w.Write([]byte(err.Error()))
 			return
 		}
 		if true {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(meme)
+			_ = json.NewEncoder(w).Encode(meme)
 		} else {
-			w.Write([]byte(s.generator.GetMemeURL(meme)))
+			_, _ = w.Write([]byte(s.generator.GetMemeURL(meme)))
 		}
 	})
 

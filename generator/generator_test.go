@@ -33,7 +33,7 @@ func TestBuildPrintPayload(t *testing.T) {
 
 func TestMakeText(t *testing.T) {
 	m := Meme{}
-	os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
+	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
 	ctx := context.Background()
 	file, err := m.makeText(ctx, "hello", Point{200, 200})
 	require.NoError(t, err, m.OpLog)
@@ -44,7 +44,7 @@ func TestMakeText(t *testing.T) {
 }
 func TestMakeImage(t *testing.T) {
 	m := Meme{}
-	os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
+	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
 	ctx := context.Background()
 	file, err := m.makeRectangle(ctx, Point{20, 20}, Point{100, 100}, Point{200, 200}, &Deltas{{2, 4}, {}, {3, 0}, {}})
 	require.NoError(t, err, m.OpLog)

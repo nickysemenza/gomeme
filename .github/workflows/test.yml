@@ -24,13 +24,16 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
-      - run: apt-get install -y imagemagick
+          stable: ${{ !contains(matrix.go, 'beta') }} # https://github.com/actions/setup-go/issues/176
+      # - run: sudo apt-get update && sudo apt-get install -y imagemagick
+      - uses: mfinelli/setup-imagemagick@v1
+      - run: magick -version
+      - run: magick -list font
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
       - name: Get dependencies
-        run: go get -v -t -d ./...
-      - name: Build
-        run: go build -v ./...
+        run: go mod vendor
       - name: Test
-        run: go test -v -race -cover ./...
+        run: make unit-cover-go
+      - uses: codecov/codecov-action@v2

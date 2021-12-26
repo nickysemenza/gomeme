@@ -52,9 +52,7 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - test-server
       - test-ui
       # - build-docker:
       #     requires:
       #       - test-ui
-      #       - test-server

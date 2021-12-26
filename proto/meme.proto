@@ -11,7 +11,7 @@ service API {
 message Meme {
     string ID = 1;
     string URL = 2;
-    repeated Operation OpLog = 3;
+    repeated OpLog OpLog = 3;
 }
 message CreateMemeParams {
     string TemplateName = 1;

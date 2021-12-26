@@ -11,9 +11,9 @@ export class Meme extends jspb.Message {
   setUrl(value: string): void;
 
   clearOplogList(): void;
-  getOplogList(): Array<OperationMap[keyof OperationMap]>;
-  setOplogList(value: Array<OperationMap[keyof OperationMap]>): void;
-  addOplog(value: OperationMap[keyof OperationMap], index?: number): OperationMap[keyof OperationMap];
+  getOplogList(): Array<OpLog>;
+  setOplogList(value: Array<OpLog>): void;
+  addOplog(value?: OpLog, index?: number): OpLog;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Meme.AsObject;
@@ -29,7 +29,7 @@ export namespace Meme {
   export type AsObject = {
     id: string,
     url: string,
-    oplogList: Array<OperationMap[keyof OperationMap]>,
+    oplogList: Array<OpLog.AsObject>,
   }
 }
 
