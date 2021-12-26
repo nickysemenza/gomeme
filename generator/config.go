@@ -51,12 +51,14 @@ func (p Point) Sub(p2 Point) Point {
 	}
 }
 
+type Deltas [4]Point
+
 //Target represents a location where input can be placed on a meme
 type Target struct {
-	FriendlyName string   `json:"friendly_name" mapstructure:"friendly_name"`
-	TopLeft      Point    `json:"top_left" mapstructure:"top_left"`
-	Size         Point    `json:"size"`
-	Deltas       [4]Point `json:"deltas"`
+	FriendlyName string  `json:"friendly_name" mapstructure:"friendly_name"`
+	TopLeft      Point   `json:"top_left" mapstructure:"top_left"`
+	Size         Point   `json:"size"`
+	Deltas       *Deltas `json:"deltas"`
 }
 
 //Template is a template for a meme

@@ -106,7 +106,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 				return &m, fmt.Errorf("Process: failed to composite: %w", err)
 			}
 
-			bounding, err = m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, &target.Deltas)
+			bounding, err = m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, target.Deltas)
 			if err != nil {
 				return &m, fmt.Errorf("Process: failed to add bounding: %w", err)
 			}
@@ -170,13 +170,13 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 	return dest, err
 }
 
-func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDimensions Point, deltas *[4]Point) (string, error) {
+func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDimensions Point, deltas *Deltas) (string, error) {
 	op := OpRect
 	dest := m.genFile(op)
 	t := time.Now()
 
 	// CCW
-	points := [4]Point{
+	points := Deltas{
 		topLeft,
 		{X: topLeft.X, Y: bottomRight.Y},
 		bottomRight,
@@ -277,7 +277,7 @@ type DistortPayload struct {
 	ControlPoints [4]ControlPointDelta
 }
 
-func (d *DistortPayload) applyDelta(delta [4]Point) error {
+func (d *DistortPayload) applyDelta(delta *Deltas) error {
 	for x := range d.ControlPoints {
 		d.ControlPoints[x].P2 = d.ControlPoints[x].P2.Add(delta[x])
 	}

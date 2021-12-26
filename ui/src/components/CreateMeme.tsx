@@ -54,6 +54,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
     );
     // req.setDebug(true);
 
+    console.log({ req });
     getAPIClient().createMeme(req, (err, reply) => {
       console.log(JSON.stringify({ err, reply }));
       if (reply) {
@@ -68,7 +69,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
       {/* <pre className="w-8">{JSON.stringify(targets, null, 2)}</pre> */}
       <div className="flex flex-col">
         {targets.map((t, x) => (
-          <div key={x}>
+          <div key={x} className="w-64">
             <h2 className="font-bold">target {x + 1}</h2>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -90,7 +91,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
                 );
               }}
             ></input>
-            <img src={t.value} alt="" />
+            {t.kind !== TargetInput.Kind.TEXT && <img src={t.value} alt="" />}
             {/* {t.kind === "b64" && <img src={t.value} />} */}
           </div>
         ))}
@@ -102,7 +103,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
         </button>
       </div>
       <div>
-        {res && <img src={res.getUrl()} alt="generated" className="w-200" />}
+        {res && <img src={res.getUrl()} alt="generated" className="w-72" />}
       </div>
     </div>
   );

@@ -23,9 +23,9 @@ const (
 type TargetInput_Kind int32
 
 const (
-	TargetInput_B64  TargetInput_Kind = 0
-	TargetInput_URL  TargetInput_Kind = 1
-	TargetInput_TEXT TargetInput_Kind = 2
+	TargetInput_B64  TargetInput_Kind = 0 // base64 encoded image
+	TargetInput_URL  TargetInput_Kind = 1 // url
+	TargetInput_TEXT TargetInput_Kind = 2 // any text
 )
 
 // Enum value maps for TargetInput_Kind.
@@ -187,9 +187,6 @@ func (x *CreateMemeParams) GetDebug() bool {
 	return false
 }
 
-// message TextInput {
-//     string text = 1;
-// }
 type TargetInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
