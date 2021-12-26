@@ -17,12 +17,12 @@ message CreateMemeParams {
     repeated TargetInput TargetInputs = 2; 
     bool Debug = 3;
 }
-
 message TargetInput {
     string value = 1;
     enum Kind {
-        B64 = 0;
-        URL = 1;
+        B64 = 0; // base64 encoded image
+        URL = 1; // url
+        TEXT = 2; // any text
     }
     Kind kind = 2;
 }

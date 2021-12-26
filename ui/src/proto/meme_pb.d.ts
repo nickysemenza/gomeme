@@ -83,6 +83,7 @@ export namespace TargetInput {
   export interface KindMap {
     B64: 0;
     URL: 1;
+    TEXT: 2;
   }
 
   export const Kind: KindMap;

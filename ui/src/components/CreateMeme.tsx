@@ -11,7 +11,7 @@ import update from "immutability-helper";
 import { b64 } from "./b64placeholder";
 interface TargetForm {
   value: string;
-  kind: "url" | "b64";
+  kind: TargetInput.KindMap[keyof TargetInput.KindMap];
 }
 
 interface Props {
@@ -31,7 +31,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
       });
 
       targets[0] = {
-        kind: "b64",
+        kind: TargetInput.Kind.B64,
         value: b64,
       };
       console.log({ targets });
@@ -46,14 +46,13 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
     req.setTargetinputsList(
       targets.map((t) => {
         let input = new TargetInput();
-        input.setKind(
-          t.kind === "url" ? TargetInput.Kind.URL : TargetInput.Kind.B64
-        );
+        input.setKind(t.kind);
         input.setValue(t.value);
 
         return input;
       })
     );
+    // req.setDebug(true);
 
     getAPIClient().createMeme(req, (err, reply) => {
       console.log(JSON.stringify({ err, reply }));
@@ -69,7 +68,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
       {/* <pre className="w-8">{JSON.stringify(targets, null, 2)}</pre> */}
       <div className="flex flex-col">
         {targets.map((t, x) => (
-          <div>
+          <div key={x}>
             <h2 className="font-bold">target {x + 1}</h2>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -80,7 +79,11 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
                     [x]: {
                       value: { $set: v.target.value },
                       kind: {
-                        $set: v.target.value.startsWith("http") ? "url" : "b64",
+                        $set: v.target.value.startsWith("http")
+                          ? TargetInput.Kind.URL
+                          : v.target.value.startsWith("data:")
+                          ? TargetInput.Kind.B64
+                          : TargetInput.Kind.TEXT,
                       },
                     },
                   })

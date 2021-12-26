@@ -24,6 +24,8 @@ const (
 	OpShrink    Operation = "shrink"
 	OpDistort   Operation = "distort"
 	OpComposite Operation = "composite"
+	OpText      Operation = "make_text"
+	OpRect      Operation = "make_rect"
 )
 
 //Generator is the singleton application
@@ -38,6 +40,7 @@ type OpLog struct {
 	Time   time.Duration `json:"time,omitempty"`
 	Output string        `json:"output,omitempty"`
 	File   string        `json:"file,omitempty"`
+	args   []string
 }
 
 //Meme is a meme
@@ -67,7 +70,8 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := req.TargetInputs[step]
-		fileName, err := GetFile(ctx, input)
+		fileName, err := m.GetFile(ctx, input)
+
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to get file: %w", err)
 		}
@@ -127,6 +131,7 @@ func (m *Meme) genFile(op Operation) string {
 }
 
 func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {
+	// return fileName, nil
 	op := OpShrink
 	dest := m.genFile(op)
 	t := time.Now()
@@ -138,11 +143,14 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
 	return dest, err
 }
 
 func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayload) (string, error) {
+	if !payload.set() {
+		return fileName, nil
+	}
 	op := OpDistort
 	dest := m.genFile(op)
 	t := time.Now()
@@ -158,12 +166,12 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
 	return dest, err
 }
 
 func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDimensions Point, deltas *[4]Point) (string, error) {
-	op := OpDistort
+	op := OpRect
 	dest := m.genFile(op)
 	t := time.Now()
 
@@ -205,7 +213,30 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	return dest, err
+}
+
+func (m *Meme) makeText(ctx context.Context, text string) (string, error) {
+	op := OpText
+	dest := m.genFile(op)
+	t := time.Now()
+
+	args := []string{
+		"-background",
+		"transparent",
+		"-fill",
+		"orange",
+		"-font",
+		"Helvetica",
+		"-pointsize",
+		"20",
+		"caption:" + text,
+		dest,
+	}
+	cmd := runCommand(ctx, "convert", args...)
+	output, err := cmd.CombinedOutput()
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
 	return dest, err
 }
 
@@ -223,7 +254,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 	}
 	cmd := runCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest})
+	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
 	return dest, err
 }
 
@@ -261,6 +292,12 @@ func (d *DistortPayload) ToIMString() string {
 	}
 	return strings.Join(cps, "  ")
 }
+func (d *DistortPayload) set() bool {
+	if d == nil || len(d.ControlPoints) != 4 {
+		return false
+	}
+	return true
+}
 
 //BuildBase creates a base distortion payload that's effectively a noop
 func (p *Point) BuildBase() DistortPayload {
@@ -283,7 +320,8 @@ func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 }
 
 // GetFile fetches the file from base64 payload or frmo url
-func GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
+func (m *Meme) GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
+
 	switch t.Kind {
 	case pb.TargetInput_B64:
 		image, err := util.ImageFromBase64(t.Value)
@@ -293,7 +331,8 @@ func GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
 		return util.SaveImage(image)
 	case pb.TargetInput_URL:
 		return util.DownloadImage(ctx, t.Value)
-
+	case pb.TargetInput_TEXT:
+		return m.makeText(ctx, t.Value)
 		// case t.FileName != "":
 		// 	return t.FileName, nil
 	}
