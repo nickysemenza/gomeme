@@ -33,6 +33,8 @@ func main() {
 
 	viper.SetDefault("LISTEN_HOST", "localhost")
 	viper.SetDefault("BASE_API", "http://localhost:3333")
+	viper.SetDefault("FONT", "helvetica")
+
 	viper.AutomaticEnv()
 
 	l := generator.Listen{Host: viper.GetString("LISTEN_HOST"), HTTPPort: 3333, GRPCPort: 9091}
@@ -44,6 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 	config.Listen = l
+	config.Font = viper.GetString("FONT")
 
 	wg := sync.WaitGroup{}
 

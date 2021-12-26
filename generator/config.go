@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Templates map[string]Template `json:"templates"`
 	Listen    Listen
+	Font      string
 }
 
 // Listen contains the port and address to listen on

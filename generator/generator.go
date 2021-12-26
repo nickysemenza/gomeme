@@ -52,6 +52,7 @@ type Meme struct {
 	CurrentStep int32       `json:"current_step,omitempty"`
 	OpLog       []*pb.OpLog `json:"op_log,omitempty"`
 	ResultFile  string      `json:"file,omitempty"`
+	g           *Generator
 }
 
 // GetMemeURL returns the full url
@@ -95,6 +96,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	m := Meme{
 		ID:         ulid.MustNew(ulid.Timestamp(t), ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)).String(),
 		ResultFile: template.File,
+		g:          g,
 	}
 
 	for step, target := range template.Targets {
@@ -118,7 +120,6 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		}
 
 		dist := target.Size.BuildBase()
-		// spew.Dump(dist.ToIMString())
 		err = dist.applyDelta(target.Deltas)
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to apply delta: %w", err)
@@ -281,7 +282,7 @@ func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, e
 		"-fill",
 		"orange",
 		"-font",
-		"Lato-Regular",
+		m.g.Config.Font,
 		// "-pointsize",
 		// "20",
 		"-size",
