@@ -35,16 +35,6 @@ jobs:
   #           docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
   #           docker push nicky/gomeme:latest
   #           docker run --entrypoint="./gomeme" nicky/gomeme
-  test-server:
-    docker:
-      - image: circleci/golang:1.17
-    steps:
-      - checkout
-      - run: go build ./...
-      - run: ./test_coverage.sh
-      - run: bash <(curl -s https://codecov.io/bash)
-      - store_test_results:
-          path: .
   test-ui:
     docker:
       - image: node:17

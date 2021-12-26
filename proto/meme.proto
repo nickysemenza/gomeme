@@ -11,6 +11,7 @@ service API {
 message Meme {
     string ID = 1;
     string URL = 2;
+    repeated Operation OpLog = 3;
 }
 message CreateMemeParams {
     string TemplateName = 1;
@@ -52,4 +53,21 @@ message TemplateList {
 
 message Ping {
     string message = 1;
+}
+
+enum Operation {
+        Shrink = 0;
+        Distort = 1;
+        Composite = 2;
+        Text = 3;
+        Rect = 4;
+  }
+    
+message OpLog  {
+    int32 step = 1;
+    Operation Op = 2;
+    string Duration = 3;
+    string DebugOutput = 4;
+    string File = 5;
+    repeated string Args = 6;
 }

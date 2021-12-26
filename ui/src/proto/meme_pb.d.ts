@@ -10,6 +10,11 @@ export class Meme extends jspb.Message {
   getUrl(): string;
   setUrl(value: string): void;
 
+  clearOplogList(): void;
+  getOplogList(): Array<OperationMap[keyof OperationMap]>;
+  setOplogList(value: Array<OperationMap[keyof OperationMap]>): void;
+  addOplog(value: OperationMap[keyof OperationMap], index?: number): OperationMap[keyof OperationMap];
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Meme.AsObject;
   static toObject(includeInstance: boolean, msg: Meme): Meme.AsObject;
@@ -24,6 +29,7 @@ export namespace Meme {
   export type AsObject = {
     id: string,
     url: string,
+    oplogList: Array<OperationMap[keyof OperationMap]>,
   }
 }
 
@@ -240,4 +246,56 @@ export namespace Ping {
     message: string,
   }
 }
+
+export class OpLog extends jspb.Message {
+  getStep(): number;
+  setStep(value: number): void;
+
+  getOp(): OperationMap[keyof OperationMap];
+  setOp(value: OperationMap[keyof OperationMap]): void;
+
+  getDuration(): string;
+  setDuration(value: string): void;
+
+  getDebugoutput(): string;
+  setDebugoutput(value: string): void;
+
+  getFile(): string;
+  setFile(value: string): void;
+
+  clearArgsList(): void;
+  getArgsList(): Array<string>;
+  setArgsList(value: Array<string>): void;
+  addArgs(value: string, index?: number): string;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): OpLog.AsObject;
+  static toObject(includeInstance: boolean, msg: OpLog): OpLog.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: OpLog, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): OpLog;
+  static deserializeBinaryFromReader(message: OpLog, reader: jspb.BinaryReader): OpLog;
+}
+
+export namespace OpLog {
+  export type AsObject = {
+    step: number,
+    op: OperationMap[keyof OperationMap],
+    duration: string,
+    debugoutput: string,
+    file: string,
+    argsList: Array<string>,
+  }
+}
+
+export interface OperationMap {
+  SHRINK: 0;
+  DISTORT: 1;
+  COMPOSITE: 2;
+  TEXT: 3;
+  RECT: 4;
+}
+
+export const Operation: OperationMap;
 

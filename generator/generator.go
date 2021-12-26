@@ -19,17 +19,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//Operation is a step
-type Operation string
+// //Operation is a step
+// type Operation string
 
-//Operations
-const (
-	OpShrink    Operation = "shrink"
-	OpDistort   Operation = "distort"
-	OpComposite Operation = "composite"
-	OpText      Operation = "make_text"
-	OpRect      Operation = "make_rect"
-)
+// //Operations
+// const (
+// 	OpShrink    Operation = "shrink"
+// 	OpDistort   Operation = "distort"
+// 	OpComposite Operation = "composite"
+// 	OpText      Operation = "make_text"
+// 	OpRect      Operation = "make_rect"
+// )
 
 //Generator is the singleton application
 type Generator struct {
@@ -37,21 +37,21 @@ type Generator struct {
 }
 
 //OpLog represents the log of an operation
-type OpLog struct {
-	Step   int           `json:"step"`
-	Op     Operation     `json:"op,omitempty"`
-	Time   time.Duration `json:"time,omitempty"`
-	Output string        `json:"output,omitempty"`
-	File   string        `json:"file,omitempty"`
-	args   []string
-}
+// type OpLog struct {
+// 	Step   int           `json:"step"`
+// 	Op     Operation     `json:"op,omitempty"`
+// 	Time   time.Duration `json:"time,omitempty"`
+// 	Output string        `json:"output,omitempty"`
+// 	File   string        `json:"file,omitempty"`
+// 	args   []string
+// }
 
 //Meme is a meme
 type Meme struct {
-	ID          string  `json:"id,omitempty"`
-	CurrentStep int     `json:"current_step,omitempty"`
-	OpLog       []OpLog `json:"op_log,omitempty"`
-	ResultFile  string  `json:"file,omitempty"`
+	ID          string     `json:"id,omitempty"`
+	CurrentStep int32      `json:"current_step,omitempty"`
+	OpLog       []pb.OpLog `json:"op_log,omitempty"`
+	ResultFile  string     `json:"file,omitempty"`
 }
 
 // GetMemeURL returns the full url
@@ -98,7 +98,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	}
 
 	for step, target := range template.Targets {
-		m.CurrentStep = step
+		m.CurrentStep = int32(step)
 		input := req.TargetInputs[step]
 		var fileName string
 		var err error
@@ -162,12 +162,12 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	}
 	return &m, nil
 }
-func (m *Meme) genFile(op Operation) string {
+func (m *Meme) genFile(op pb.Operation) string {
 	return fmt.Sprintf("tmp/%s-%d-%s.png", m.ID, m.CurrentStep, op)
 }
 
 func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {
-	op := OpShrink
+	op := pb.Operation_Shrink
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
@@ -178,7 +178,13 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+		Op:          op,
+		Duration:    time.Since(t).String(),
+		DebugOutput: string(output),
+		File:        dest,
+		Args:        args,
+	})
 	return dest, err
 }
 
@@ -186,7 +192,7 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 	if !payload.set() {
 		return fileName, nil
 	}
-	op := OpDistort
+	op := pb.Operation_Distort
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
@@ -201,12 +207,18 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+		Op:          op,
+		Duration:    time.Since(t).String(),
+		DebugOutput: string(output),
+		File:        dest,
+		Args:        args,
+	})
 	return dest, err
 }
 
 func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDimensions Point, deltas *Deltas) (string, error) {
-	op := OpRect
+	op := pb.Operation_Rect
 	dest := m.genFile(op)
 	t := time.Now()
 
@@ -248,12 +260,18 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+		Op:          op,
+		Duration:    time.Since(t).String(),
+		DebugOutput: string(output),
+		File:        dest,
+		Args:        args,
+	})
 	return dest, err
 }
 
 func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, error) {
-	op := OpText
+	op := pb.Operation_Text
 	dest := m.genFile(op)
 	t := time.Now()
 
@@ -275,13 +293,19 @@ func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, e
 	}
 	cmd := runCommand(ctx, "convert", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+		Op:          op,
+		Duration:    time.Since(t).String(),
+		DebugOutput: string(output),
+		File:        dest,
+		Args:        args,
+	})
 	return dest, err
 }
 
 /// composites A onto B, given the top-left corner position of A
 func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLeft Point) (string, error) {
-	op := OpComposite
+	op := pb.Operation_Composite
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
@@ -293,7 +317,13 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 	}
 	cmd := runCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
-	m.OpLog = append(m.OpLog, OpLog{m.CurrentStep, op, time.Since(t), string(output), dest, args})
+	m.OpLog = append(m.OpLog, pb.OpLog{Step: m.CurrentStep,
+		Op:          op,
+		Duration:    time.Since(t).String(),
+		DebugOutput: string(output),
+		File:        dest,
+		Args:        args,
+	})
 	return dest, err
 }
 
