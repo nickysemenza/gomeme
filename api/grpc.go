@@ -3,11 +3,11 @@ package api
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gomeme/generator"
 	pb "github.com/nickysemenza/gomeme/proto"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
@@ -21,6 +21,9 @@ type Server struct {
 func (s *Server) GetPing(ctx context.Context, in *pb.Ping) (*pb.Ping, error) {
 	return &pb.Ping{Message: fmt.Sprintf("pong: %s", in.Message)}, nil
 }
+func pointToPB(p generator.Point) *pb.Point {
+	return &pb.Point{X: p.X, Y: p.Y}
+}
 
 //GetTemplates returns a list of all templates
 func (s *Server) GetTemplates(ctx context.Context, _ *pb.GetTemplatesParams) (*pb.TemplateList, error) {
@@ -31,21 +34,21 @@ func (s *Server) GetTemplates(ctx context.Context, _ *pb.GetTemplatesParams) (*p
 			Name: name,
 		}
 		for _, target := range template.Targets {
-			t.Targets = append(t.Targets, &pb.Target{TopLeft: &pb.Point{X: int32(target.TopLeft.X)}})
+			t.Targets = append(t.Targets, &pb.Target{
+				Size:         pointToPB(target.Size),
+				FriendlyName: target.FriendlyName,
+				TopLeft:      pointToPB(target.TopLeft)})
 		}
 		templates = append(templates, &t)
 	}
+	sort.Slice(templates, func(i, j int) bool {
+		return templates[i].Name < templates[j].Name
+	})
 	return &pb.TemplateList{Templates: templates}, nil
 }
 
 //CreateMeme makes a meme
 func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.Meme, error) {
-	// input := generator.Input{TemplateName: in.GetTemplateName()}
-	// for _, i := range in.GetTargetInputs() {
-	// 	input.TargetInputs = append(input.TargetInputs, generator.TargetInput{
-	// 		FileName: i.GetFileName(),
-	// 		URL:      i.GetURL()})
-	// }
 	meme, err := s.g.Process(ctx, in)
 	if err != nil {
 		err = fmt.Errorf("failed to generate meme: %w", err)
@@ -56,7 +59,7 @@ func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.M
 	spew.Dump(meme)
 	return &pb.Meme{
 		ID:  meme.ID,
-		URL: fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile),
+		URL: s.g.GetMemeURL(meme),
 	}, nil
 }
 

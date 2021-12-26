@@ -2,6 +2,8 @@ package generator
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os/exec"
@@ -11,6 +13,7 @@ import (
 	pb "github.com/nickysemenza/gomeme/proto"
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/oklog/ulid/v2"
+	"github.com/spf13/viper"
 
 	"github.com/davecgh/go-spew/spew"
 	log "github.com/sirupsen/logrus"
@@ -35,7 +38,7 @@ type Generator struct {
 
 //OpLog represents the log of an operation
 type OpLog struct {
-	Step   int           `json:"step,omitempty"`
+	Step   int           `json:"step"`
 	Op     Operation     `json:"op,omitempty"`
 	Time   time.Duration `json:"time,omitempty"`
 	Output string        `json:"output,omitempty"`
@@ -51,6 +54,26 @@ type Meme struct {
 	ResultFile  string  `json:"file,omitempty"`
 }
 
+// GetMemeURL returns the full url
+func (g *Generator) GetMemeURL(meme *Meme) string {
+	return fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile)
+}
+
+// ProcessBase64Payload processes a base64 payload
+func (g *Generator) ProcessBase64Payload(ctx context.Context, b string) (*Meme, error) {
+	jsonBytes, err := base64.StdEncoding.DecodeString(b)
+	if err != nil {
+		return nil, err
+	}
+	var req pb.CreateMemeParams
+	err = json.Unmarshal(jsonBytes, &req)
+	if err != nil {
+		return nil, err
+	}
+	return g.Process(ctx, &req)
+
+}
+
 //Process makes a meme
 func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Meme, error) {
 	templateName := req.TemplateName
@@ -58,6 +81,13 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	if !ok {
 		return nil, fmt.Errorf("Process: template %s does not exist", templateName)
 	}
+
+	jsonBytes, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("Process: %w", err)
+	}
+	hash := base64.StdEncoding.EncodeToString(jsonBytes)
+	log.Info("Process: hash: ", hash)
 
 	//TODO: ensure length of input is right
 
@@ -70,7 +100,14 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	for step, target := range template.Targets {
 		m.CurrentStep = step
 		input := req.TargetInputs[step]
-		fileName, err := m.GetFile(ctx, input)
+		var fileName string
+		var err error
+
+		if input.Kind == pb.TargetInput_TEXT {
+			fileName, err = m.makeText(ctx, input.Value, target.Size)
+		} else {
+			fileName, err = m.GetFile(ctx, input)
+		}
 
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to get file: %w", err)
@@ -95,7 +132,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 			return &m, fmt.Errorf("Process: failed to composite: %w", err)
 		}
 
-		if req.Debug {
+		if req.GetDebug() {
 			//debug overlay
 			bounding, err := m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, nil)
 			if err != nil {
@@ -121,7 +158,6 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
 			return &m, fmt.Errorf("Process: failed to copy: %w", err)
 		}
-		// spew.Dump(dist.ToIMString())
 
 	}
 	return &m, nil
@@ -131,14 +167,13 @@ func (m *Meme) genFile(op Operation) string {
 }
 
 func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {
-	// return fileName, nil
 	op := OpShrink
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
 		fileName,
 		"-resize",
-		fmt.Sprintf("%dx%d!", destSize.X, destSize.Y), //todo: opt to not stretch
+		fmt.Sprintf("%s!", destSize.Dim()), //todo: opt to not stretch
 		dest,
 	}
 	cmd := runCommand(ctx, "convert", args...)
@@ -217,7 +252,7 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 	return dest, err
 }
 
-func (m *Meme) makeText(ctx context.Context, text string) (string, error) {
+func (m *Meme) makeText(ctx context.Context, text string, hint Point) (string, error) {
 	op := OpText
 	dest := m.genFile(op)
 	t := time.Now()
@@ -229,8 +264,12 @@ func (m *Meme) makeText(ctx context.Context, text string) (string, error) {
 		"orange",
 		"-font",
 		"Helvetica",
-		"-pointsize",
-		"20",
+		// "-pointsize",
+		// "20",
+		"-size",
+		hint.Dim(),
+		"-gravity",
+		"center",
 		"caption:" + text,
 		dest,
 	}
@@ -278,6 +317,9 @@ type DistortPayload struct {
 }
 
 func (d *DistortPayload) applyDelta(delta *Deltas) error {
+	if delta == nil {
+		return nil
+	}
 	for x := range d.ControlPoints {
 		d.ControlPoints[x].P2 = d.ControlPoints[x].P2.Add(delta[x])
 	}
@@ -332,9 +374,7 @@ func (m *Meme) GetFile(ctx context.Context, t *pb.TargetInput) (string, error) {
 	case pb.TargetInput_URL:
 		return util.DownloadImage(ctx, t.Value)
 	case pb.TargetInput_TEXT:
-		return m.makeText(ctx, t.Value)
-		// case t.FileName != "":
-		// 	return t.FileName, nil
+		return "", nil
 	}
 	return "", fmt.Errorf("could not get file from input: %v", t)
 }

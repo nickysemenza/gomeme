@@ -21,8 +21,8 @@ type Listen struct {
 
 //Point represents an x,y coordinate
 type Point struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+	X int32 `json:"x"`
+	Y int32 `json:"y"`
 }
 
 // Comma prints the point as csv
@@ -51,6 +51,7 @@ func (p Point) Sub(p2 Point) Point {
 	}
 }
 
+// Deltas holds the 4 corners of a distortion
 type Deltas [4]Point
 
 //Target represents a location where input can be placed on a meme

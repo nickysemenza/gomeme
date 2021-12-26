@@ -17,8 +17,9 @@ interface TargetForm {
 interface Props {
   template: Template;
   onCreate: (meme: Meme) => void;
+  debug: boolean;
 }
-const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
+const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
   const [targets, setTargets] = useState<TargetForm[]>([]);
   const [res, setRes] = useState<Meme>();
   useEffect(() => {
@@ -27,7 +28,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
       let targets: TargetForm[] = new Array(t.length).fill({
         value:
           "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
-        kind: "url",
+        kind: TargetInput.Kind.URL,
       });
 
       targets[0] = {
@@ -52,7 +53,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
         return input;
       })
     );
-    // req.setDebug(true);
+    req.setDebug(debug);
 
     console.log({ req });
     getAPIClient().createMeme(req, (err, reply) => {
@@ -96,7 +97,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate }) => {
           </div>
         ))}
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-40 h-20"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded "
           onClick={makeMeme}
         >
           make meme 👌

@@ -15,7 +15,7 @@ message Meme {
 message CreateMemeParams {
     string TemplateName = 1;
     repeated TargetInput TargetInputs = 2; 
-    bool Debug = 3;
+    optional bool Debug = 3;
 }
 message TargetInput {
     string value = 1;

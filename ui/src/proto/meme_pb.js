@@ -518,8 +518,8 @@ proto.CreateMemeParams.serializeBinaryToWriter = function(message, writer) {
       proto.TargetInput.serializeBinaryToWriter
     );
   }
-  f = message.getDebug();
-  if (f) {
+  f = /** @type {boolean} */ (jspb.Message.getField(message, 3));
+  if (f != null) {
     writer.writeBool(
       3,
       f
@@ -598,7 +598,25 @@ proto.CreateMemeParams.prototype.getDebug = function() {
  * @return {!proto.CreateMemeParams} returns this
  */
 proto.CreateMemeParams.prototype.setDebug = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 3, value);
+  return jspb.Message.setField(this, 3, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.CreateMemeParams} returns this
+ */
+proto.CreateMemeParams.prototype.clearDebug = function() {
+  return jspb.Message.setField(this, 3, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.CreateMemeParams.prototype.hasDebug = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

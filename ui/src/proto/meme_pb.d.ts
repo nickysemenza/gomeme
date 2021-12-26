@@ -36,6 +36,8 @@ export class CreateMemeParams extends jspb.Message {
   setTargetinputsList(value: Array<TargetInput>): void;
   addTargetinputs(value?: TargetInput, index?: number): TargetInput;
 
+  hasDebug(): boolean;
+  clearDebug(): void;
   getDebug(): boolean;
   setDebug(value: boolean): void;
 

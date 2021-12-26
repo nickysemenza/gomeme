@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -23,8 +24,9 @@ import (
 
 //Server is a HTTP server
 type Server struct {
-	G      *grpcweb.WrappedGrpcServer
-	Listen generator.Listen
+	grpc      *grpcweb.WrappedGrpcServer
+	generator *generator.Generator
+	Listen    generator.Listen
 }
 
 func main() {
@@ -46,10 +48,11 @@ func main() {
 	wg := sync.WaitGroup{}
 
 	g := generator.Generator{Config: config}
+	s.generator = &g
 
 	grpcServer := api.NewServer(&g)
 
-	s.G = grpcweb.WrapServer(grpcServer)
+	s.grpc = grpcweb.WrapServer(grpcServer)
 
 	go s.servegRPC(ctx, &wg, grpcServer)
 
@@ -118,11 +121,27 @@ func (s *Server) buildRouter() *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Use(NewGrpcWebMiddleware(s.G).Handler)
+	r.Use(NewGrpcWebMiddleware(s.grpc).Handler)
 
 	r.Get("/hi", func(w http.ResponseWriter, r *http.Request) {
 		//nolint: errcheck
 		w.Write([]byte("hi"))
+	})
+	r.Get("/b/{payload}", func(w http.ResponseWriter, r *http.Request) {
+		b := chi.URLParam(r, "payload")
+		ctx := r.Context()
+		meme, err := s.generator.ProcessBase64Payload(ctx, b)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		if true {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(meme)
+		} else {
+			w.Write([]byte(s.generator.GetMemeURL(meme)))
+		}
 	})
 
 	r.Handle("/tmp/{res}", http.StripPrefix("/tmp/", http.FileServer(http.Dir("tmp/"))))
