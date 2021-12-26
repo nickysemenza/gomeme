@@ -5,7 +5,7 @@ RUN yarn
 COPY ui ./
 RUN yarn build
 
-FROM golang:1.16-buster as go-builder
+FROM golang:1.17-buster as go-builder
 COPY . /src/gomeme
 WORKDIR /src/gomeme
 RUN make build
