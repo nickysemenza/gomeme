@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FONT: "Lato-Regular" # one of the fonts that `magick -list font` has on Actions
-
     strategy:
       matrix:
         go: ["1.17", "1.18.0-beta1"]

@@ -105,18 +105,22 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		var fileName string
 		var err error
 
+		isText := false
 		if text := input.GetTextInput(); text != nil {
+			isText = true
 			fileName, err = m.makeText(ctx, text.Text, text.Color, target.Size)
 		} else if img := input.GetImageInput(); img != nil {
 			fileName, err = m.GetFile(ctx, img)
 		}
-
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to get file: %w", err)
 		}
-		shrunkFile, err := m.shrinkToSize(ctx, fileName, target.Size)
-		if err != nil {
-			return &m, fmt.Errorf("Process: failed to shrink: %w", err)
+		if !isText {
+			// text should already by target.Size
+			fileName, err = m.shrinkToSize(ctx, fileName, target.Size)
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to shrink: %w", err)
+			}
 		}
 
 		dist := target.Size.BuildBase()
@@ -124,7 +128,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to apply delta: %w", err)
 		}
-		distortedFile, err := m.distort(ctx, shrunkFile, dist)
+		distortedFile, err := m.distort(ctx, fileName, dist)
 		if err != nil {
 			return &m, fmt.Errorf("Process: failed to distort: %w", err)
 		}
@@ -144,13 +148,15 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 				return &m, fmt.Errorf("Process: failed to composite: %w", err)
 			}
 
-			bounding, err = m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, target.Deltas)
-			if err != nil {
-				return &m, fmt.Errorf("Process: failed to add bounding: %w", err)
-			}
-			compositedFile, err = m.composite(ctx, bounding, compositedFile, Point{})
-			if err != nil {
-				return &m, fmt.Errorf("Process: failed to composite: %w", err)
+			if target.Deltas != nil {
+				bounding, err = m.makeRectangle(ctx, target.TopLeft, target.TopLeft.Add(target.Size), template.Size, target.Deltas)
+				if err != nil {
+					return &m, fmt.Errorf("Process: failed to add bounding: %w", err)
+				}
+				compositedFile, err = m.composite(ctx, bounding, compositedFile, Point{})
+				if err != nil {
+					return &m, fmt.Errorf("Process: failed to composite: %w", err)
+				}
 			}
 		}
 
@@ -190,7 +196,11 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 }
 
 func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayload) (string, error) {
-	if !payload.set() {
+	if !payload.set() ||
+		(payload.ControlPoints[0].P1.X == 0 &&
+			payload.ControlPoints[0].P1.Y == 0 &&
+			payload.ControlPoints[0].P2.X == 0 &&
+			payload.ControlPoints[0].P2.Y == 0) {
 		return fileName, nil
 	}
 	op := pb.Operation_Distort

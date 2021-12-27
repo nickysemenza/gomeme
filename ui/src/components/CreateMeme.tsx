@@ -180,6 +180,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
                 <div className="flex flex-col">
                   {o.getOp()}
                   {o.getDuration()}
+                  {o.getArgsList().join(", ")}
                 </div>
               </div>
             ))}
