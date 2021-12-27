@@ -1,0 +1,4 @@
+# https://github.com/github/linguist/blob/master/docs/overrides.md
+ui/src/proto/** linguist-generated
+proto/meme.pb.go linguist-generated
+proto/meme_grpc.pb.go linguist-generated

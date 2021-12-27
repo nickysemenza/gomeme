@@ -80,22 +80,22 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	for step, target := range template.Targets {
 		m.CurrentStep = int32(step)
 		input := req.TargetInputs[step]
-		var fileName string
-		var err error
 
-		isText := false
+		var fileName string
+
 		if text := input.GetTextInput(); text != nil {
-			isText = true
 			fileName, err = m.makeText(ctx, text.Text, text.Color, target.Size)
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to make text: %w", err)
+			}
 		} else if img := input.GetImageInput(); img != nil {
 			fileName, err = m.GetFile(ctx, img)
-		}
-		if err != nil {
-			return &m, fmt.Errorf("Process: failed to get file: %w", err)
-		}
-		if !isText {
-			// text should already by target.Size
-			fileName, err = m.shrinkToSize(ctx, fileName, target.Size)
+			if err != nil {
+				return &m, fmt.Errorf("Process: failed to get file: %w", err)
+			}
+
+			// text should already by target.Size so only need to do for images
+			fileName, err = m.shrinkToSize(ctx, fileName, target.Size, img.Stretch)
 			if err != nil {
 				return &m, fmt.Errorf("Process: failed to shrink: %w", err)
 			}
@@ -151,14 +151,22 @@ func (m *Meme) genFile(op pb.Operation) string {
 	return fmt.Sprintf("tmp/%s-%d-%s.png", m.ID, m.CurrentStep, op)
 }
 
-func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point) (string, error) {
+func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point, stretch bool) (string, error) {
 	op := pb.Operation_Shrink
 	dest := m.genFile(op)
 	t := time.Now()
+	flags := ""
+	if stretch { //todo: opt in to stretch
+		// https://legacy.imagemagick.org/Usage/resize/#noaspect
+		flags = "!"
+	}
+	// https://legacy.imagemagick.org/Usage/thumbnails/#pad
 	args := []string{
 		fileName,
-		"-resize",
-		fmt.Sprintf("%s!", destSize.Dim()), //todo: opt to not stretch
+		"-resize", fmt.Sprintf("%s%s", destSize.Dim(), flags),
+		"-background", "none", // order matters here
+		"-gravity", "center",
+		"-extent", destSize.Dim(),
 		dest,
 	}
 	cmd := RunCommand(ctx, "magick", args...)
@@ -187,10 +195,8 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 	args := []string{
 		fileName,
 		"-matte",
-		"-virtual-pixel",
-		"transparent",
-		"-distort",
-		"Perspective",
+		"-virtual-pixel", "transparent",
+		"-distort", "Perspective",
 		payload.ToIMString(),
 		dest,
 	}
@@ -234,12 +240,9 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 		"-size",
 		fileDimensions.Dim(),
 		"xc:transparent",
-		"-fill",
-		"transparent",
-		"-stroke",
-		color,
-		"-draw",
-		fmt.Sprintf(`polyline %s %s %s %s %s`,
+		"-fill", "transparent",
+		"-stroke", color,
+		"-draw", fmt.Sprintf(`polyline %s %s %s %s %s`,
 			points[0].Comma(),
 			points[1].Comma(),
 			points[2].Comma(),
@@ -270,16 +273,11 @@ func (m *Meme) makeText(ctx context.Context, text, color string, hint Point) (st
 	args := []string{
 		"-background",
 		"transparent",
-		"-fill",
-		color,
-		"-font",
-		m.g.Config.Font,
-		// "-pointsize",
-		// "20",
-		"-size",
-		hint.Dim(),
-		"-gravity",
-		"center",
+		"-fill", color,
+		"-font", m.g.Config.Font,
+		// "-pointsize", "20",
+		"-size", hint.Dim(),
+		"-gravity", "center",
 		"caption:" + text,
 		dest,
 	}

@@ -21,8 +21,6 @@ var global = (function() {
   return Function('return this')();
 }.call(null));
 
-var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
-goog.object.extend(proto, google_protobuf_empty_pb);
 goog.exportSymbol('proto.CreateMemeParams', null, global);
 goog.exportSymbol('proto.GetTemplatesParams', null, global);
 goog.exportSymbol('proto.ImageInput', null, global);
@@ -1034,7 +1032,8 @@ proto.ImageInput.prototype.toObject = function(opt_includeInstance) {
  */
 proto.ImageInput.toObject = function(includeInstance, msg) {
   var f, obj = {
-    url: jspb.Message.getFieldWithDefault(msg, 1, "")
+    url: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    stretch: jspb.Message.getBooleanFieldWithDefault(msg, 2, false)
   };
 
   if (includeInstance) {
@@ -1075,6 +1074,10 @@ proto.ImageInput.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setUrl(value);
       break;
+    case 2:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setStretch(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1111,6 +1114,13 @@ proto.ImageInput.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getStretch();
+  if (f) {
+    writer.writeBool(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -1129,6 +1139,24 @@ proto.ImageInput.prototype.getUrl = function() {
  */
 proto.ImageInput.prototype.setUrl = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
+};
+
+
+/**
+ * optional bool stretch = 2;
+ * @return {boolean}
+ */
+proto.ImageInput.prototype.getStretch = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 2, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.ImageInput} returns this
+ */
+proto.ImageInput.prototype.setStretch = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 2, value);
 };
 
 

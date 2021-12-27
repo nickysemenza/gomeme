@@ -26,6 +26,7 @@ message TextInput {
 }
 message ImageInput {
     string URL = 1;
+    bool stretch = 2;
 }
 message TargetInput {
     oneof input {

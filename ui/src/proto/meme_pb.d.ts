@@ -2,7 +2,6 @@
 // file: proto/meme.proto
 
 import * as jspb from "google-protobuf";
-import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 
 export class Meme extends jspb.Message {
   getId(): string;
@@ -100,6 +99,9 @@ export class ImageInput extends jspb.Message {
   getUrl(): string;
   setUrl(value: string): void;
 
+  getStretch(): boolean;
+  setStretch(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ImageInput.AsObject;
   static toObject(includeInstance: boolean, msg: ImageInput): ImageInput.AsObject;
@@ -113,6 +115,7 @@ export class ImageInput extends jspb.Message {
 export namespace ImageInput {
   export type AsObject = {
     url: string,
+    stretch: boolean,
   }
 }
 
