@@ -7,6 +7,8 @@ import {
   Meme,
   ImageInput,
   TextInput,
+  OperationMap,
+  Operation,
 } from "../proto/meme_pb";
 import { getAPIClient, buildURL } from "../util";
 import update from "immutability-helper";
@@ -42,7 +44,9 @@ const getRandomColor = (): string => {
 };
 const getRandom = (): TargetForm => {
   let image1 = new ImageInput();
-  image1.setUrl(b64);
+  image1.setUrl(
+    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
+  );
   let image2 = new ImageInput();
   image2.setUrl(b64);
   let text1 = new TextInput();
@@ -59,6 +63,7 @@ const getRandom = (): TargetForm => {
 const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
   const [targets, setTargets] = useState<TargetForm[]>([]);
   const [res, setRes] = useState<Meme>();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchDetails = () => {
       let t = template.getTargetsList();
@@ -71,6 +76,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
   }, [template]);
 
   const makeMeme = () => {
+    setLoading(true);
     const req = new CreateMemeParams();
     req.setTemplatename(template.getName());
     req.setTargetinputsList(
@@ -91,6 +97,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
     console.log({ req });
     getAPIClient().createMeme(req, (err, reply) => {
       console.log(JSON.stringify({ err, reply }));
+      setLoading(false);
       if (reply) {
         console.log("created", reply.getId(), reply.getUrl());
         onCreate(reply);
@@ -169,6 +176,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
         </button>
       </div>
       <div>
+        {loading && <div className="text-xl text-bold">loading...</div>}
         {res && <img src={res.getUrl()} alt="generated" className="w-72" />}
         <div>
           {res &&
@@ -178,9 +186,11 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
                 <img src={buildURL(o.getFile())} className="w-24" alt="" />
                 {/* {o.getFile()} */}
                 <div className="flex flex-col">
-                  {o.getOp()}
-                  {o.getDuration()}
-                  {o.getArgsList().join(", ")}
+                  <div className="text-green-700 ">{getOpName(o.getOp())}</div>
+                  <div className="text-blue-700 ">{o.getDuration()}</div>
+                  <div className="text-orange-700 ">
+                    {o.getArgsList().join(", ")}
+                  </div>
                 </div>
               </div>
             ))}
@@ -189,4 +199,24 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
     </div>
   );
 };
+const getOpName = (op: OperationMap[keyof OperationMap]) => {
+  switch (op) {
+    case Operation.SHRINK:
+      return "shrink";
+    case Operation.COMPOSITE:
+      return "composite";
+    case Operation.DISTORT:
+      return "distort";
+    case Operation.RECT:
+      return "rectangle (debug)";
+    case Operation.TEXT:
+      return "text";
+    default:
+      assertUnreachable(op);
+  }
+};
+
+function assertUnreachable(x: never): never {
+  throw new Error("Didn't expect to get here");
+}
 export default CreateMeme;

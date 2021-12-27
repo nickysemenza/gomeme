@@ -19,32 +19,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// //Operation is a step
-// type Operation string
-
-// //Operations
-// const (
-// 	OpShrink    Operation = "shrink"
-// 	OpDistort   Operation = "distort"
-// 	OpComposite Operation = "composite"
-// 	OpText      Operation = "make_text"
-// 	OpRect      Operation = "make_rect"
-// )
-
 //Generator is the singleton application
 type Generator struct {
 	Config *Config
 }
-
-//OpLog represents the log of an operation
-// type OpLog struct {
-// 	Step   int           `json:"step"`
-// 	Op     Operation     `json:"op,omitempty"`
-// 	Time   time.Duration `json:"time,omitempty"`
-// 	Output string        `json:"output,omitempty"`
-// 	File   string        `json:"file,omitempty"`
-// 	args   []string
-// }
 
 //Meme is a meme
 type Meme struct {

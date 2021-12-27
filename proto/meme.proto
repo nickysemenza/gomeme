@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 option go_package = "github.com/nickysemenza/gomeme/proto";
-import "google/protobuf/empty.proto";
 
 service API {
     rpc GetPing(Ping) returns (Ping) {}
@@ -33,13 +32,7 @@ message TargetInput {
         TextInput TextInput = 1;
         ImageInput ImageInput = 2;
     }
-    // string value = 1;
-    // enum Kind {
-    //     B64 = 0; // base64 encoded image
-    //     URL = 1; // url
-    //     TEXT = 2; // any text
-    // }
-    // Kind kind = 2;
+   
 }
 message GetTemplatesParams {}
 

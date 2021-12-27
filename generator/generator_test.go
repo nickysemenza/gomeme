@@ -33,6 +33,7 @@ func TestBuildPrintPayload(t *testing.T) {
 }
 
 func TestMakeText(t *testing.T) {
+	viper.AutomaticEnv()
 	m := Meme{g: &Generator{Config: &Config{Font: viper.GetString("FONT")}}}
 	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
 	ctx := context.Background()
