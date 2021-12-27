@@ -2,6 +2,7 @@
 // file: proto/meme.proto
 
 import * as jspb from "google-protobuf";
+import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 
 export class Meme extends jspb.Message {
   getId(): string;
@@ -339,6 +340,41 @@ export namespace OpLog {
     debugoutput: string,
     file: string,
     argsList: Array<string>,
+  }
+}
+
+export class InfoParams extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): InfoParams.AsObject;
+  static toObject(includeInstance: boolean, msg: InfoParams): InfoParams.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: InfoParams, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): InfoParams;
+  static deserializeBinaryFromReader(message: InfoParams, reader: jspb.BinaryReader): InfoParams;
+}
+
+export namespace InfoParams {
+  export type AsObject = {
+  }
+}
+
+export class SystemInfo extends jspb.Message {
+  getCommandsMap(): jspb.Map<string, string>;
+  clearCommandsMap(): void;
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SystemInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: SystemInfo): SystemInfo.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SystemInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SystemInfo;
+  static deserializeBinaryFromReader(message: SystemInfo, reader: jspb.BinaryReader): SystemInfo;
+}
+
+export namespace SystemInfo {
+  export type AsObject = {
+    commandsMap: Array<[string, string]>,
   }
 }
 

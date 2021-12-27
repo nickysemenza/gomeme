@@ -31,11 +31,21 @@ type APICreateMeme = {
   readonly responseType: typeof proto_meme_pb.Meme;
 };
 
+type APIGetInfo = {
+  readonly methodName: string;
+  readonly service: typeof API;
+  readonly requestStream: false;
+  readonly responseStream: false;
+  readonly requestType: typeof proto_meme_pb.InfoParams;
+  readonly responseType: typeof proto_meme_pb.SystemInfo;
+};
+
 export class API {
   static readonly serviceName: string;
   static readonly GetPing: APIGetPing;
   static readonly GetTemplates: APIGetTemplates;
   static readonly CreateMeme: APICreateMeme;
+  static readonly GetInfo: APIGetInfo;
 }
 
 export type ServiceError = { message: string, code: number; metadata: grpc.Metadata }
@@ -96,6 +106,15 @@ export class APIClient {
   createMeme(
     requestMessage: proto_meme_pb.CreateMemeParams,
     callback: (error: ServiceError|null, responseMessage: proto_meme_pb.Meme|null) => void
+  ): UnaryResponse;
+  getInfo(
+    requestMessage: proto_meme_pb.InfoParams,
+    metadata: grpc.Metadata,
+    callback: (error: ServiceError|null, responseMessage: proto_meme_pb.SystemInfo|null) => void
+  ): UnaryResponse;
+  getInfo(
+    requestMessage: proto_meme_pb.InfoParams,
+    callback: (error: ServiceError|null, responseMessage: proto_meme_pb.SystemInfo|null) => void
   ): UnaryResponse;
 }
 

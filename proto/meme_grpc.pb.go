@@ -25,6 +25,7 @@ type APIClient interface {
 	GetPing(ctx context.Context, in *Ping, opts ...grpc.CallOption) (*Ping, error)
 	GetTemplates(ctx context.Context, in *GetTemplatesParams, opts ...grpc.CallOption) (*TemplateList, error)
 	CreateMeme(ctx context.Context, in *CreateMemeParams, opts ...grpc.CallOption) (*Meme, error)
+	GetInfo(ctx context.Context, in *InfoParams, opts ...grpc.CallOption) (*SystemInfo, error)
 }
 
 type aPIClient struct {
@@ -62,6 +63,15 @@ func (c *aPIClient) CreateMeme(ctx context.Context, in *CreateMemeParams, opts .
 	return out, nil
 }
 
+func (c *aPIClient) GetInfo(ctx context.Context, in *InfoParams, opts ...grpc.CallOption) (*SystemInfo, error) {
+	out := new(SystemInfo)
+	err := c.cc.Invoke(ctx, "/API/GetInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // APIServer is the server API for API service.
 // All implementations must embed UnimplementedAPIServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type APIServer interface {
 	GetPing(context.Context, *Ping) (*Ping, error)
 	GetTemplates(context.Context, *GetTemplatesParams) (*TemplateList, error)
 	CreateMeme(context.Context, *CreateMemeParams) (*Meme, error)
+	GetInfo(context.Context, *InfoParams) (*SystemInfo, error)
 	mustEmbedUnimplementedAPIServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedAPIServer) GetTemplates(context.Context, *GetTemplatesParams)
 }
 func (UnimplementedAPIServer) CreateMeme(context.Context, *CreateMemeParams) (*Meme, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMeme not implemented")
+}
+func (UnimplementedAPIServer) GetInfo(context.Context, *InfoParams) (*SystemInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInfo not implemented")
 }
 func (UnimplementedAPIServer) mustEmbedUnimplementedAPIServer() {}
 
@@ -152,6 +166,24 @@ func _API_CreateMeme_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _API_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(APIServer).GetInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/API/GetInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(APIServer).GetInfo(ctx, req.(*InfoParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // API_ServiceDesc is the grpc.ServiceDesc for API service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var API_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMeme",
 			Handler:    _API_CreateMeme_Handler,
+		},
+		{
+			MethodName: "GetInfo",
+			Handler:    _API_GetInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

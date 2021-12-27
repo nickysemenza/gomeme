@@ -1,12 +1,13 @@
 syntax = "proto3";
 
 option go_package = "github.com/nickysemenza/gomeme/proto";
-
+import "google/protobuf/empty.proto";
 
 service API {
     rpc GetPing(Ping) returns (Ping) {}
     rpc GetTemplates(GetTemplatesParams) returns (TemplateList) {}
     rpc CreateMeme(CreateMemeParams) returns (Meme) {}
+    rpc GetInfo(InfoParams) returns (SystemInfo) {}
 }
 message Meme {
     string ID = 1;
@@ -83,4 +84,8 @@ message OpLog  {
     string DebugOutput = 4;
     string File = 5;
     repeated string Args = 6;
+}
+message InfoParams{}
+message SystemInfo {
+    map<string, string> commands = 3;
 }

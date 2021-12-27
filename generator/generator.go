@@ -177,7 +177,7 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 		fmt.Sprintf("%s!", destSize.Dim()), //todo: opt to not stretch
 		dest,
 	}
-	cmd := runCommand(ctx, "magick", args...)
+	cmd := RunCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -206,7 +206,7 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 		payload.ToIMString(),
 		dest,
 	}
-	cmd := runCommand(ctx, "magick", args...)
+	cmd := RunCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -259,7 +259,7 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 			points[0].Comma()),
 		dest,
 	}
-	cmd := runCommand(ctx, "magick", args...)
+	cmd := RunCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -295,7 +295,7 @@ func (m *Meme) makeText(ctx context.Context, text, color string, hint Point) (st
 		"caption:" + text,
 		dest,
 	}
-	cmd := runCommand(ctx, "magick", args...)
+	cmd := RunCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -319,7 +319,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 		fileNameB,
 		dest,
 	}
-	cmd := runCommand(ctx, "composite", args...)
+	cmd := RunCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -334,7 +334,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 func (m *Meme) cpFile(ctx context.Context, fileNameA, fileNameB string) error {
 	spew.Dump("aaa", fileNameA, fileNameB)
 	args := []string{fileNameA, fileNameB}
-	cmd := runCommand(ctx, "cp", args...)
+	cmd := RunCommand(ctx, "cp", args...)
 	_, err := cmd.CombinedOutput()
 	return err
 }
@@ -387,7 +387,8 @@ func (p *Point) BuildBase() DistortPayload {
 	}
 }
 
-func runCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
+// RunCommand execs a command
+func RunCommand(ctx context.Context, name string, arg ...string) *exec.Cmd {
 	log.WithFields(log.Fields{
 		"command": name,
 		"args":    arg,

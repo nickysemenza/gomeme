@@ -3,7 +3,9 @@ package api
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"sort"
+	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gomeme/generator"
@@ -47,7 +49,25 @@ func (s *Server) GetTemplates(ctx context.Context, _ *pb.GetTemplatesParams) (*p
 	return &pb.TemplateList{Templates: templates}, nil
 }
 
-//CreateMeme makes a meme
+func (s *Server) GetInfo(ctx context.Context, _ *pb.InfoParams) (*pb.SystemInfo, error) {
+	si := pb.SystemInfo{
+		Commands: map[string]string{},
+	}
+	cmds := []*exec.Cmd{
+		generator.RunCommand(ctx, "magick", "-version"),
+		generator.RunCommand(ctx, "magick", "-list", "font"),
+	}
+	for _, cmd := range cmds {
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return nil, err
+		}
+		si.Commands[strings.Join(cmd.Args, " ")] = string(output)
+	}
+	return &si, nil
+}
+
+// CreateMeme makes a meme
 func (s *Server) CreateMeme(ctx context.Context, in *pb.CreateMemeParams) (*pb.Meme, error) {
 	meme, err := s.g.Process(ctx, in)
 	if err != nil {
