@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/nickysemenza/gomeme/util"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +33,7 @@ func TestBuildPrintPayload(t *testing.T) {
 }
 
 func TestMakeText(t *testing.T) {
-	m := Meme{}
+	m := Meme{g: &Generator{Config: &Config{Font: viper.GetString("FONT")}}}
 	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
 	ctx := context.Background()
 	file, err := m.makeText(ctx, "hello", "", Point{200, 200})
