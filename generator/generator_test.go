@@ -79,8 +79,8 @@ func TestGenerate(t *testing.T) {
 		{
 			desc: "debug mode, stretch image ",
 			TargetInputs: []*proto.TargetInput{
-				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "hello"}}},
 				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "https://via.placeholder.com/350x150", Stretch: true}}},
+				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=", Stretch: false}}},
 			},
 			debug: true,
 		},
@@ -94,6 +94,12 @@ func TestGenerate(t *testing.T) {
 			})
 			require.NoError(t, err, m.OpLog)
 			require.NotNil(t, m)
+			require.Contains(t, g.GetMemeURL(m), "png")
+
+			// redo with base64 input?
+			m2, err := g.ProcessBase64Payload(ctx, m.hash)
+			require.NoError(t, err)
+			require.NotNil(t, m2)
 		})
 	}
 

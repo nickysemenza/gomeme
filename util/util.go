@@ -6,13 +6,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
 	"strings"
 
-	_ "image/jpeg" //allow decoding jpeg
-	_ "image/png"  //allow decoding png
 	"io"
 	"net/http"
 	"os"
@@ -110,6 +109,11 @@ func ImageFromBase64(image string) (out image.Image, err error) {
 		out, err = jpeg.Decode(res)
 		if err != nil {
 			return nil, fmt.Errorf("ImageFromBase64: failed to decode jpeg: %w", err)
+		}
+	case "image/gif":
+		out, err = gif.Decode(res)
+		if err != nil {
+			return nil, fmt.Errorf("ImageFromBase64: failed to decode gif: %w", err)
 		}
 	}
 	return

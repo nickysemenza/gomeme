@@ -3,7 +3,6 @@ package generator
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os/exec"
@@ -15,6 +14,7 @@ import (
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/oklog/ulid/v2"
 	"github.com/spf13/viper"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/davecgh/go-spew/spew"
 	log "github.com/sirupsen/logrus"
@@ -32,6 +32,7 @@ type Meme struct {
 	OpLog       []*pb.OpLog `json:"op_log,omitempty"`
 	ResultFile  string      `json:"file,omitempty"`
 	g           *Generator
+	hash        string
 }
 
 // GetMemeURL returns the full url
@@ -46,7 +47,7 @@ func (g *Generator) ProcessBase64Payload(ctx context.Context, b string) (*Meme, 
 		return nil, err
 	}
 	var req pb.CreateMemeParams
-	err = json.Unmarshal(jsonBytes, &req)
+	err = protojson.Unmarshal(jsonBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +63,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		return nil, fmt.Errorf("Process: template %s does not exist", templateName)
 	}
 
-	jsonBytes, err := json.Marshal(req)
+	jsonBytes, err := protojson.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("Process: %w", err)
 	}
@@ -76,6 +77,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		ID:         ulid.MustNew(ulid.Timestamp(t), ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)).String(),
 		ResultFile: filepath.Join(g.Config.BaseDir, template.File),
 		g:          g,
+		hash:       hash,
 	}
 
 	for step, target := range template.Targets {

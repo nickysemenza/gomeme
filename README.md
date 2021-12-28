@@ -1,7 +1,7 @@
 # gomeme
 _or, a glorified ImageMagick wrapper_
 
-[![codecov](https://codecov.io/gh/nickysemenza/gomeme/branch/master/graph/badge.svg?token=gwRNGI4hpe)](https://codecov.io/gh/nickysemenza/gomeme)
+[![codecov](https://codecov.io/gh/nickysemenza/gomeme/branch/main/graph/badge.svg?token=gwRNGI4hpe)](https://codecov.io/gh/nickysemenza/gomeme)
 
 generate memes from templates 👌
 

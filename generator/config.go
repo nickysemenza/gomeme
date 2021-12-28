@@ -51,14 +51,6 @@ func (p Point) Add(p2 Point) Point {
 	}
 }
 
-// Sub is the oppose of Add
-func (p Point) Sub(p2 Point) Point {
-	return Point{
-		X: p.X - p2.X,
-		Y: p.Y - p2.Y,
-	}
-}
-
 // Deltas holds the 4 corners of a distortion
 type Deltas [4]Point
 
