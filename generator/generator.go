@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -73,7 +74,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	t := time.Now()
 	m := Meme{
 		ID:         ulid.MustNew(ulid.Timestamp(t), ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)).String(),
-		ResultFile: template.File,
+		ResultFile: filepath.Join(g.Config.BaseDir, template.File),
 		g:          g,
 	}
 
@@ -138,7 +139,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 			}
 		}
 
-		m.ResultFile = fmt.Sprintf("tmp/%s-final.png", m.ID)
+		m.ResultFile = filepath.Join(m.g.Config.TmpDir(), fmt.Sprintf("%s-final.png", m.ID))
 		fmt.Println(compositedFile)
 		if err = m.cpFile(ctx, compositedFile, m.ResultFile); err != nil {
 			return &m, fmt.Errorf("Process: failed to copy: %w", err)
@@ -148,7 +149,7 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 	return &m, nil
 }
 func (m *Meme) genFile(op pb.Operation) string {
-	return fmt.Sprintf("tmp/%s-%d-%s.png", m.ID, m.CurrentStep, op)
+	return filepath.Join(m.g.Config.TmpDir(), fmt.Sprintf("%s-%d-%s.png", m.ID, m.CurrentStep, op))
 }
 
 func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point, stretch bool) (string, error) {

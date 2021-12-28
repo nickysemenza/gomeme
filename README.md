@@ -1,6 +1,8 @@
 # gomeme
 _or, a glorified ImageMagick wrapper_
 
+[![codecov](https://codecov.io/gh/nickysemenza/gomeme/branch/master/graph/badge.svg?token=gwRNGI4hpe)](https://codecov.io/gh/nickysemenza/gomeme)
+
 generate memes from templates 👌
 
 Each meme template has one or more "targets". These are the locations where the customization is applied. For example the infamous drake meme template has 2 targets on the right half of the image, one for each pane where your own content goes. These targets are defined by the dimensions of a bounding box, as well as the coordinate of the top left corner. However, some templates have targets which are not describable via a rectangle in 2D space. You can skew/distort the target by moving each of the 4 corners in 2D space, by speciying and X and Y delta for each point. Detail on these transformations can be found in [ImageMagick's Control Point documentation](http://www.imagemagick.org/Usage/distorts/#control_points).

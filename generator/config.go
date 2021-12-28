@@ -2,6 +2,7 @@ package generator
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/viper"
 )
@@ -11,6 +12,12 @@ type Config struct {
 	Templates map[string]Template `json:"templates"`
 	Listen    Listen
 	Font      string
+	BaseDir   string
+}
+
+// TmpDir returns the temp dir
+func (c *Config) TmpDir() string {
+	return filepath.Join(c.BaseDir, "tmp")
 }
 
 // Listen contains the port and address to listen on
@@ -74,11 +81,14 @@ type Template struct {
 func LoadConfig() (*Config, error) {
 	viper.SetConfigName("gomeme")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("..")
 	err := viper.ReadInConfig()
 	if err != nil {
 		return nil, fmt.Errorf("error config file: %w", err)
 	}
 	c := Config{}
+	fmt.Println()
+	c.BaseDir = filepath.Dir(viper.ConfigFileUsed())
 
 	err = viper.UnmarshalKey("templates", &c.Templates)
 

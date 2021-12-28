@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/nickysemenza/gomeme/proto"
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -34,8 +35,7 @@ func TestBuildPrintPayload(t *testing.T) {
 
 func TestMakeText(t *testing.T) {
 	viper.AutomaticEnv()
-	m := Meme{g: &Generator{Config: &Config{Font: viper.GetString("FONT")}}}
-	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
+	m := Meme{g: mustConfig(t)}
 	ctx := context.Background()
 	file, err := m.makeText(ctx, "hello", "", Point{200, 200})
 	require.NoError(t, err, m.OpLog)
@@ -45,8 +45,7 @@ func TestMakeText(t *testing.T) {
 	require.Equal(t, i.Bounds().Dy(), 200)
 }
 func TestMakeImage(t *testing.T) {
-	m := Meme{}
-	_ = os.Mkdir("tmp", 0777) //todo: allow `tmp/` dir to be customised in tests
+	m := Meme{g: mustConfig(t)}
 	ctx := context.Background()
 	file, err := m.makeRectangle(ctx, Point{20, 20}, Point{100, 100}, Point{200, 200}, &Deltas{{2, 4}, {}, {3, 0}, {}})
 	require.NoError(t, err, m.OpLog)
@@ -54,4 +53,56 @@ func TestMakeImage(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, i.Bounds().Dx(), 200)
 	require.Equal(t, i.Bounds().Dy(), 200)
+}
+
+func TestGenerate(t *testing.T) {
+	viper.AutomaticEnv()
+	c, err := LoadConfig()
+	require.NoError(t, err)
+	c.Font = viper.GetString("FONT")
+
+	g := Generator{Config: c}
+	ctx := context.Background()
+
+	testCases := []struct {
+		desc         string
+		TargetInputs []*proto.TargetInput
+		debug        bool
+	}{
+		{
+			desc: "base text",
+			TargetInputs: []*proto.TargetInput{
+				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "hello"}}},
+				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "world"}}},
+			},
+		},
+		{
+			desc: "debug mode, stretch image ",
+			TargetInputs: []*proto.TargetInput{
+				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "hello"}}},
+				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "https://via.placeholder.com/350x150", Stretch: true}}},
+			},
+			debug: true,
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			m, err := g.Process(ctx, &proto.CreateMemeParams{
+				TemplateName: "office1",
+				TargetInputs: tC.TargetInputs,
+				Debug:        &tC.debug,
+			})
+			require.NoError(t, err, m.OpLog)
+			require.NotNil(t, m)
+		})
+	}
+
+}
+func mustConfig(t *testing.T) *Generator {
+	viper.AutomaticEnv()
+	c, err := LoadConfig()
+	require.NoError(t, err)
+	c.Font = viper.GetString("FONT")
+	_ = os.Mkdir(c.TmpDir(), 0777) //todo: allow `tmp/` dir to be customised in tests
+	return &Generator{Config: c}
 }
