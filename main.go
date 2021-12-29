@@ -47,6 +47,7 @@ func main() {
 	}
 	config.Listen = l
 	config.Font = viper.GetString("FONT")
+	config.BaseAPI = viper.GetString("BASE_API")
 
 	wg := sync.WaitGroup{}
 

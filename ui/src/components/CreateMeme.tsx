@@ -112,10 +112,10 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
         {targets.map((t, x) => (
           <div key={x} className="w-full">
             <h2 className="font-bold">target {x + 1}</h2>
-            <div className="flex flex-row p-1 m-1">
+            <div className="flex flex-col p-1 m-1">
               <div className="w-1/2">
                 <input
-                  className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
                   value={t.text?.getText() || t.image?.getUrl() || ""}
                   onChange={(v) => {
                     setTargets(
@@ -177,18 +177,31 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
       </div>
       <div>
         {loading && <div className="text-xl text-bold">loading...</div>}
-        {res && <img src={res.getUrl()} alt="generated" className="w-72" />}
+        {res && (
+          <img
+            src={res.getUrl()}
+            alt="generated"
+            className="w-72 object-contain"
+          />
+        )}
         <div>
           {res &&
             debug &&
             res.getOplogList().map((o) => (
               <div className="border border-orange-600 flex">
-                <img src={buildURL(o.getFile())} className="w-24" alt="" />
-                {/* {o.getFile()} */}
+                <img
+                  src={o.getFile()}
+                  className="w-24 object-contain"
+                  alt={getOpName(o.getOp())}
+                />
                 <div className="flex flex-col">
-                  <div className="text-green-700 ">{getOpName(o.getOp())}</div>
-                  <div className="text-blue-700 ">{o.getDuration()}</div>
-                  <div className="text-orange-700 ">
+                  <div className="flex flex-row">
+                    <div className="text-green-700 pr-1">
+                      {getOpName(o.getOp())} - step {o.getStep()}
+                    </div>
+                    <div className="text-blue-700 ">{o.getDuration()}</div>
+                  </div>
+                  <div className="text-orange-700 text-xs ">
                     {o.getArgsList().join(", ")}
                   </div>
                 </div>

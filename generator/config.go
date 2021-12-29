@@ -12,6 +12,7 @@ type Config struct {
 	Templates map[string]Template `json:"templates"`
 	Listen    Listen
 	Font      string
+	BaseAPI   string
 	BaseDir   string
 }
 

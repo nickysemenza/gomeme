@@ -13,7 +13,6 @@ import (
 	pb "github.com/nickysemenza/gomeme/proto"
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/oklog/ulid/v2"
-	"github.com/spf13/viper"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/davecgh/go-spew/spew"
@@ -35,9 +34,14 @@ type Meme struct {
 	hash        string
 }
 
+// ImageURL returns raw image url
+func (c *Config) ImageURL(image string) string {
+	return fmt.Sprintf("%s/%s", c.BaseAPI, filepath.Join("tmp", filepath.Base(image)))
+}
+
 // GetMemeURL returns the full url
 func (g *Generator) GetMemeURL(meme *Meme) string {
-	return fmt.Sprintf("%s/%s", viper.GetString("BASE_API"), meme.ResultFile)
+	return g.Config.ImageURL(meme.ResultFile)
 }
 
 // ProcessBase64Payload processes a base64 payload
@@ -148,6 +152,8 @@ func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Mem
 		}
 
 	}
+	m.ResultFile = filepath.Base(m.ResultFile) // trim to just be the file
+
 	return &m, nil
 }
 func (m *Meme) genFile(op pb.Operation) string {
@@ -178,7 +184,7 @@ func (m *Meme) shrinkToSize(ctx context.Context, fileName string, destSize Point
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
-		File:        dest,
+		File:        m.g.Config.ImageURL(dest),
 		Args:        args,
 	})
 	return dest, err
@@ -209,7 +215,7 @@ func (m *Meme) distort(ctx context.Context, fileName string, payload DistortPayl
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
-		File:        dest,
+		File:        m.g.Config.ImageURL(dest),
 		Args:        args,
 	})
 	return dest, err
@@ -259,7 +265,7 @@ func (m *Meme) makeRectangle(ctx context.Context, topLeft, bottomRight, fileDime
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
-		File:        dest,
+		File:        m.g.Config.ImageURL(dest),
 		Args:        args,
 	})
 	return dest, err
@@ -290,7 +296,7 @@ func (m *Meme) makeText(ctx context.Context, text, color string, hint Point) (st
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
-		File:        dest,
+		File:        m.g.Config.ImageURL(dest),
 		Args:        args,
 	})
 	return dest, err
@@ -314,7 +320,7 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 		Op:          op,
 		Duration:    time.Since(t).String(),
 		DebugOutput: string(output),
-		File:        dest,
+		File:        m.g.Config.ImageURL(dest),
 		Args:        args,
 	})
 	return dest, err

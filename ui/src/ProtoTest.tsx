@@ -60,7 +60,7 @@ const ProtoTest: React.SFC<Props> = () => {
           <tr>
             <th className="w-1/6 border border-slate-600">name</th>
             <th className="w-1/2 border border-slate-600">input</th>
-            {debug && <th className="w-1/2 border border-slate-600">debug</th>}
+            {debug && <th className="w-1/4 border border-slate-600">debug</th>}
           </tr>
         </thead>
         <tbody>
