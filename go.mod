@@ -9,7 +9,7 @@ require (
 	github.com/golangci/golangci-lint v1.43.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/oklog/ulid/v2 v2.0.2
-	github.com/ory/go-acc v0.2.6
+	github.com/ory/go-acc v0.2.7
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
