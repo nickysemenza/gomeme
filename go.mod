@@ -6,7 +6,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.0
-	github.com/golangci/golangci-lint v1.44.1
+	github.com/golangci/golangci-lint v1.44.2
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/ory/go-acc v0.2.7
@@ -45,7 +45,7 @@ require (
 	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211216145620-d92e9ce0af51 // indirect
-	github.com/daixiang0/gci v0.3.0 // indirect
+	github.com/daixiang0/gci v0.3.1-0.20220208004058-76d765e3ab48 // indirect
 	github.com/denis-tingajkin/go-header v0.4.2 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/ristretto v0.0.2 // indirect
@@ -164,7 +164,7 @@ require (
 	github.com/tomarrell/wrapcheck/v2 v2.4.0 // indirect
 	github.com/tommy-muehle/go-mnd/v2 v2.5.0 // indirect
 	github.com/ultraware/funlen v0.0.3 // indirect
-	github.com/ultraware/whitespace v0.0.4 // indirect
+	github.com/ultraware/whitespace v0.0.5 // indirect
 	github.com/uudashr/gocognit v1.0.5 // indirect
 	github.com/yagipy/maintidx v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.1.1-0.20210918184747-d757024714a1 // indirect
