@@ -6,7 +6,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.0
-	github.com/golangci/golangci-lint v1.45.1
+	github.com/golangci/golangci-lint v1.45.2
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/ory/go-acc v0.2.8
