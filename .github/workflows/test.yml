@@ -38,7 +38,7 @@ jobs:
         run: go mod vendor
       - name: Test
         run: make unit-cover-go
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
   test-ui:
     runs-on: ubuntu-latest
     defaults:
@@ -55,7 +55,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn install
       - run: yarn test -- --coverage
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
 
   deploy:
     name: Deploy app
