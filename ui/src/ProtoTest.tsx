@@ -5,8 +5,7 @@ import { getAPIClient, buildURL } from "./util";
 import CreateMeme from "./components/CreateMeme";
 import ReactJson from "react-json-view";
 
-interface Props {}
-const ProtoTest: React.SFC<Props> = () => {
+const ProtoTest: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
 
   const [debug, setDebug] = useState(false);

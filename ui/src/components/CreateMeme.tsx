@@ -10,7 +10,7 @@ import {
   OperationMap,
   Operation,
 } from "../proto/meme_pb";
-import { getAPIClient, buildURL } from "../util";
+import { getAPIClient } from "../util";
 import update from "immutability-helper";
 import { b64 } from "./b64placeholder";
 import { HexColorPicker } from "react-colorful";
