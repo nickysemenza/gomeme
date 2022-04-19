@@ -335,6 +335,8 @@ github.com/go-chi/chi v4.1.2+incompatible h1:fGFk2Gmi/YKXk0OmGfBh0WgmN3XB8lVnEyN
 github.com/go-chi/chi v4.1.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
 github.com/go-chi/cors v1.2.0 h1:tV1g1XENQ8ku4Bq3K9ub2AtgG+p16SmzeMSGTwrOKdE=
 github.com/go-chi/cors v1.2.0/go.mod h1:sSbTewc+6wYHBBCW7ytsFSn836hqM7JxpglAy2Vzc58=
+github.com/go-chi/cors v1.2.1 h1:xEC8UT3Rlp2QuWNEr4Fs/c2EAGVKBwy/1vHx3bppil4=
+github.com/go-chi/cors v1.2.1/go.mod h1:sSbTewc+6wYHBBCW7ytsFSn836hqM7JxpglAy2Vzc58=
 github.com/go-critic/go-critic v0.6.1 h1:lS8B9LH/VVsvQQP7Ao5TJyQqteVKVs3E4dXiHMyubtI=
 github.com/go-critic/go-critic v0.6.1/go.mod h1:SdNCfU0yF3UBjtaZGw6586/WocupMOJuiqgom5DsQxM=
 github.com/go-critic/go-critic v0.6.2 h1:L5SDut1N4ZfsWZY0sH4DCrsHLHnhuuWak2wa165t9gs=
