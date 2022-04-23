@@ -1,4 +1,4 @@
-FROM node:buster-slim as ui-builder
+FROM node as ui-builder
 WORKDIR /work/ui
 COPY ui/package.json ui/yarn.lock ./
 RUN yarn
