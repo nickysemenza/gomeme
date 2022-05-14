@@ -30,7 +30,7 @@ func TestImageToBase64String(t *testing.T) {
 }
 
 func TestDownloadImage(t *testing.T) {
-	file, err := DownloadImage(context.Background(), "https://via.placeholder.com/350x150")
+	file, err := DownloadImage(context.Background(), "https://dummyimage.com/350x150/fff/aaa")
 	require.NoError(t, err)
 	i, err := LoadImage(file)
 	require.NoError(t, err)

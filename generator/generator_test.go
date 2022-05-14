@@ -79,7 +79,7 @@ func TestGenerate(t *testing.T) {
 		{
 			desc: "debug mode, stretch image ",
 			TargetInputs: []*proto.TargetInput{
-				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "https://via.placeholder.com/350x150", Stretch: true}}},
+				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "https://dummyimage.com/640x360/fff/aaa", Stretch: true}}},
 				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=", Stretch: false}}},
 			},
 			debug: true,
