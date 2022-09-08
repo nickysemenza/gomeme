@@ -16,7 +16,7 @@
     "react-router-dom": "6.3.0",
     "react-scripts": "5.0.1",
     "ts-protoc-gen": "0.15.0",
-    "typescript": "4.8.2"
+    "typescript": "4.8.3"
   },
   "scripts": {
     "build:tailwind": "tailwind build -i src/base.css -o src/tailwind.output.css",
