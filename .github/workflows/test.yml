@@ -20,7 +20,7 @@ jobs:
       FONT: "Lato-Regular" # one of the fonts that `magick -list font` has on Actions
     strategy:
       matrix:
-        go: ["1.18.1"]
+        go: ["1.19"]
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
@@ -45,7 +45,7 @@ jobs:
         working-directory: ui
     strategy:
       matrix:
-        node-version: [17.x, 16.x]
+        node-version: [17.x, 18.x]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
