@@ -10,8 +10,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
-        with:
-          version: v1.33
   test-backend:
     # https://github.com/golangci/golangci-lint-action
     name: Go ${{ matrix.go }} test
@@ -20,14 +18,15 @@ jobs:
       FONT: "Lato-Regular" # one of the fonts that `magick -list font` has on Actions
     strategy:
       matrix:
-        go: ["1.19"]
+        go: ["1.20"]
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
       # - run: sudo apt-get update && sudo apt-get install -y imagemagick
-      - uses: mfinelli/setup-imagemagick@v1
+      - uses: mfinelli/setup-imagemagick@v2
+      - run: sudo apt-get install -y libfuse2
       - run: magick -version
       - run: magick -list font
       - name: Check out code into the Go module directory
@@ -45,7 +44,7 @@ jobs:
         working-directory: ui
     strategy:
       matrix:
-        node-version: [17.x, 18.x]
+        node-version: [latest, 18.x]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}

@@ -4,19 +4,19 @@
   "private": true,
   "dependencies": {
     "@improbable-eng/grpc-web": "0.15.0",
-    "@types/jest": "27.5.2",
-    "@types/node": "17.0.24",
-    "@types/react": "18.0.25",
-    "@types/react-dom": "18.0.9",
+    "@types/jest": "29.5.0",
+    "@types/node": "18.15.10",
+    "@types/react": "18.0.29",
+    "@types/react-dom": "18.0.11",
     "immutability-helper": "3.1.1",
     "react": "18.2.0",
     "react-colorful": "5.6.1",
     "react-dom": "18.2.0",
     "react-json-view": "1.21.3",
-    "react-router-dom": "6.4.3",
+    "react-router-dom": "6.9.0",
     "react-scripts": "5.0.1",
     "ts-protoc-gen": "0.15.0",
-    "typescript": "4.9.3"
+    "typescript": "5.0.2"
   },
   "scripts": {
     "build:tailwind": "tailwind build -i src/base.css -o src/tailwind.output.css",
@@ -44,9 +44,9 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "10.4.13",
+    "autoprefixer": "10.4.14",
     "npm-run-all": "4.1.5",
-    "postcss": "8.4.19",
-    "tailwindcss": "3.2.4"
+    "postcss": "8.4.21",
+    "tailwindcss": "3.2.7"
   }
 }
