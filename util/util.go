@@ -9,7 +9,6 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
-	"io/ioutil"
 	"strings"
 
 	"io"
@@ -17,9 +16,9 @@ import (
 	"os"
 )
 
-//DownloadImage downloads an image to the local FS
+// DownloadImage downloads an image to the local FS
 func DownloadImage(ctx context.Context, url string) (string, error) {
-	file, err := ioutil.TempFile("", "dlimage.*.png")
+	file, err := os.CreateTemp("", "dlimage.*.png")
 	if err != nil {
 		return "", fmt.Errorf("SaveImage: failed to create file: %w", err)
 	}
@@ -39,7 +38,7 @@ func DownloadImage(ctx context.Context, url string) (string, error) {
 	return file.Name(), nil
 }
 
-//LoadImage gets an image from a file
+// LoadImage gets an image from a file
 func LoadImage(fileName string) (image.Image, error) {
 	ImageFromFile, err := os.Open(fileName)
 	if err != nil {
@@ -61,7 +60,7 @@ func LoadImage(fileName string) (image.Image, error) {
 // https://www.devdungeon.com/content/working-images-go#writing_image_to_file
 func SaveImage(i image.Image) (string, error) {
 
-	file, err := ioutil.TempFile("", "saveimage.*.png")
+	file, err := os.CreateTemp("", "saveimage.*.png")
 	if err != nil {
 		return "", fmt.Errorf("SaveImage: failed to create file: %w", err)
 	}
@@ -74,7 +73,7 @@ func SaveImage(i image.Image) (string, error) {
 	return file.Name(), nil
 }
 
-//ImageToBase64String converts an image to a base65 encoded png
+// ImageToBase64String converts an image to a base65 encoded png
 func ImageToBase64String(img image.Image) (string, error) {
 	var buff bytes.Buffer
 	err := png.Encode(&buff, img)
