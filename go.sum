@@ -245,6 +245,8 @@ github.com/go-critic/go-critic v0.8.1 h1:16omCF1gN3gTzt4j4J6fKI/HnRojhEp+Eks6EuK
 github.com/go-critic/go-critic v0.8.1/go.mod h1:kpzXl09SIJX1cr9TB/g/sAG+eFEl7ZS9f9cqvZtyNl0=
 github.com/go-critic/go-critic v0.8.2 h1:mekhZ9jw5NBEj3I8o/EywXw5zBfGAJuMo4VVVjtxF80=
 github.com/go-critic/go-critic v0.8.2/go.mod h1:nZPlrtVfOuLOe8GpvWTfcMzfkG0QVZWAziAeXpivfQo=
+github.com/go-critic/go-critic v0.9.0 h1:Pmys9qvU3pSML/3GEQ2Xd9RZ/ip+aXHKILuxczKGV/U=
+github.com/go-critic/go-critic v0.9.0/go.mod h1:5P8tdXL7m/6qnyG6oRAlYLORvoXH0WDypYgAEmagT40=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
@@ -353,6 +355,8 @@ github.com/golangci/golangci-lint v1.53.3 h1:CUcRafczT4t1F+mvdkUm6KuOpxUZTl0yWN/
 github.com/golangci/golangci-lint v1.53.3/go.mod h1:W4Gg3ONq6p3Jl+0s/h9Gr0j7yEgHJWWZO2bHl2tBUXM=
 github.com/golangci/golangci-lint v1.54.0 h1:sWD8sCmlWRZYj7I0VZLwX7uYfjIcIUHq8rSO4IJtzdw=
 github.com/golangci/golangci-lint v1.54.0/go.mod h1:iNEG4/FSaCPMDZTk1JGetYZzz5sg25ref6QECL/NA9U=
+github.com/golangci/golangci-lint v1.54.1 h1:0qMrH1gkeIBqCZaaAm5Fwq4xys9rO/lJofHfZURIFFk=
+github.com/golangci/golangci-lint v1.54.1/go.mod h1:JK47+qksV/t2mAz9YvndwT0ZLW4A1rvDljOs3g9jblo=
 github.com/golangci/lint-1 v0.0.0-20191013205115-297bf364a8e0 h1:MfyDlzVjl1hoaPzPD4Gpb/QgoRfSBR0jdhwGyAWwMSA=
 github.com/golangci/lint-1 v0.0.0-20191013205115-297bf364a8e0/go.mod h1:66R6K6P6VWk9I95jvqGxkqJxVWGFy9XlDwLwVz1RCFg=
 github.com/golangci/maligned v0.0.0-20180506175553-b1d89398deca h1:kNY3/svz5T29MYHubXix4aDDuE3RWHkPvopM/EDv/MA=
@@ -741,6 +745,8 @@ github.com/prometheus/procfs v0.9.0/go.mod h1:+pB4zwohETzFnmlpe6yd2lSc+0/46IYZRB
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
 github.com/quasilyte/go-ruleguard v0.3.19 h1:tfMnabXle/HzOb5Xe9CUZYWXKfkS1KwRmZyPmD9nVcc=
 github.com/quasilyte/go-ruleguard v0.3.19/go.mod h1:lHSn69Scl48I7Gt9cX3VrbsZYvYiBYszZOZW4A+oTEw=
+github.com/quasilyte/go-ruleguard v0.4.0 h1:DyM6r+TKL+xbKB4Nm7Afd1IQh9kEUKQs2pboWGKtvQo=
+github.com/quasilyte/go-ruleguard v0.4.0/go.mod h1:Eu76Z/R8IXtViWUIHkE3p8gdH3/PKk1eh3YGfaEof10=
 github.com/quasilyte/gogrep v0.5.0 h1:eTKODPXbI8ffJMN+W2aE0+oL0z/nh8/5eNdiO34SOAo=
 github.com/quasilyte/gogrep v0.5.0/go.mod h1:Cm9lpz9NZjEoL1tgZ2OgeUKPIxL1meE7eo60Z6Sk+Ng=
 github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727 h1:TCg2WBOl980XxGFEZSS6KlBGIV0diGdySzxATTWoqaU=
