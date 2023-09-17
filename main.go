@@ -16,13 +16,13 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 )
 
-//Server is a HTTP server
+// Server is a HTTP server
 type Server struct {
 	grpc      *grpcweb.WrappedGrpcServer
 	generator *generator.Generator
@@ -67,7 +67,7 @@ func main() {
 
 }
 
-//ServegRPC runs an gRPC server
+// ServegRPC runs an gRPC server
 func (s *Server) servegRPC(ctx context.Context, wg *sync.WaitGroup, grpcServer *grpc.Server) {
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", s.Listen.Host, s.Listen.GRPCPort))
 	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -84,12 +84,12 @@ func (s *Server) servegRPC(ctx context.Context, wg *sync.WaitGroup, grpcServer *
 
 }
 
-//GrpcWebMiddleware handles wrapped GPRC requests
+// GrpcWebMiddleware handles wrapped GPRC requests
 type GrpcWebMiddleware struct {
 	*grpcweb.WrappedGrpcServer
 }
 
-//Handler handles wrapped GPRC requests
+// Handler handles wrapped GPRC requests
 func (m *GrpcWebMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if m.IsAcceptableGrpcCorsRequest(r) || m.IsGrpcWebRequest(r) {
@@ -100,7 +100,7 @@ func (m *GrpcWebMiddleware) Handler(next http.Handler) http.Handler {
 	})
 }
 
-//NewGrpcWebMiddleware handles wrapped GPRC requests
+// NewGrpcWebMiddleware handles wrapped GPRC requests
 func NewGrpcWebMiddleware(grpcWeb *grpcweb.WrappedGrpcServer) *GrpcWebMiddleware {
 	return &GrpcWebMiddleware{grpcWeb}
 }
