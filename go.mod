@@ -11,7 +11,7 @@ require (
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/go-acc v0.2.8
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/viper v1.18.1
+	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.60.0
 	google.golang.org/protobuf v1.31.0
