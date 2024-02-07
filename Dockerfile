@@ -5,7 +5,7 @@ RUN yarn
 COPY ui ./
 RUN yarn build
 
-FROM golang:1.21 as go-builder
+FROM golang:1.22 as go-builder
 COPY . /src/gomeme
 WORKDIR /src/gomeme
 RUN make build
