@@ -12,18 +12,13 @@ jobs:
         uses: golangci/golangci-lint-action@v5
   test-backend:
     # https://github.com/golangci/golangci-lint-action
-    name: Go ${{ matrix.go }} test
+    name: Go test
     runs-on: ubuntu-latest
     env:
       FONT: "Lato-Regular" # one of the fonts that `magick -list font` has on Actions
-    strategy:
-      matrix:
-        go: ["1.20"]
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go }}
       # - run: sudo apt-get update && sudo apt-get install -y imagemagick
       - uses: mfinelli/setup-imagemagick@v5
       - run: sudo apt-get install -y libfuse2
@@ -42,15 +37,12 @@ jobs:
     defaults:
       run:
         working-directory: ui
-    strategy:
-      matrix:
-        node-version: [latest, 18.x]
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Node.js 
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: latest
       - run: yarn install
       - run: yarn test -- --coverage
       - uses: codecov/codecov-action@v4
