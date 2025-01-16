@@ -15,16 +15,15 @@ import (
 	"github.com/oklog/ulid/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	"github.com/davecgh/go-spew/spew"
 	log "github.com/sirupsen/logrus"
 )
 
-//Generator is the singleton application
+// Generator is the singleton application
 type Generator struct {
 	Config *Config
 }
 
-//Meme is a meme
+// Meme is a meme
 type Meme struct {
 	ID          string      `json:"id,omitempty"`
 	CurrentStep int32       `json:"current_step,omitempty"`
@@ -59,7 +58,7 @@ func (g *Generator) ProcessBase64Payload(ctx context.Context, b string) (*Meme, 
 
 }
 
-//Process makes a meme
+// Process makes a meme
 func (g *Generator) Process(ctx context.Context, req *pb.CreateMemeParams) (*Meme, error) {
 	templateName := req.TemplateName
 	template, ok := g.Config.Templates[templateName]
@@ -302,19 +301,20 @@ func (m *Meme) makeText(ctx context.Context, text, color string, hint Point) (st
 	return dest, err
 }
 
-/// composites A onto B, given the top-left corner position of A
+// / composites A onto B, given the top-left corner position of A
 func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLeft Point) (string, error) {
 	op := pb.Operation_Composite
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
+		"composite",
 		"-geometry",
 		fmt.Sprintf("+%d+%d", topLeft.X, topLeft.Y),
 		fileNameA,
 		fileNameB,
 		dest,
 	}
-	cmd := RunCommand(ctx, "composite", args...)
+	cmd := RunCommand(ctx, "magick", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
@@ -327,20 +327,19 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 }
 
 func (m *Meme) cpFile(ctx context.Context, fileNameA, fileNameB string) error {
-	spew.Dump("aaa", fileNameA, fileNameB)
 	args := []string{fileNameA, fileNameB}
 	cmd := RunCommand(ctx, "cp", args...)
 	_, err := cmd.CombinedOutput()
 	return err
 }
 
-//ControlPointDelta represents the delta between 2 control points
+// ControlPointDelta represents the delta between 2 control points
 type ControlPointDelta struct {
 	P1 Point
 	P2 Point
 }
 
-//DistortPayload is the payload to the distort function
+// DistortPayload is the payload to the distort function
 type DistortPayload struct {
 	ControlPoints [4]ControlPointDelta
 }
@@ -355,7 +354,7 @@ func (d *DistortPayload) applyDelta(delta *Deltas) error {
 	return nil
 }
 
-//ToIMString generates a string for imagemagick
+// ToIMString generates a string for imagemagick
 func (d *DistortPayload) ToIMString() string {
 	cps := make([]string, 4)
 	for a, p := range d.ControlPoints {
@@ -370,7 +369,7 @@ func (d *DistortPayload) set() bool {
 	return true
 }
 
-//BuildBase creates a base distortion payload that's effectively a noop
+// BuildBase creates a base distortion payload that's effectively a noop
 func (p *Point) BuildBase() DistortPayload {
 	return DistortPayload{
 		ControlPoints: [4]ControlPointDelta{
