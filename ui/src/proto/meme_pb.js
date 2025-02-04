@@ -370,11 +370,11 @@ proto.Meme.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Meme.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    url: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    oplogList: jspb.Message.toObjectList(msg.getOplogList(),
+id: jspb.Message.getFieldWithDefault(msg, 1, ""),
+url: jspb.Message.getFieldWithDefault(msg, 2, ""),
+oplogList: jspb.Message.toObjectList(msg.getOplogList(),
     proto.OpLog.toObject, includeInstance),
-    params: (f = msg.getParams()) && proto.CreateMemeParams.toObject(includeInstance, f)
+params: (f = msg.getParams()) && proto.CreateMemeParams.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -641,10 +641,10 @@ proto.CreateMemeParams.prototype.toObject = function(opt_includeInstance) {
  */
 proto.CreateMemeParams.toObject = function(includeInstance, msg) {
   var f, obj = {
-    templatename: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    targetinputsList: jspb.Message.toObjectList(msg.getTargetinputsList(),
+templatename: jspb.Message.getFieldWithDefault(msg, 1, ""),
+targetinputsList: jspb.Message.toObjectList(msg.getTargetinputsList(),
     proto.TargetInput.toObject, includeInstance),
-    debug: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
+debug: (f = jspb.Message.getBooleanField(msg, 3)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -872,8 +872,8 @@ proto.TextInput.prototype.toObject = function(opt_includeInstance) {
  */
 proto.TextInput.toObject = function(includeInstance, msg) {
   var f, obj = {
-    text: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    color: jspb.Message.getFieldWithDefault(msg, 2, "")
+text: jspb.Message.getFieldWithDefault(msg, 1, ""),
+color: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1032,8 +1032,8 @@ proto.ImageInput.prototype.toObject = function(opt_includeInstance) {
  */
 proto.ImageInput.toObject = function(includeInstance, msg) {
   var f, obj = {
-    url: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    stretch: jspb.Message.getBooleanFieldWithDefault(msg, 2, false)
+url: jspb.Message.getFieldWithDefault(msg, 1, ""),
+stretch: jspb.Message.getBooleanFieldWithDefault(msg, 2, false)
   };
 
   if (includeInstance) {
@@ -1218,8 +1218,8 @@ proto.TargetInput.prototype.toObject = function(opt_includeInstance) {
  */
 proto.TargetInput.toObject = function(includeInstance, msg) {
   var f, obj = {
-    textinput: (f = msg.getTextinput()) && proto.TextInput.toObject(includeInstance, f),
-    imageinput: (f = msg.getImageinput()) && proto.ImageInput.toObject(includeInstance, f)
+textinput: (f = msg.getTextinput()) && proto.TextInput.toObject(includeInstance, f),
+imageinput: (f = msg.getImageinput()) && proto.ImageInput.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1521,9 +1521,9 @@ proto.Target.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Target.toObject = function(includeInstance, msg) {
   var f, obj = {
-    friendlyname: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    topleft: (f = msg.getTopleft()) && proto.Point.toObject(includeInstance, f),
-    size: (f = msg.getSize()) && proto.Point.toObject(includeInstance, f)
+friendlyname: jspb.Message.getFieldWithDefault(msg, 1, ""),
+topleft: (f = msg.getTopleft()) && proto.Point.toObject(includeInstance, f),
+size: (f = msg.getSize()) && proto.Point.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1753,8 +1753,8 @@ proto.Point.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Point.toObject = function(includeInstance, msg) {
   var f, obj = {
-    x: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    y: jspb.Message.getFieldWithDefault(msg, 2, 0)
+x: jspb.Message.getFieldWithDefault(msg, 1, 0),
+y: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -1920,11 +1920,11 @@ proto.Template.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Template.toObject = function(includeInstance, msg) {
   var f, obj = {
-    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    size: (f = msg.getSize()) && proto.Point.toObject(includeInstance, f),
-    targetsList: jspb.Message.toObjectList(msg.getTargetsList(),
+name: jspb.Message.getFieldWithDefault(msg, 1, ""),
+size: (f = msg.getSize()) && proto.Point.toObject(includeInstance, f),
+targetsList: jspb.Message.toObjectList(msg.getTargetsList(),
     proto.Target.toObject, includeInstance),
-    url: jspb.Message.getFieldWithDefault(msg, 4, "")
+url: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -2191,7 +2191,7 @@ proto.TemplateList.prototype.toObject = function(opt_includeInstance) {
  */
 proto.TemplateList.toObject = function(includeInstance, msg) {
   var f, obj = {
-    templatesList: jspb.Message.toObjectList(msg.getTemplatesList(),
+templatesList: jspb.Message.toObjectList(msg.getTemplatesList(),
     proto.Template.toObject, includeInstance)
   };
 
@@ -2344,7 +2344,7 @@ proto.Ping.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Ping.toObject = function(includeInstance, msg) {
   var f, obj = {
-    message: jspb.Message.getFieldWithDefault(msg, 1, "")
+message: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -2481,12 +2481,12 @@ proto.OpLog.prototype.toObject = function(opt_includeInstance) {
  */
 proto.OpLog.toObject = function(includeInstance, msg) {
   var f, obj = {
-    step: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    op: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    duration: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    debugoutput: jspb.Message.getFieldWithDefault(msg, 4, ""),
-    file: jspb.Message.getFieldWithDefault(msg, 5, ""),
-    argsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f
+step: jspb.Message.getFieldWithDefault(msg, 1, 0),
+op: jspb.Message.getFieldWithDefault(msg, 2, 0),
+duration: jspb.Message.getFieldWithDefault(msg, 3, ""),
+debugoutput: jspb.Message.getFieldWithDefault(msg, 4, ""),
+file: jspb.Message.getFieldWithDefault(msg, 5, ""),
+argsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -2881,7 +2881,7 @@ proto.SystemInfo.prototype.toObject = function(opt_includeInstance) {
  */
 proto.SystemInfo.toObject = function(includeInstance, msg) {
   var f, obj = {
-    commandsMap: (f = msg.getCommandsMap()) ? f.toObject(includeInstance, undefined) : []
+commandsMap: (f = msg.getCommandsMap()) ? f.toObject(includeInstance, undefined) : []
   };
 
   if (includeInstance) {

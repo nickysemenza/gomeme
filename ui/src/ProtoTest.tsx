@@ -45,7 +45,7 @@ const ProtoTest: React.FC = () => {
         </div>
         <div>
           <button
-            className="bg-red-300 hover:bg-red-700 text-white font-bold py-1 px-1 rounded "
+            className="bg-red-300 hover:bg-red-700 text-white font-bold py-1 px-1 rounded-sm "
             onClick={() => {
               setDebug(!debug);
             }}

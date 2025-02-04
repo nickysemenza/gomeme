@@ -4,23 +4,24 @@
   "private": true,
   "dependencies": {
     "@improbable-eng/grpc-web": "0.15.0",
+    "@tailwindcss/cli": "^4.0.3",
     "@types/jest": "29.5.14",
     "@types/node": "22.13.1",
-    "@types/react": "18.3.18",
-    "@types/react-dom": "18.3.5",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
     "immutability-helper": "3.1.1",
-    "react": "18.3.1",
+    "react": "19.0.0",
     "react-colorful": "5.6.1",
-    "react-dom": "18.3.1",
+    "react-dom": "19.0.0",
     "react-json-view": "1.21.3",
-    "react-router-dom": "6.29.0",
+    "react-router-dom": "7.1.5",
     "react-scripts": "5.0.1",
     "ts-protoc-gen": "0.15.0",
     "typescript": "5.7.3"
   },
   "scripts": {
-    "build:tailwind": "tailwind build -i src/base.css -o src/tailwind.output.css",
-    "watch:tailwind": "tailwind -i ./src/base.css -o src/tailwind.output.css --watch",
+    "build:tailwind": "tailwindcss -i src/base.css -o src/tailwind.output.css",
+    "watch:tailwind": "tailwindcss -i ./src/base.css -o src/tailwind.output.css --watch",
     "start": "npm-run-all build:tailwind --parallel watch:tailwind start:react",
     "start:react": "react-scripts start",
     "prebuild": "run-s build:tailwind",
@@ -47,6 +48,7 @@
     "autoprefixer": "10.4.20",
     "npm-run-all2": "7.0.2",
     "postcss": "8.5.1",
-    "tailwindcss": "4.0.3"
+    "protoc-gen-js": "^3.21.4-4",
+    "tailwindcss": "^4.0.3"
   }
 }

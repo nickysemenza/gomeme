@@ -5,6 +5,7 @@ PROTOC_GEN_TS_PATH ="./ui/node_modules/.bin/protoc-gen-ts"
 protogen:
 	protoc \
 		--plugin="protoc-gen-ts=$(PROTOC_GEN_TS_PATH)" \
+		--plugin="protoc-gen-js=./ui/node_modules/.bin/protoc-gen-js" \
 		--js_out="import_style=commonjs,binary:$(OUT_DIR)" \
 		--ts_out="service=grpc-web:$(OUT_DIR)" \
 		--go_out=. --go_opt=paths=source_relative \

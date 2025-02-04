@@ -115,7 +115,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
             <div className="flex flex-col p-1 m-1">
               <div className="w-1/2">
                 <input
-                  className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2"
+                  className="shadow-sm appearance-none border rounded-sm py-2 px-3 text-gray-700 leading-tight focus:outline-hidden focus:shadow-outline mb-2"
                   value={t.text?.getText() || t.image?.getUrl() || ""}
                   onChange={(v) => {
                     setTargets(
@@ -169,7 +169,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
           </div>
         ))}
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded-sm"
           onClick={makeMeme}
         >
           make meme 👌
