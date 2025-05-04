@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/cors v1.2.1
 	github.com/golangci/golangci-lint v1.64.8
-	github.com/golangci/golangci-lint/v2 v2.1.5
+	github.com/golangci/golangci-lint/v2 v2.1.6
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ory/go-acc v0.2.8
@@ -202,7 +202,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/t-yuki/gocover-cobertura v0.0.0-20180217150009-aaee18c8195c // indirect
 	github.com/tdakkota/asciicheck v0.4.1 // indirect
-	github.com/tetafro/godot v1.5.0 // indirect
+	github.com/tetafro/godot v1.5.1 // indirect
 	github.com/timakin/bodyclose v0.0.0-20241222091800-1db5c5ca4d67 // indirect
 	github.com/timonwong/loggercheck v0.11.0 // indirect
 	github.com/tomarrell/wrapcheck/v2 v2.11.0 // indirect
@@ -216,7 +216,7 @@ require (
 	github.com/yeya24/promlinter v0.3.0 // indirect
 	github.com/ykadowak/zerologlint v0.1.5 // indirect
 	gitlab.com/bosi/decorder v0.4.2 // indirect
-	go-simpler.org/musttag v0.13.0 // indirect
+	go-simpler.org/musttag v0.13.1 // indirect
 	go-simpler.org/sloglint v0.11.0 // indirect
 	go.tmz.dev/musttag v0.7.2 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
