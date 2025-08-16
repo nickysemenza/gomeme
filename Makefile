@@ -24,13 +24,7 @@ dev-ui:
 test:
 	go test -race -cover ./...
 
-bin/golangci-lint:
-	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/golangci/golangci-lint/cmd/golangci-lint
-bin/go-acc:
-	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/ory/go-acc	
-lint-go: bin/golangci-lint
-	bin/golangci-lint run || (echo "lint failed"; exit 1)
-unit-cover-go: bin/go-acc
-	./bin/go-acc -o coverage-full.txt ./... -- -race	
+lint-go:
+	golangci-lint run || (echo "lint failed"; exit 1)
+unit-cover-go:
+	go test -race -coverpkg=./... -coverprofile=coverage-full.txt ./...	
