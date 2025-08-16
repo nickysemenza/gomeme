@@ -22,13 +22,13 @@ func DownloadImage(ctx context.Context, url string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("SaveImage: failed to create file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	response, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("failed to download image: %w", err)
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
@@ -44,7 +44,7 @@ func LoadImage(fileName string) (image.Image, error) {
 	if err != nil {
 		return nil, fmt.Errorf("LoadImage: %w", err)
 	}
-	defer ImageFromFile.Close()
+	defer func() { _ = ImageFromFile.Close() }()
 
 	// Calling the generic image.Decode() will tell give us the data
 	// and type of image it is as a string. We expect "png"
@@ -64,7 +64,7 @@ func SaveImage(i image.Image) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("SaveImage: failed to create file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	err = png.Encode(file, i)
 	if err != nil {
