@@ -106,16 +106,29 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
     });
   };
   return (
-    <div className="flex">
-      {/* <pre className="w-8">{JSON.stringify(targets, null, 2)}</pre> */}
-      <div className="flex flex-col">
+    <div className="space-y-6">
+      {/* Input Controls */}
+      <div className="space-y-4">
         {targets.map((t, x) => (
-          <div key={x} className="w-full">
-            <h2 className="font-bold">target {x + 1}</h2>
-            <div className="flex flex-col p-1 m-1">
-              <div className="w-1/2">
+          <div key={x} className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                Input {x + 1}
+              </h3>
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                t.kind === 'text' 
+                  ? 'bg-purple-100 text-purple-700' 
+                  : 'bg-blue-100 text-blue-700'
+              }`}>
+                {t.kind === 'text' ? '✏️ Text' : '🖼️ Image'}
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="relative">
                 <input
-                  className="shadow-sm appearance-none border rounded-sm py-2 px-3 text-gray-700 leading-tight focus:outline-hidden focus:shadow-outline mb-2"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white"
+                  placeholder={t.kind === 'text' ? 'Enter your text...' : 'Enter image URL or paste base64 data...'}
                   value={t.text?.getText() || t.image?.getUrl() || ""}
                   onChange={(v) => {
                     setTargets(
@@ -140,75 +153,140 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
                       })
                     );
                   }}
-                ></input>
+                />
               </div>
-              <div>
+              
+              <div className="flex flex-wrap gap-4 items-start">
                 {t.text && (
-                  <HexColorPicker
-                    color={t.text.getColor()}
-                    onChange={(v) => {
-                      setTargets(
-                        update(targets, {
-                          [x]: {
-                            $apply: (curr) => {
-                              if (curr.text) curr.text.setColor(v);
-                              return curr;
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Text Color</label>
+                    <HexColorPicker
+                      color={t.text.getColor()}
+                      onChange={(v) => {
+                        setTargets(
+                          update(targets, {
+                            [x]: {
+                              $apply: (curr) => {
+                                if (curr.text) curr.text.setColor(v);
+                                return curr;
+                              },
                             },
-                          },
-                        })
-                      );
-                    }}
-                  />
+                          })
+                        );
+                      }}
+                    />
+                    <div className="mt-2 text-xs text-gray-500 font-mono text-center">
+                      {t.text.getColor()}
+                    </div>
+                  </div>
                 )}
                 {t.image && (
-                  <img src={t.image.getUrl()} alt="" className="h-40" />
+                  <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Preview</label>
+                    <img 
+                      src={t.image.getUrl()} 
+                      alt="Preview" 
+                      className="h-32 w-32 object-cover rounded-lg border border-gray-200" 
+                    />
+                  </div>
                 )}
               </div>
             </div>
-            {/* {t.kind === "b64" && <img src={t.value} />} */}
           </div>
         ))}
+      </div>
+      
+      {/* Generate Button */}
+      <div className="flex justify-center pt-4">
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded-sm"
+          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center space-x-2"
           onClick={makeMeme}
+          disabled={loading}
         >
-          make meme 👌
+          {loading ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <span>Creating Magic...</span>
+            </>
+          ) : (
+            <>
+              <span>🎭</span>
+              <span>Generate Meme</span>
+            </>
+          )}
         </button>
       </div>
-      <div>
-        {loading && <div className="text-xl text-bold">loading...</div>}
-        {res && (
-          <img
-            src={res.getUrl()}
-            alt="generated"
-            className="w-72 object-contain"
-          />
-        )}
-        <div>
-          {res &&
-            debug &&
-            res.getOplogList().map((o) => (
-              <div className="border border-orange-600 flex">
-                <img
-                  src={o.getFile()}
-                  className="w-24 object-contain"
-                  alt={getOpName(o.getOp())}
-                />
-                <div className="flex flex-col">
-                  <div className="flex flex-row">
-                    <div className="text-green-700 pr-1">
-                      {getOpName(o.getOp())} - step {o.getStep()}
-                    </div>
-                    <div className="text-blue-700 ">{o.getDuration()}</div>
-                  </div>
-                  <div className="text-orange-700 text-xs ">
-                    {o.getArgsList().join(", ")}
-                  </div>
-                </div>
+      
+      {/* Result Display */}
+      {(res || loading) && (
+        <div className="mt-8 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4">
+            <h3 className="text-white font-bold text-lg">✨ Your Generated Meme</h3>
+          </div>
+          
+          <div className="p-6">
+            {loading && (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <p className="text-lg font-semibold text-gray-600">Creating your meme...</p>
+                <p className="text-sm text-gray-500">This may take a few moments</p>
               </div>
-            ))}
+            )}
+            
+            {res && (
+              <div className="text-center">
+                <img
+                  src={res.getUrl()}
+                  alt="Generated meme"
+                  className="max-w-full h-auto rounded-lg shadow-md mx-auto mb-4"
+                  style={{ maxHeight: '400px' }}
+                />
+                <p className="text-sm text-gray-500">
+                  🎉 Meme created successfully! Right-click to save.
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Debug Information */}
+          {res && debug && res.getOplogList().length > 0 && (
+            <div className="border-t border-gray-200 bg-gray-50 p-6">
+              <h4 className="text-sm font-semibold text-gray-700 mb-4">🔍 Debug Operations:</h4>
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {res.getOplogList().map((o, index) => (
+                  <div key={index} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={o.getFile()}
+                        className="w-16 h-16 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                        alt={getOpName(o.getOp())}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                            {getOpName(o.getOp())}
+                          </span>
+                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                            Step {o.getStep()}
+                          </span>
+                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-mono">
+                            {o.getDuration()}
+                          </span>
+                        </div>
+                        {o.getArgsList().length > 0 && (
+                          <p className="text-xs text-gray-600 break-words">
+                            <span className="font-medium">Args:</span> {o.getArgsList().join(", ")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
