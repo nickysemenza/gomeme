@@ -307,14 +307,13 @@ func (m *Meme) composite(ctx context.Context, fileNameA, fileNameB string, topLe
 	dest := m.genFile(op)
 	t := time.Now()
 	args := []string{
-		"composite",
 		"-geometry",
 		fmt.Sprintf("+%d+%d", topLeft.X, topLeft.Y),
 		fileNameA,
 		fileNameB,
 		dest,
 	}
-	cmd := RunCommand(ctx, "magick", args...)
+	cmd := RunCommand(ctx, "composite", args...)
 	output, err := cmd.CombinedOutput()
 	m.OpLog = append(m.OpLog, &pb.OpLog{Step: m.CurrentStep,
 		Op:          op,
