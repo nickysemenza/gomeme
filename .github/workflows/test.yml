@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FONT: "Lato-Regular" # one of the fonts that `magick -list font` has on Actions
+      GOTOOLCHAIN: "go1.25.0+auto" # Fix for "no such tool covdata" error - https://github.com/golang/go/issues/75031
     steps:
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
