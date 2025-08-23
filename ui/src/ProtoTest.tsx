@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { GetTemplatesParams, Template } from "./proto/meme_pb";
 import { getAPIClient, buildURL } from "./util";
 import CreateMeme from "./components/CreateMeme";
+import Button from "./components/Button";
 import ReactJson from "react-json-view";
 
 const ProtoTest: React.FC = () => {
@@ -53,17 +54,13 @@ const ProtoTest: React.FC = () => {
             </div>
           </div>
 
-          <button
-            className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
-              debug
-                ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-            }`}
+          <Button
+            variant={debug ? "danger" : "secondary"}
             onClick={() => setDebug(!debug)}
+            icon={debug ? '🔍' : '⚡'}
           >
-            <span className="mr-2">{debug ? '🔍' : '⚡'}</span>
             {debug ? 'Disable Debug' : 'Enable Debug'}
-          </button>
+          </Button>
         </div>
 
         {/* Templates Grid */}
