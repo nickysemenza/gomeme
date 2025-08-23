@@ -36,6 +36,24 @@ const ProtoTest: React.FC = () => {
             collection of templates with flexible input options.
           </p>
           
+          {/* Navigation */}
+          <div className="flex justify-center space-x-4 mb-8">
+            <a
+              href="/editor"
+              className="inline-flex items-center px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+            >
+              <span className="mr-2">🛠️</span>
+              Template Editor
+            </a>
+            <a
+              href="/system"
+              className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              <span className="mr-2">⚙️</span>
+              System Info
+            </a>
+          </div>
+          
           <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl mx-auto mb-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Supported Inputs</h2>
             <div className="flex flex-wrap justify-center gap-6 text-sm">

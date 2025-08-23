@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ProtoTest from "./ProtoTest";
 import SystemInfoView from "./SystemInfoView";
+import MemeEditor from "./MemeEditor";
 
 const App: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<ProtoTest />} />
           <Route path="/system" element={<SystemInfoView />} />
+          <Route path="/editor" element={<MemeEditor />} />
         </Routes>
       </BrowserRouter>
     </div>
