@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from "react";
-
-import { GetTemplatesParams, Template } from "./proto/meme_pb";
-import { getAPIClient, buildURL } from "./util";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { memeClient } from "./connect";
+import { buildURL } from "./util";
 import CreateMeme from "./components/CreateMeme";
 import Button from "./components/Button";
 import ReactJson from "react-json-view";
 
 const ProtoTest: React.FC = () => {
-  const [templates, setTemplates] = useState<Template[]>([]);
-
   const [debug, setDebug] = useState(false);
 
-  useEffect(() => {
-    const fetchMemes = () => {
-      const req = new GetTemplatesParams();
-      getAPIClient().getTemplates(req, (err, reply) => {
-        console.log({ err, reply });
-        if (reply) {
-          const list = reply.getTemplatesList();
-          setTemplates(list);
-        }
-      });
-    };
-    fetchMemes();
-  }, []);
+  const { data, isLoading } = useQuery({
+    queryKey: ["templates"],
+    queryFn: () => memeClient.getTemplates({}),
+  });
+  const templates = data?.Templates ?? [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,10 +22,10 @@ const ProtoTest: React.FC = () => {
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">GoMeme</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
-            A powerful meme generator powered by ImageMagick. Create custom memes using our 
+            A powerful meme generator powered by ImageMagick. Create custom memes using our
             collection of templates with flexible input options.
           </p>
-          
+
           {/* Navigation */}
           <div className="flex justify-center space-x-4 mb-8">
             <a
@@ -53,7 +43,7 @@ const ProtoTest: React.FC = () => {
               System Info
             </a>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl mx-auto mb-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Supported Inputs</h2>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
@@ -84,18 +74,18 @@ const ProtoTest: React.FC = () => {
         {/* Templates Grid */}
         <div className="space-y-8">
           {templates.map((t) => (
-            <div key={t.getName()} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div key={t.Name} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                   {/* Template Info */}
                   <div className="lg:w-1/4 flex-shrink-0">
                     <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4">{t.getName()}</h3>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">{t.Name}</h3>
                       <div className="mx-auto w-48 h-48 bg-gray-100 rounded-lg overflow-hidden">
                         <img
                           className="w-full h-full object-cover"
-                          src={buildURL(t.getUrl())}
-                          alt={`${t.getName()} template`}
+                          src={buildURL(t.URL)}
+                          alt={`${t.Name} template`}
                         />
                       </div>
                     </div>
@@ -105,7 +95,7 @@ const ProtoTest: React.FC = () => {
                   <div className="lg:w-3/4 flex-grow">
                     <CreateMeme
                       template={t}
-                      onCreate={(meme) => {}}
+                      onCreate={() => {}}
                       debug={debug}
                     />
                   </div>
@@ -116,9 +106,9 @@ const ProtoTest: React.FC = () => {
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <h4 className="text-sm font-medium text-gray-900 mb-3">Debug Information</h4>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-64">
-                      <ReactJson 
-                        src={t.toObject(false)} 
-                        theme="monokai" 
+                      <ReactJson
+                        src={t as object}
+                        theme="monokai"
                         displayDataTypes={false}
                         displayObjectSize={false}
                         enableClipboard={false}
@@ -131,18 +121,23 @@ const ProtoTest: React.FC = () => {
           ))}
         </div>
 
-        {/* Empty State */}
-        {templates.length === 0 && (
+        {/* Empty/Loading State */}
+        {(isLoading || templates.length === 0) && (
           <div className="text-center py-12">
             <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <span className="text-4xl">🎭</span>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No templates available</h3>
-            <p className="text-gray-600">Loading templates...</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {isLoading ? "Loading templates..." : "No templates available"}
+            </h3>
+            <p className="text-gray-600">
+              {isLoading ? "Please wait..." : "Check server connection"}
+            </p>
           </div>
         )}
       </div>
     </div>
   );
 };
+
 export default ProtoTest;

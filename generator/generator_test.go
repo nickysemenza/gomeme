@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nickysemenza/gomeme/proto"
+	memepb "github.com/nickysemenza/gomeme/gen"
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -66,28 +66,28 @@ func TestGenerate(t *testing.T) {
 
 	testCases := []struct {
 		desc         string
-		TargetInputs []*proto.TargetInput
+		TargetInputs []*memepb.TargetInput
 		debug        bool
 	}{
 		{
 			desc: "base text",
-			TargetInputs: []*proto.TargetInput{
-				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "hello"}}},
-				{Input: &proto.TargetInput_TextInput{TextInput: &proto.TextInput{Text: "world"}}},
+			TargetInputs: []*memepb.TargetInput{
+				{Input: &memepb.TargetInput_TextInput{TextInput: &memepb.TextInput{Text: "hello"}}},
+				{Input: &memepb.TargetInput_TextInput{TextInput: &memepb.TextInput{Text: "world"}}},
 			},
 		},
 		{
 			desc: "debug mode, stretch image ",
-			TargetInputs: []*proto.TargetInput{
-				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "https://dummyimage.com/640x360/fff/aaa", Stretch: true}}},
-				{Input: &proto.TargetInput_ImageInput{ImageInput: &proto.ImageInput{URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=", Stretch: false}}},
+			TargetInputs: []*memepb.TargetInput{
+				{Input: &memepb.TargetInput_ImageInput{ImageInput: &memepb.ImageInput{URL: "https://dummyimage.com/640x360/fff/aaa", Stretch: true}}},
+				{Input: &memepb.TargetInput_ImageInput{ImageInput: &memepb.ImageInput{URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=", Stretch: false}}},
 			},
 			debug: true,
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			m, err := g.Process(ctx, &proto.CreateMemeParams{
+			m, err := g.Process(ctx, &memepb.CreateMemeParams{
 				TemplateName: "office1",
 				TargetInputs: tC.TargetInputs,
 				Debug:        &tC.debug,

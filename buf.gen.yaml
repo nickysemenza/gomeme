@@ -1,0 +1,16 @@
+version: v2
+plugins:
+  # Go protobuf messages
+  - remote: buf.build/protocolbuffers/go
+    out: gen
+    opt: paths=source_relative
+  # Go Connect service stubs
+  - remote: buf.build/connectrpc/go
+    out: gen
+    opt: paths=source_relative
+  # TypeScript/ES protobuf messages (v1 for connect compatibility)
+  - remote: buf.build/bufbuild/es:v1.10.0
+    out: ui/src/gen
+  # TypeScript Connect service stubs (v1)
+  - remote: buf.build/connectrpc/es:v1.6.1
+    out: ui/src/gen

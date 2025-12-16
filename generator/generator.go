@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/nickysemenza/gomeme/proto"
+	pb "github.com/nickysemenza/gomeme/gen"
 	"github.com/nickysemenza/gomeme/util"
 	"github.com/oklog/ulid/v2"
 	"google.golang.org/protobuf/encoding/protojson"

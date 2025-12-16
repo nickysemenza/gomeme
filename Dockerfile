@@ -1,9 +1,9 @@
 FROM node as ui-builder
 WORKDIR /work/ui
-COPY ui/package.json ui/yarn.lock ./
-RUN yarn
+COPY ui/package.json ui/package-lock.json ./
+RUN npm ci
 COPY ui ./
-RUN yarn build
+RUN npm run build
 
 FROM golang:1.25 as go-builder
 COPY . /src/gomeme

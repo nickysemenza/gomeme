@@ -1,5 +1,6 @@
 import React from "react";
-import { Meme, OperationMap, Operation } from "../proto/meme_pb";
+import type { Meme, OpLog } from "../gen/meme_pb";
+import { Operation } from "../gen/meme_pb";
 import { LoadingState } from "./LoadingSpinner";
 
 interface Props {
@@ -12,9 +13,9 @@ const MemeResult: React.FC<Props> = ({ meme, loading, debug }) => {
   if (loading && !meme) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-        <LoadingState 
-          title="Creating Your Meme" 
-          message="This may take a few seconds..." 
+        <LoadingState
+          title="Creating Your Meme"
+          message="This may take a few seconds..."
         />
       </div>
     );
@@ -27,7 +28,9 @@ const MemeResult: React.FC<Props> = ({ meme, loading, debug }) => {
           <span className="text-2xl">🎨</span>
         </div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to Create</h3>
-        <p className="text-gray-600">Fill in the inputs above and click "Generate Meme"</p>
+        <p className="text-gray-600">
+          Fill in the inputs above and click "Generate Meme"
+        </p>
       </div>
     );
   }
@@ -43,7 +46,7 @@ const MemeResult: React.FC<Props> = ({ meme, loading, debug }) => {
           </h3>
           <div className="bg-gray-50 rounded-lg p-4">
             <img
-              src={meme.getUrl()}
+              src={meme.URL}
               alt="Generated meme"
               className="w-full max-w-sm mx-auto rounded-lg shadow-sm"
             />
@@ -52,9 +55,7 @@ const MemeResult: React.FC<Props> = ({ meme, loading, debug }) => {
       )}
 
       {/* Debug Information */}
-      {meme && debug && meme.getOplogList().length > 0 && (
-        <DebugPanel meme={meme} />
-      )}
+      {meme && debug && meme.OpLog.length > 0 && <DebugPanel meme={meme} />}
     </div>
   );
 };
@@ -70,7 +71,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ meme }) => (
       Processing Steps
     </h3>
     <div className="space-y-3 max-h-96 overflow-y-auto">
-      {meme.getOplogList().map((operation, idx) => (
+      {meme.OpLog.map((operation, idx) => (
         <ProcessingStep key={idx} operation={operation} />
       ))}
     </div>
@@ -78,7 +79,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ meme }) => (
 );
 
 interface ProcessingStepProps {
-  operation: any; // OpLog type from proto
+  operation: OpLog;
 }
 
 const ProcessingStep: React.FC<ProcessingStepProps> = ({ operation }) => (
@@ -86,26 +87,24 @@ const ProcessingStep: React.FC<ProcessingStepProps> = ({ operation }) => (
     <div className="flex items-start space-x-3">
       <div className="flex-shrink-0">
         <img
-          src={operation.getFile()}
+          src={operation.File}
           className="w-16 h-16 object-cover rounded-lg"
-          alt={getOpName(operation.getOp())}
+          alt={getOpName(operation.Op)}
         />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center space-x-2 mb-1">
           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Step {operation.getStep()}
+            Step {operation.step}
           </span>
           <span className="text-sm font-medium text-gray-900">
-            {getOpName(operation.getOp())}
+            {getOpName(operation.Op)}
           </span>
-          <span className="text-xs text-gray-500">
-            {operation.getDuration()}
-          </span>
+          <span className="text-xs text-gray-500">{operation.Duration}</span>
         </div>
-        {operation.getArgsList().length > 0 && (
+        {operation.Args.length > 0 && (
           <p className="text-xs text-gray-600 font-mono bg-white px-2 py-1 rounded">
-            {operation.getArgsList().join(", ")}
+            {operation.Args.join(", ")}
           </p>
         )}
       </div>
@@ -113,17 +112,17 @@ const ProcessingStep: React.FC<ProcessingStepProps> = ({ operation }) => (
   </div>
 );
 
-const getOpName = (op: OperationMap[keyof OperationMap]) => {
+const getOpName = (op: Operation): string => {
   switch (op) {
-    case Operation.SHRINK:
+    case Operation.Shrink:
       return "shrink";
-    case Operation.COMPOSITE:
+    case Operation.Composite:
       return "composite";
-    case Operation.DISTORT:
+    case Operation.Distort:
       return "distort";
-    case Operation.RECT:
+    case Operation.Rect:
       return "rectangle (debug)";
-    case Operation.TEXT:
+    case Operation.Text:
       return "text";
     default:
       return "unknown";

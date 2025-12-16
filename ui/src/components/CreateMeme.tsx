@@ -1,26 +1,20 @@
 import React, { useState, useEffect } from "react";
-
-import {
-  Template,
-  CreateMemeParams,
-  TargetInput as ProtoTargetInput,
-  Meme,
-  ImageInput,
-  TextInput,
-} from "../proto/meme_pb";
-import { getAPIClient } from "../util";
+import { useMutation } from "@tanstack/react-query";
+import { memeClient } from "../connect";
+import type { Template, Meme } from "../gen/meme_pb";
+import { TargetInput as ProtoTargetInput, ImageInput, TextInput } from "../gen/meme_pb";
 import update from "immutability-helper";
 import { b64 } from "./b64placeholder";
 import TargetInput, { TargetForm } from "./TargetInput";
 import Button from "./Button";
 import MemeResult from "./MemeResult";
 
-
 interface Props {
   template: Template;
   onCreate: (meme: Meme) => void;
   debug: boolean;
 }
+
 const getRandomColor = (): string => {
   const colors = [
     "#9859e0",
@@ -33,19 +27,24 @@ const getRandomColor = (): string => {
     "#e133f4",
     "#f22e7f",
   ];
-
   return colors[Math.floor(Math.random() * colors.length)];
 };
+
 const getRandom = (): TargetForm => {
-  let image1 = new ImageInput();
-  image1.setUrl(
-    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
-  );
-  let image2 = new ImageInput();
-  image2.setUrl(b64);
-  let text1 = new TextInput();
-  text1.setText("cat");
-  text1.setColor(getRandomColor());
+  const image1 = new ImageInput({
+    URL: "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80",
+    stretch: false,
+  });
+
+  const image2 = new ImageInput({
+    URL: b64,
+    stretch: false,
+  });
+
+  const text1 = new TextInput({
+    Text: "cat",
+    Color: getRandomColor(),
+  });
 
   const items: TargetForm[] = [
     { image: image1, kind: "image" },
@@ -54,52 +53,71 @@ const getRandom = (): TargetForm => {
   ];
   return items[Math.floor(Math.random() * items.length)];
 };
+
 const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
   const [targets, setTargets] = useState<TargetForm[]>([]);
   const [res, setRes] = useState<Meme>();
-  const [loading, setLoading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: (params: { templateName: string; targetInputs: ProtoTargetInput[]; debug: boolean }) =>
+      memeClient.createMeme({
+        TemplateName: params.templateName,
+        TargetInputs: params.targetInputs,
+        Debug: params.debug,
+      }),
+    onSuccess: (data) => {
+      console.log("created", data.ID, data.URL);
+      onCreate(data);
+      setRes(data);
+    },
+    onError: (error) => {
+      console.error("Failed to create meme:", error);
+    },
+  });
+
   useEffect(() => {
-    const fetchDetails = () => {
-      let t = template.getTargetsList();
-      let targets: TargetForm[] = Array.from({ length: t.length }, () =>
-        getRandom()
-      );
-      setTargets(targets);
-    };
-    fetchDetails();
+    const numTargets = template.Targets.length;
+    const randomTargets: TargetForm[] = Array.from({ length: numTargets }, () =>
+      getRandom()
+    );
+    setTargets(randomTargets);
   }, [template]);
 
   const makeMeme = () => {
-    setLoading(true);
-    const req = new CreateMemeParams();
-    req.setTemplatename(template.getName());
-    req.setTargetinputsList(
-      targets.map((t) => {
-        let input = new ProtoTargetInput();
-        input.setImageinput(t.image);
-        input.setTextinput(t.text);
-        return input;
-      })
-    );
-    req.setDebug(debug);
-
-    console.log({ req });
-    getAPIClient().createMeme(req, (err, reply) => {
-      console.log(JSON.stringify({ err, reply }));
-      setLoading(false);
-      if (reply) {
-        console.log("created", reply.getId(), reply.getUrl());
-        onCreate(reply);
-        setRes(reply);
+    const targetInputs: ProtoTargetInput[] = targets.map((t) => {
+      if (t.kind === "image" && t.image) {
+        return new ProtoTargetInput({
+          input: {
+            case: "ImageInput",
+            value: t.image,
+          },
+        });
+      } else if (t.kind === "text" && t.text) {
+        return new ProtoTargetInput({
+          input: {
+            case: "TextInput",
+            value: t.text,
+          },
+        });
       }
+      return new ProtoTargetInput();
+    });
+
+    mutation.mutate({
+      templateName: template.Name,
+      targetInputs: targetInputs,
+      debug: debug,
     });
   };
 
   const handleTargetUpdate = (index: number, target: TargetForm) => {
-    setTargets(update(targets, {
-      [index]: { $set: target }
-    }));
+    setTargets(
+      update(targets, {
+        [index]: { $set: target },
+      })
+    );
   };
+
   return (
     <div className="flex flex-col lg:flex-row gap-8">
       {/* Input Form */}
@@ -113,12 +131,12 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
               onUpdate={(updatedTarget) => handleTargetUpdate(index, updatedTarget)}
             />
           ))}
-          
+
           <Button
             size="lg"
             className="w-full"
             onClick={makeMeme}
-            loading={loading}
+            loading={mutation.isPending}
             icon="🎨"
           >
             Generate Meme
@@ -129,11 +147,7 @@ const CreateMeme: React.FC<Props> = ({ template, onCreate, debug }) => {
       {/* Result Area */}
       <div className="flex-1 lg:max-w-md">
         <div className="sticky top-8">
-          <MemeResult 
-            meme={res} 
-            loading={loading} 
-            debug={debug} 
-          />
+          <MemeResult meme={res} loading={mutation.isPending} debug={debug} />
         </div>
       </div>
     </div>

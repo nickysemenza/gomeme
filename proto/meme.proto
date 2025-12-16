@@ -1,8 +1,10 @@
 syntax = "proto3";
 
-option go_package = "github.com/nickysemenza/gomeme/proto";
+package meme.v1;
 
-service API {
+option go_package = "github.com/nickysemenza/gomeme/gen;memepb";
+
+service MemeService {
     rpc GetPing(Ping) returns (Ping) {}
     rpc GetTemplates(GetTemplatesParams) returns (TemplateList) {}
     rpc CreateMeme(CreateMemeParams) returns (Meme) {}
