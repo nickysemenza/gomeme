@@ -1,11 +1,11 @@
-FROM node as ui-builder
+FROM node AS ui-builder
 WORKDIR /work/ui
-COPY ui/package.json ui/package-lock.json ./
+COPY ui/package.json ui/package-lock.json ui/.npmrc ./
 RUN npm ci
 COPY ui ./
 RUN npm run build
 
-FROM golang:1.25 as go-builder
+FROM golang:1.25 AS go-builder
 COPY . /src/gomeme
 WORKDIR /src/gomeme
 RUN make build
