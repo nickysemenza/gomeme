@@ -74,7 +74,7 @@ func (s *Server) buildRouter() *chi.Mux {
 
 	// REST endpoints
 	r.Get("/hi", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi"))
+		_, _ = w.Write([]byte("hi"))
 	})
 	r.Get("/b/{payload}", func(w http.ResponseWriter, r *http.Request) {
 		b := chi.URLParam(r, "payload")
