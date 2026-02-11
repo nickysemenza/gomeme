@@ -5,7 +5,7 @@ RUN npm ci
 COPY ui ./
 RUN npm run build
 
-FROM golang:1.25 AS go-builder
+FROM golang:1.26 AS go-builder
 COPY . /src/gomeme
 WORKDIR /src/gomeme
 RUN make build
