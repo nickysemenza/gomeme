@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@bufbuild/protobuf": "^1.10.1",
+    "@bufbuild/protobuf": "^2.0.0",
     "@connectrpc/connect": "^1.7.0",
     "@connectrpc/connect-web": "^1.7.0",
     "@tailwindcss/cli": "^4.0.3",
