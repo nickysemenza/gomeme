@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import * as yaml from "js-yaml";
 import Button from "./Button";
+import { templates } from "~/lib/templates";
 
 interface Point {
   x: number;
@@ -21,13 +22,27 @@ interface EditorTemplate {
   file: string;
 }
 
+// Maps polygon vertex index to deltas array index
+// Polygon order: TL(0), TR(1), BR(2), BL(3)
+// Deltas order (from meme-generator): TL(0), BL(1), TR(2), BR(3)
+const POLY_TO_DELTA = [0, 2, 3, 1] as const;
+
+const ZERO_DELTAS: Point[] = [
+  { x: 0, y: 0 },
+  { x: 0, y: 0 },
+  { x: 0, y: 0 },
+  { x: 0, y: 0 },
+];
+
 interface DragState {
   isDragging: boolean;
-  dragType: "move" | "resize";
+  dragType: "move" | "resize" | "skew";
   targetIndex: number;
   startPos: Point;
   startSize: Point;
   startTopLeft: Point;
+  cornerIndex?: number;
+  startDeltas?: Point[];
 }
 
 const MemeEditor: React.FC = () => {
@@ -40,32 +55,50 @@ const MemeEditor: React.FC = () => {
 
   const [selectedTarget, setSelectedTarget] = useState<number>(-1);
   const [dragState, setDragState] = useState<DragState | null>(null);
+  const [skewMode, setSkewMode] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imageLoaded, setImageLoaded] = useState(false);
   const [yamlInput, setYamlInput] = useState<string>("");
   const [existingTemplates, setExistingTemplates] = useState<string[]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const [displaySize, setDisplaySize] = useState<Point>({ x: 0, y: 0 });
 
-  const loadSampleTemplate = () => {
+  const scale = displaySize.x > 0 ? template.size.x / displaySize.x : 1;
+
+  const getTargetPolygon = (target: EditorTarget): Point[] => {
+    const { top_left: tl, size: s, deltas: d } = target;
+    const zero = { x: 0, y: 0 };
+    const [d0, d1, d2, d3] = d && d.length === 4
+      ? d
+      : [zero, zero, zero, zero];
+    // Corner order matches meme-generator: TL, BL, TR, BR
+    // Render as TL -> TR -> BR -> BL polygon
+    return [
+      { x: tl.x + d0.x, y: tl.y + d0.y },           // TL
+      { x: tl.x + s.x + d2.x, y: tl.y + d2.y },     // TR
+      { x: tl.x + s.x + d3.x, y: tl.y + s.y + d3.y }, // BR
+      { x: tl.x + d1.x, y: tl.y + s.y + d1.y },     // BL
+    ];
+  };
+
+  const loadPreset = (name: string) => {
+    const preset = templates[name];
+    if (!preset) return;
     setTemplate({
-      name: "drake_sample",
-      size: { x: 425, y: 365 },
-      targets: [
-        {
-          friendly_name: "panel 1",
-          top_left: { x: 217, y: 0 },
-          size: { x: 210, y: 170 },
-        },
-        {
-          friendly_name: "panel 2",
-          top_left: { x: 217, y: 174 },
-          size: { x: 210, y: 170 },
-        },
-      ],
-      file: "templates/drake1.jpeg",
+      name: preset.name,
+      size: { ...preset.size },
+      targets: preset.targets.map((t) => ({
+        friendly_name: t.friendlyName,
+        top_left: { ...t.topLeft },
+        size: { ...t.size },
+        ...(t.deltas && { deltas: t.deltas.map((d) => ({ ...d })) }),
+      })),
+      file: preset.file,
     });
-    setImageUrl("/templates/drake1.jpeg");
+    setImageUrl(preset.file);
+    setImageLoaded(false);
     setSelectedTarget(-1);
+    setSkewMode(preset.targets.some((t) => t.deltas != null));
   };
 
   const handleImageLoad = useCallback(
@@ -75,6 +108,7 @@ const MemeEditor: React.FC = () => {
         ...prev,
         size: { x: img.naturalWidth, y: img.naturalHeight },
       }));
+      setDisplaySize({ x: img.clientWidth, y: img.clientHeight });
       setImageLoaded(true);
     },
     [],
@@ -116,20 +150,33 @@ const MemeEditor: React.FC = () => {
   const handleMouseDown = (
     e: React.MouseEvent,
     targetIndex: number,
-    dragType: "move" | "resize",
+    dragType: "move" | "resize" | "skew",
+    cornerIndex?: number,
   ) => {
     e.preventDefault();
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
     const target = template.targets[targetIndex];
+    // Auto-init deltas when starting a skew drag
+    if (dragType === "skew" && !target.deltas) {
+      updateTarget(targetIndex, {
+        deltas: ZERO_DELTAS.map((d) => ({ ...d })),
+      });
+    }
+    const deltas = target.deltas || ZERO_DELTAS;
     setDragState({
       isDragging: true,
       dragType,
       targetIndex,
-      startPos: { x: e.clientX - rect.left, y: e.clientY - rect.top },
+      startPos: {
+        x: (e.clientX - rect.left) * scale,
+        y: (e.clientY - rect.top) * scale,
+      },
       startSize: { ...target.size },
       startTopLeft: { ...target.top_left },
+      cornerIndex,
+      startDeltas: deltas.map((d) => ({ ...d })),
     });
     setSelectedTarget(targetIndex);
   };
@@ -140,8 +187,8 @@ const MemeEditor: React.FC = () => {
 
       const rect = canvasRef.current.getBoundingClientRect();
       const currentPos = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) * scale,
+        y: (e.clientY - rect.top) * scale,
       };
       const deltaX = currentPos.x - dragState.startPos.x;
       const deltaY = currentPos.y - dragState.startPos.y;
@@ -180,9 +227,21 @@ const MemeEditor: React.FC = () => {
             ),
           },
         });
+      } else if (
+        dragState.dragType === "skew" &&
+        dragState.cornerIndex != null &&
+        dragState.startDeltas
+      ) {
+        const deltaIdx = POLY_TO_DELTA[dragState.cornerIndex];
+        const newDeltas = dragState.startDeltas.map((d) => ({ ...d }));
+        newDeltas[deltaIdx] = {
+          x: Math.round(dragState.startDeltas[deltaIdx].x + deltaX),
+          y: Math.round(dragState.startDeltas[deltaIdx].y + deltaY),
+        };
+        updateTarget(dragState.targetIndex, { deltas: newDeltas });
       }
     },
-    [dragState, template.size, updateTarget],
+    [dragState, scale, template.size, updateTarget],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -348,6 +407,25 @@ const MemeEditor: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Settings Panel */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Preset Templates */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Presets
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {Object.keys(templates).map((name) => (
+                <Button
+                  key={name}
+                  onClick={() => loadPreset(name)}
+                  size="sm"
+                  variant="secondary"
+                >
+                  {name}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* Template Settings */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -443,18 +521,9 @@ const MemeEditor: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">Targets</h3>
-              <div className="flex space-x-2">
-                <Button onClick={addTarget} size="sm" variant="secondary">
-                  + Add
-                </Button>
-                <Button
-                  onClick={loadSampleTemplate}
-                  size="sm"
-                  variant="secondary"
-                >
-                  Sample
-                </Button>
-              </div>
+              <Button onClick={addTarget} size="sm" variant="secondary">
+                + Add
+              </Button>
             </div>
             <div className="space-y-3">
               {template.targets.map((target, index) => (
@@ -514,9 +583,32 @@ const MemeEditor: React.FC = () => {
         {/* Visual Editor */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Visual Editor
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Visual Editor
+              </h3>
+              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={skewMode}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setSkewMode(on);
+                    if (!on) {
+                      setTemplate((prev) => ({
+                        ...prev,
+                        targets: prev.targets.map((t) => {
+                          const { deltas: _, ...rest } = t;
+                          return rest;
+                        }),
+                      }));
+                    }
+                  }}
+                  className="rounded border-gray-300"
+                />
+                Skew
+              </label>
+            </div>
             <div className="border border-gray-300 rounded-lg overflow-hidden bg-gray-100 relative inline-block">
               {imageUrl ? (
                 <div
@@ -534,44 +626,95 @@ const MemeEditor: React.FC = () => {
                     className="block max-w-full max-h-96 object-contain"
                     draggable={false}
                   />
-                  {imageLoaded &&
-                    template.targets.map((target, index) => (
-                      <div
-                        key={index}
-                        className={`absolute border-2 ${
-                          selectedTarget === index
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-red-500 bg-red-500/10"
-                        } cursor-move`}
-                        style={{
-                          left: target.top_left.x,
-                          top: target.top_left.y,
-                          width: target.size.x,
-                          height: target.size.y,
-                        }}
-                        onClick={() => setSelectedTarget(index)}
-                        onMouseDown={(e) => handleMouseDown(e, index, "move")}
-                      >
-                        <div
-                          className={`absolute -top-6 left-0 px-2 py-1 text-xs font-medium rounded ${
-                            selectedTarget === index
-                              ? "bg-blue-500 text-white"
-                              : "bg-red-500 text-white"
-                          }`}
-                        >
-                          {target.friendly_name}
-                        </div>
-                        {selectedTarget === index && (
-                          <div
-                            className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 border border-white cursor-se-resize"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              handleMouseDown(e, index, "resize");
-                            }}
-                          />
-                        )}
-                      </div>
-                    ))}
+                  {imageLoaded && template.size.x > 0 && (
+                    <svg
+                      className="absolute top-0 left-0 w-full h-full cursor-crosshair"
+                      viewBox={`0 0 ${template.size.x} ${template.size.y}`}
+                      preserveAspectRatio="xMidYMid meet"
+                    >
+                      {template.targets.map((target, index) => {
+                        const pts = getTargetPolygon(target);
+                        const pointsStr = pts
+                          .map((p) => `${p.x},${p.y}`)
+                          .join(" ");
+                        const isSelected = selectedTarget === index;
+                        const color = isSelected ? "#3b82f6" : "#ef4444";
+                        // Label position: top-left corner of polygon
+                        const labelPt = pts[0];
+                        return (
+                          <g key={index}>
+                            <polygon
+                              points={pointsStr}
+                              fill={isSelected ? "rgba(59,130,246,0.1)" : "rgba(239,68,68,0.1)"}
+                              stroke={color}
+                              strokeWidth={3 * scale}
+                              className="cursor-move"
+                              onClick={() => setSelectedTarget(index)}
+                              onMouseDown={(e) =>
+                                handleMouseDown(e, index, "move")
+                              }
+                            />
+                            {(() => {
+                              const labelH = 20 * scale;
+                              const labelW =
+                                target.friendly_name.length * 9 * scale;
+                              // Place above TL corner, but flip inside if it would clip
+                              const above = labelPt.y - labelH - 4 * scale >= 0;
+                              const ly = above
+                                ? labelPt.y - labelH - 4 * scale
+                                : labelPt.y + 4 * scale;
+                              return (
+                                <>
+                                  <rect
+                                    x={labelPt.x}
+                                    y={ly}
+                                    width={labelW}
+                                    height={labelH}
+                                    rx={4 * scale}
+                                    fill={color}
+                                  />
+                                  <text
+                                    x={labelPt.x + 6 * scale}
+                                    y={ly + 15 * scale}
+                                    fontSize={13 * scale}
+                                    fontWeight="500"
+                                    fill="white"
+                                    style={{ pointerEvents: "none" }}
+                                  >
+                                    {target.friendly_name}
+                                  </text>
+                                </>
+                              );
+                            })()}
+                            {/* Corner handles for skew adjustment */}
+                            {isSelected &&
+                              skewMode &&
+                              pts.map((pt, ci) => (
+                                <circle
+                                  key={ci}
+                                  cx={pt.x}
+                                  cy={pt.y}
+                                  r={7 * scale}
+                                  fill="#3b82f6"
+                                  stroke="white"
+                                  strokeWidth={2 * scale}
+                                  className="cursor-grab"
+                                  onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    handleMouseDown(
+                                      e,
+                                      index,
+                                      "skew",
+                                      ci,
+                                    );
+                                  }}
+                                />
+                              ))}
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  )}
                 </div>
               ) : (
                 <div className="w-full h-64 flex items-center justify-center text-gray-500">
