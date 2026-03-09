@@ -84,39 +84,30 @@ const CreateMeme: React.FC<Props> = ({ template, debug }) => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      <div className="flex-1">
-        <div className="space-y-6">
-          {targets.map((target, index) => (
-            <TargetInput
-              key={index}
-              target={target}
-              index={index}
-              onUpdate={(t) => handleTargetUpdate(index, t)}
-            />
-          ))}
+    <div className="flex flex-col lg:flex-row gap-3">
+      <div className="flex-1 space-y-2">
+        {targets.map((target, index) => (
+          <TargetInput
+            key={index}
+            target={target}
+            index={index}
+            onUpdate={(t) => handleTargetUpdate(index, t)}
+          />
+        ))}
 
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={makeMeme}
-            loading={loading}
-          >
-            Generate Meme
-          </Button>
+        <Button className="w-full" onClick={makeMeme} loading={loading}>
+          Generate Meme
+        </Button>
 
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
-            </div>
-          )}
-        </div>
+        {error && (
+          <div className="p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs">
+            {error}
+          </div>
+        )}
       </div>
 
-      <div className="flex-1 lg:max-w-md">
-        <div className="sticky top-8">
-          <MemeResultView result={result} loading={loading} debug={debug} />
-        </div>
+      <div className="flex-1 lg:max-w-sm">
+        <MemeResultView result={result} loading={loading} debug={debug} />
       </div>
     </div>
   );

@@ -48,99 +48,66 @@ const TargetInput: React.FC<Props> = ({ target, index, onUpdate }) => {
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-      <div className="flex items-center mb-4">
-        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+    <div className="bg-gray-50 rounded p-3 border border-gray-200">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
           {index + 1}
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">
-          Input {index + 1}
-        </h3>
-        <div className="ml-auto">
-          <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-              target.kind === "image"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-purple-100 text-purple-800"
-            }`}
+        <span
+          className={`text-xs font-medium px-1.5 py-0.5 rounded ${
+            target.kind === "image"
+              ? "bg-blue-100 text-blue-700"
+              : "bg-purple-100 text-purple-700"
+          }`}
+        >
+          {target.kind}
+        </span>
+      </div>
+
+      <input
+        type="text"
+        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+        placeholder={
+          target.kind === "image" ? "https://... or data:image/..." : "Text..."
+        }
+        value={target.text?.text || target.image?.url || ""}
+        onChange={(e) => handleInputChange(e.target.value)}
+      />
+
+      {target.text && (
+        <div className="mt-2 flex items-center gap-2">
+          <div
+            className="w-6 h-6 rounded border border-gray-300 flex-shrink-0 cursor-pointer relative group"
+            style={{ backgroundColor: target.text.color }}
           >
-            {target.kind === "image" ? "Image" : "Text"}
+            <div className="absolute top-7 left-0 z-10 hidden group-hover:block">
+              <HexColorPicker
+                color={target.text.color}
+                onChange={handleColorChange}
+              />
+            </div>
+          </div>
+          <span
+            className="font-bold text-sm truncate"
+            style={{ color: target.text.color }}
+          >
+            {target.text.text}
           </span>
         </div>
-      </div>
+      )}
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {target.kind === "image" ? "Image URL or Base64" : "Text Content"}
-          </label>
-          <input
-            type="text"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-            placeholder={
-              target.kind === "image"
-                ? "https://... or data:image/..."
-                : "Enter text here..."
-            }
-            value={target.text?.text || target.image?.url || ""}
-            onChange={(e) => handleInputChange(e.target.value)}
-          />
-        </div>
-
-        <div>
-          {target.text && (
-            <TextPreview text={target.text} onColorChange={handleColorChange} />
-          )}
-          {target.image && <ImagePreview image={target.image} />}
-        </div>
-      </div>
+      {target.image && target.image.url && (
+        <img
+          src={target.image.url}
+          alt="preview"
+          className="mt-2 h-16 object-contain rounded"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
+      )}
     </div>
   );
 };
-
-const TextPreview: React.FC<{
-  text: TextInput;
-  onColorChange: (color: string) => void;
-}> = ({ text, onColorChange }) => (
-  <div className="space-y-3">
-    <label className="block text-sm font-medium text-gray-700">
-      Text Color
-    </label>
-    <div className="flex items-center space-x-4">
-      <div className="w-12 h-12 rounded-lg border-2 border-gray-200 overflow-hidden">
-        <div className="w-full h-full" style={{ backgroundColor: text.color }} />
-      </div>
-      <div className="flex-1">
-        <HexColorPicker color={text.color} onChange={onColorChange} />
-      </div>
-    </div>
-    {text.text && (
-      <div className="mt-3 p-3 bg-white rounded-lg border">
-        <p className="text-sm text-gray-600 mb-1">Preview:</p>
-        <span className="font-bold text-lg" style={{ color: text.color }}>
-          {text.text}
-        </span>
-      </div>
-    )}
-  </div>
-);
-
-const ImagePreview: React.FC<{ image: ImageInput }> = ({ image }) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      Image Preview
-    </label>
-    <div className="w-full max-w-xs mx-auto bg-white rounded-lg border p-2">
-      <img
-        src={image.url}
-        alt="Input preview"
-        className="w-full h-40 object-contain rounded"
-        onError={(e) => {
-          e.currentTarget.style.display = "none";
-        }}
-      />
-    </div>
-  </div>
-);
 
 export default TargetInput;
