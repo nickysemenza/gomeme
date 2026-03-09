@@ -1,4 +1,3 @@
-gomeme
-tmp/
-vendor/
-bin/
+node_modules/
+dist/
+.wrangler/
