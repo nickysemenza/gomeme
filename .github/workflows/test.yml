@@ -12,7 +12,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: latest
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run build
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm run build
 
