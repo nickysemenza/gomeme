@@ -12,7 +12,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: latest
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
       - run: pnpm run build
