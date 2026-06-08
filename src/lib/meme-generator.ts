@@ -4,6 +4,7 @@ import {
   MagickColors,
   MagickFormat,
   Gravity,
+  MagickGeometry,
   CompositeOperator,
   DistortMethod,
   VirtualPixelMethod,
@@ -13,18 +14,24 @@ import {
 import type { Point, Deltas, TargetInput } from "./schemas";
 import { templates } from "./templates";
 
-let initialized = false;
+// Cache the in-flight promise, not a boolean: initializeImageMagick must run
+// exactly once. A boolean flag flips only after the await resolves, so two
+// concurrent callers both pass the guard and double-initialize, which throws.
+let initPromise: Promise<void> | null = null;
 
-export async function initMagick(): Promise<void> {
-  if (initialized) return;
-  const wasmUrl = new URL(
-    "@imagemagick/magick-wasm/magick.wasm",
-    import.meta.url,
-  );
-  const response = await fetch(wasmUrl);
-  const wasmBytes = new Uint8Array(await response.arrayBuffer());
-  await initializeImageMagick(wasmBytes);
-  initialized = true;
+export function initMagick(): Promise<void> {
+  if (!initPromise) {
+    initPromise = (async () => {
+      const wasmUrl = new URL(
+        "@imagemagick/magick-wasm/magick.wasm",
+        import.meta.url,
+      );
+      const response = await fetch(wasmUrl);
+      const wasmBytes = new Uint8Array(await response.arrayBuffer());
+      await initializeImageMagick(wasmBytes);
+    })();
+  }
+  return initPromise;
 }
 
 export interface OpLogEntry {
@@ -39,18 +46,65 @@ export interface MemeResult {
   opLog: OpLogEntry[];
 }
 
+// Guardrails for fetching/decoding arbitrary user-supplied images before they
+// reach the WASM decoder, which otherwise surfaces opaque low-level errors.
+const MAX_IMAGE_BYTES = 25 * 1024 * 1024; // 25 MB
+const FETCH_TIMEOUT_MS = 15_000;
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+
+function decodeBase64(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 async function fetchImageBytes(url: string): Promise<Uint8Array> {
   if (url.startsWith("data:")) {
-    const base64 = url.split(",")[1];
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
+    const comma = url.indexOf(",");
+    if (comma === -1) throw new Error("Malformed data URL: missing comma");
+    try {
+      const bytes = decodeBase64(url.slice(comma + 1));
+      if (bytes.length > MAX_IMAGE_BYTES) {
+        throw new Error("Image exceeds 25 MB limit");
+      }
+      return bytes;
+    } catch (e) {
+      if (e instanceof Error && e.message.includes("25 MB")) throw e;
+      throw new Error("Malformed data URL: could not decode base64");
     }
-    return bytes;
   }
-  const response = await fetch(url);
-  return new Uint8Array(await response.arrayBuffer());
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+    }
+    const contentType = (response.headers.get("content-type") || "")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
+    // Some hosts omit content-type; only reject when it's present and disallowed.
+    if (contentType && !ALLOWED_IMAGE_TYPES.includes(contentType)) {
+      throw new Error(`Unsupported image type: ${contentType}`);
+    }
+    const buffer = await response.arrayBuffer();
+    if (buffer.byteLength > MAX_IMAGE_BYTES) {
+      throw new Error("Image exceeds 25 MB limit");
+    }
+    return new Uint8Array(buffer);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      throw new Error("Image fetch timed out");
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function imageToDataUrl(image: IMagickImage): string {
@@ -163,7 +217,6 @@ function hasNonZeroDistortion(payload: DistortPayload): boolean {
 export async function generateMeme(
   templateName: string,
   inputs: TargetInput[],
-  _debug = false,
 ): Promise<MemeResult> {
   await initMagick();
 
@@ -221,7 +274,12 @@ export async function generateMeme(
           `stretch=${input.stretch}`,
         ];
         if (input.stretch) {
-          img.resize(target.size.x, target.size.y);
+          // resize(w, h) defaults to geometry "WxH", which fits within the box
+          // preserving aspect ratio. To actually stretch to exact dimensions we
+          // need the IM "!" flag, expressed here via ignoreAspectRatio.
+          const geometry = new MagickGeometry(target.size.x, target.size.y);
+          geometry.ignoreAspectRatio = true;
+          img.resize(geometry);
         } else {
           // Resize preserving aspect ratio, then pad to exact size
           img.resize(target.size.x, target.size.y);

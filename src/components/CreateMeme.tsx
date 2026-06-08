@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import update from "immutability-helper";
 import type { Template, TargetInput as TargetInputType } from "~/lib/schemas";
-import { generateMeme, type MemeResult as MemeResultType } from "~/lib/meme-generator";
+import type { MemeResult as MemeResultType } from "~/lib/meme-generator";
 import TargetInput, { type TargetForm } from "./TargetInput";
 import Button from "./Button";
 import MemeResultView from "./MemeResult";
@@ -23,8 +23,8 @@ const RANDOM_COLORS = [
   "#f22e7f",
 ];
 
-const SAMPLE_IMAGE =
-  "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
+// Local asset so the home page doesn't hit a third-party CDN on first paint.
+const SAMPLE_IMAGE = "/templates/bernie.png";
 
 function getRandomColor(): string {
   return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
@@ -70,14 +70,17 @@ const CreateMeme: React.FC<Props> = ({ template, debug }) => {
         throw new Error("Invalid target input");
       });
 
-      const res = await generateMeme(template.name, inputs, debug);
+      // Lazy-load the generator (and the large magick-wasm wrapper) only when
+      // the user actually generates, keeping it out of the first-paint chunk.
+      const { generateMeme } = await import("~/lib/meme-generator");
+      const res = await generateMeme(template.name, inputs);
       setResult(res);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [targets, template.name, debug]);
+  }, [targets, template.name]);
 
   const handleTargetUpdate = (index: number, target: TargetForm) => {
     setTargets(update(targets, { [index]: { $set: target } }));

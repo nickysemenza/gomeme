@@ -13,7 +13,6 @@
   "dependencies": {
     "@imagemagick/magick-wasm": "^0.0.40",
     "@tanstack/react-router": "^1.170.4",
-    "@tanstack/react-start": "^1.168.6",
     "immutability-helper": "^3.1.1",
     "js-yaml": "^4.1.1",
     "react": "^19.2.6",

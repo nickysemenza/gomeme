@@ -4,7 +4,6 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
-  icon?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -12,7 +11,6 @@ const Button: React.FC<Props> = ({
   variant = "primary",
   size = "md",
   loading = false,
-  icon,
   children,
   className = "",
   disabled,
@@ -49,7 +47,6 @@ const Button: React.FC<Props> = ({
         </div>
       ) : (
         <div className="flex items-center space-x-2">
-          {icon && <span>{icon}</span>}
           <span>{children}</span>
         </div>
       )}
