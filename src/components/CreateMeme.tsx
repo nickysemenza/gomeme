@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import update from "immutability-helper";
-import type { Template, TargetInput as TargetInputType } from "~/lib/schemas";
+import type { Template, TargetInput } from "~/lib/schemas";
 import type { MemeResult as MemeResultType } from "~/lib/meme-generator";
-import TargetInput, { type TargetForm } from "./TargetInput";
+import TargetInputView from "./TargetInput";
 import Button from "./Button";
 import MemeResultView from "./MemeResult";
 
@@ -30,70 +30,58 @@ function getRandomColor(): string {
   return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
 }
 
-function getRandom(): TargetForm {
-  const items: TargetForm[] = [
-    {
-      image: { kind: "image", url: SAMPLE_IMAGE, stretch: false },
-      kind: "image",
-    },
-    {
-      text: { kind: "text", text: "cat", color: getRandomColor() },
-      kind: "text",
-    },
+function getRandom(): TargetInput {
+  const items: TargetInput[] = [
+    { kind: "image", url: SAMPLE_IMAGE, stretch: false },
+    { kind: "text", text: "cat", color: getRandomColor() },
   ];
   return items[Math.floor(Math.random() * items.length)];
 }
 
 const CreateMeme: React.FC<Props> = ({ template, debug }) => {
-  const [targets, setTargets] = useState<TargetForm[]>([]);
+  const [targets, setTargets] = useState<TargetInput[]>([]);
   const [result, setResult] = useState<MemeResultType>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
+  // Seed inputs when the template changes. Keyed on stable primitives (name +
+  // count) rather than the object so an unrelated parent re-render can't wipe
+  // user-entered inputs.
   useEffect(() => {
     setTargets(
       Array.from({ length: template.targets.length }, () => getRandom()),
     );
-  }, [template]);
+  }, [template.name, template.targets.length]);
 
   const makeMeme = useCallback(async () => {
     setLoading(true);
     setError(undefined);
     try {
-      const inputs: TargetInputType[] = targets.map((t) => {
-        if (t.kind === "image" && t.image) {
-          return { kind: "image" as const, url: t.image.url, stretch: t.image.stretch };
-        }
-        if (t.kind === "text" && t.text) {
-          return { kind: "text" as const, text: t.text.text, color: t.text.color };
-        }
-        throw new Error("Invalid target input");
-      });
-
       // Lazy-load the generator (and the large magick-wasm wrapper) only when
       // the user actually generates, keeping it out of the first-paint chunk.
       const { generateMeme } = await import("~/lib/meme-generator");
-      const res = await generateMeme(template.name, inputs);
+      const res = await generateMeme(template, targets);
       setResult(res);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setLoading(false);
     }
-  }, [targets, template.name]);
+  }, [targets, template]);
 
-  const handleTargetUpdate = (index: number, target: TargetForm) => {
-    setTargets(update(targets, { [index]: { $set: target } }));
-  };
+  const handleTargetUpdate = useCallback((index: number, target: TargetInput) => {
+    setTargets((prev) => update(prev, { [index]: { $set: target } }));
+  }, []);
 
   return (
     <div className="flex flex-col lg:flex-row gap-3">
       <div className="flex-1 space-y-2">
         {targets.map((target, index) => (
-          <TargetInput
+          <TargetInputView
             key={index}
             target={target}
             index={index}
+            label={template.targets[index]?.friendlyName ?? `Target ${index + 1}`}
             onUpdate={(t) => handleTargetUpdate(index, t)}
           />
         ))}
@@ -103,7 +91,10 @@ const CreateMeme: React.FC<Props> = ({ template, debug }) => {
         </Button>
 
         {error && (
-          <div className="p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs">
+          <div
+            role="alert"
+            className="p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs"
+          >
             {error}
           </div>
         )}
