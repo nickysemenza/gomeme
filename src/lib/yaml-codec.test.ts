@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  serializeTemplate,
-  parseTemplatesYaml,
-  extractTemplateNames,
-} from "./yaml-codec";
+import { serializeTemplate, parseTemplatesYaml } from "./yaml-codec";
 import { templates } from "./templates";
 
 describe("yaml codec round trip", () => {
@@ -65,11 +61,5 @@ describe("yaml parse", () => {
     const { templates: parsed, errors } = parseTemplatesYaml(":\n  - [unbalanced");
     expect(Object.keys(parsed)).toHaveLength(0);
     expect(errors.length).toBeGreaterThan(0);
-  });
-
-  it("extractTemplateNames lists template names", () => {
-    expect(extractTemplateNames(serializeTemplate(templates.bernie))).toEqual([
-      "bernie",
-    ]);
   });
 });

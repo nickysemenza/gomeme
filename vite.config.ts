@@ -6,7 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [tailwindcss(), tsconfigPaths(), react()],
   server: {
-    port: 3000,
+    port: process.env.PORT ? Number(process.env.PORT) : 3000,
   },
   optimizeDeps: {
     exclude: ["@imagemagick/magick-wasm"],

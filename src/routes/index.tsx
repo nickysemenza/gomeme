@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { templates } from "~/lib/templates";
+import { listTemplates } from "~/lib/registry";
 import CreateMeme from "~/components/CreateMeme";
 import Button from "~/components/Button";
 
@@ -10,18 +10,21 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const [debug, setDebug] = useState(false);
-  const templateList = Object.values(templates);
+  // Read on mount: built-in templates plus any saved from the editor.
+  const [templateList] = useState(() => Object.values(listTemplates()));
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-4">
+      <h1 className="sr-only">gomeme — meme generator</h1>
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-500">
           Meme generator powered by ImageMagick — running entirely in your
           browser.
         </p>
         <Button
-          variant={debug ? "danger" : "secondary"}
+          variant="secondary"
           size="sm"
+          aria-pressed={debug}
           onClick={() => setDebug(!debug)}
         >
           {debug ? "Debug on" : "Debug"}

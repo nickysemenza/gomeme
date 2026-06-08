@@ -98,11 +98,6 @@ export function parseTemplatesYaml(text: string): ParseResult {
   return { templates, errors: [] };
 }
 
-/** Lists template names present in YAML text (empty array on parse failure). */
-export function extractTemplateNames(text: string): string[] {
-  return Object.keys(parseTemplatesYaml(text).templates);
-}
-
 /** Serializes templates to snake_case YAML under a top-level `templates:` key. */
 export function serializeTemplates(templates: Template[]): string {
   const doc = {

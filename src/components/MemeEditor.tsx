@@ -1,102 +1,70 @@
-import { useState, useRef, useCallback } from "react";
-import * as yaml from "js-yaml";
-import Button from "./Button";
+import { useState, useRef, useEffect, useCallback } from "react";
+import type { Target, Point } from "~/lib/schemas";
 import { templates } from "~/lib/templates";
+import {
+  useTemplateEditor,
+  fromTemplate,
+  type DraftTemplate,
+} from "~/hooks/useTemplateEditor";
+import { useDragInteraction } from "~/hooks/useDragInteraction";
+import Button from "./Button";
+import EditorCanvas from "./editor/EditorCanvas";
+import TargetsPanel from "./editor/TargetsPanel";
+import YamlPanel from "./editor/YamlPanel";
 
-interface Point {
-  x: number;
-  y: number;
-}
+const INITIAL: DraftTemplate = {
+  name: "new_template",
+  size: { x: 800, y: 600 },
+  file: "",
+  targets: [],
+};
 
-interface EditorTarget {
-  friendly_name: string;
-  top_left: Point;
-  size: Point;
-  deltas?: Point[];
-}
-
-interface EditorTemplate {
-  name: string;
-  size: Point;
-  targets: EditorTarget[];
-  file: string;
-}
-
-// Maps polygon vertex index to deltas array index
-// Polygon order: TL(0), TR(1), BR(2), BL(3)
-// Deltas order (from meme-generator): TL(0), BL(1), TR(2), BR(3)
-const POLY_TO_DELTA = [0, 2, 3, 1] as const;
-
-const ZERO_DELTAS: Point[] = [
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-  { x: 0, y: 0 },
-];
-
-interface DragState {
-  isDragging: boolean;
-  dragType: "move" | "resize" | "skew";
-  targetIndex: number;
-  startPos: Point;
-  startSize: Point;
-  startTopLeft: Point;
-  cornerIndex?: number;
-  startDeltas?: Point[];
+function makeTarget(n: number): Target {
+  return {
+    friendlyName: `Target ${n}`,
+    topLeft: { x: 50, y: 50 },
+    size: { x: 200, y: 100 },
+  };
 }
 
 const MemeEditor: React.FC = () => {
-  const [template, setTemplate] = useState<EditorTemplate>({
-    name: "new_template",
-    size: { x: 800, y: 600 },
-    targets: [],
-    file: "",
-  });
+  const editor = useTemplateEditor(INITIAL);
+  const { template } = editor;
 
-  const [selectedTarget, setSelectedTarget] = useState<number>(-1);
-  const [dragState, setDragState] = useState<DragState | null>(null);
+  const [selectedTarget, setSelectedTarget] = useState(-1);
   const [skewMode, setSkewMode] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState("");
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [yamlInput, setYamlInput] = useState<string>("");
-  const [existingTemplates, setExistingTemplates] = useState<string[]>([]);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const [imageError, setImageError] = useState(false);
   const [displaySize, setDisplaySize] = useState<Point>({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLDivElement>(null);
 
+  // The displayed <img> preserves aspect ratio, so its element box equals the
+  // contained image — a single uniform scale is correct for pointer math.
   const scale = displaySize.x > 0 ? template.size.x / displaySize.x : 1;
 
-  const getTargetPolygon = (target: EditorTarget): Point[] => {
-    const { top_left: tl, size: s, deltas: d } = target;
-    const zero = { x: 0, y: 0 };
-    const [d0, d1, d2, d3] = d && d.length === 4
-      ? d
-      : [zero, zero, zero, zero];
-    // Corner order matches meme-generator: TL, BL, TR, BR
-    // Render as TL -> TR -> BR -> BL polygon
-    return [
-      { x: tl.x + d0.x, y: tl.y + d0.y },           // TL
-      { x: tl.x + s.x + d2.x, y: tl.y + d2.y },     // TR
-      { x: tl.x + s.x + d3.x, y: tl.y + s.y + d3.y }, // BR
-      { x: tl.x + d1.x, y: tl.y + s.y + d1.y },     // BL
-    ];
-  };
+  const drag = useDragInteraction({
+    canvasRef,
+    targets: template.targets,
+    bounds: template.size,
+    scale,
+    onCommit: editor.updateTarget,
+    onSelect: setSelectedTarget,
+  });
+
+  const displayTargets = drag.preview
+    ? template.targets.map((t, i) =>
+        i === drag.preview!.index ? drag.preview!.target : t,
+      )
+    : template.targets;
 
   const loadPreset = (name: string) => {
     const preset = templates[name];
     if (!preset) return;
-    setTemplate({
-      name: preset.name,
-      size: { ...preset.size },
-      targets: preset.targets.map((t) => ({
-        friendly_name: t.friendlyName,
-        top_left: { ...t.topLeft },
-        size: { ...t.size },
-        ...(t.deltas && { deltas: t.deltas.map((d) => ({ ...d })) }),
-      })),
-      file: preset.file,
-    });
+    editor.load(fromTemplate(preset));
     setImageUrl(preset.file);
     setImageLoaded(false);
+    setImageError(false);
     setSelectedTarget(-1);
     setSkewMode(preset.targets.some((t) => t.deltas != null));
   };
@@ -104,294 +72,35 @@ const MemeEditor: React.FC = () => {
   const handleImageLoad = useCallback(
     (event: React.SyntheticEvent<HTMLImageElement>) => {
       const img = event.target as HTMLImageElement;
-      setTemplate((prev) => ({
-        ...prev,
-        size: { x: img.naturalWidth, y: img.naturalHeight },
-      }));
+      editor.setSize({ x: img.naturalWidth, y: img.naturalHeight });
       setDisplaySize({ x: img.clientWidth, y: img.clientHeight });
       setImageLoaded(true);
+      setImageError(false);
     },
-    [],
+    [editor],
   );
 
   const addTarget = () => {
-    const newTarget: EditorTarget = {
-      friendly_name: `Target ${template.targets.length + 1}`,
-      top_left: { x: 50, y: 50 },
-      size: { x: 200, y: 100 },
-    };
-    setTemplate((prev) => ({
-      ...prev,
-      targets: [...prev.targets, newTarget],
-    }));
+    editor.addTarget(makeTarget(template.targets.length + 1));
     setSelectedTarget(template.targets.length);
   };
 
-  const updateTarget = useCallback(
-    (index: number, updates: Partial<EditorTarget>) => {
-      setTemplate((prev) => ({
-        ...prev,
-        targets: prev.targets.map((target, i) =>
-          i === index ? { ...target, ...updates } : target,
-        ),
-      }));
-    },
-    [],
-  );
-
   const removeTarget = (index: number) => {
-    setTemplate((prev) => ({
-      ...prev,
-      targets: prev.targets.filter((_, i) => i !== index),
-    }));
+    editor.removeTarget(index);
     setSelectedTarget(-1);
   };
 
-  const handleMouseDown = (
-    e: React.MouseEvent,
-    targetIndex: number,
-    dragType: "move" | "resize" | "skew",
-    cornerIndex?: number,
-  ) => {
-    e.preventDefault();
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const target = template.targets[targetIndex];
-    // Auto-init deltas when starting a skew drag
-    if (dragType === "skew" && !target.deltas) {
-      updateTarget(targetIndex, {
-        deltas: ZERO_DELTAS.map((d) => ({ ...d })),
-      });
-    }
-    const deltas = target.deltas || ZERO_DELTAS;
-    setDragState({
-      isDragging: true,
-      dragType,
-      targetIndex,
-      startPos: {
-        x: (e.clientX - rect.left) * scale,
-        y: (e.clientY - rect.top) * scale,
-      },
-      startSize: { ...target.size },
-      startTopLeft: { ...target.top_left },
-      cornerIndex,
-      startDeltas: deltas.map((d) => ({ ...d })),
-    });
-    setSelectedTarget(targetIndex);
-  };
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!dragState || !canvasRef.current) return;
-
-      const rect = canvasRef.current.getBoundingClientRect();
-      const currentPos = {
-        x: (e.clientX - rect.left) * scale,
-        y: (e.clientY - rect.top) * scale,
-      };
-      const deltaX = currentPos.x - dragState.startPos.x;
-      const deltaY = currentPos.y - dragState.startPos.y;
-
-      if (dragState.dragType === "move") {
-        updateTarget(dragState.targetIndex, {
-          top_left: {
-            x: Math.max(
-              0,
-              Math.min(
-                template.size.x - dragState.startSize.x,
-                dragState.startTopLeft.x + deltaX,
-              ),
-            ),
-            y: Math.max(
-              0,
-              Math.min(
-                template.size.y - dragState.startSize.y,
-                dragState.startTopLeft.y + deltaY,
-              ),
-            ),
-          },
-        });
-      } else if (dragState.dragType === "resize") {
-        const newWidth = Math.max(20, dragState.startSize.x + deltaX);
-        const newHeight = Math.max(20, dragState.startSize.y + deltaY);
-        updateTarget(dragState.targetIndex, {
-          size: {
-            x: Math.min(
-              newWidth,
-              template.size.x - dragState.startTopLeft.x,
-            ),
-            y: Math.min(
-              newHeight,
-              template.size.y - dragState.startTopLeft.y,
-            ),
-          },
-        });
-      } else if (
-        dragState.dragType === "skew" &&
-        dragState.cornerIndex != null &&
-        dragState.startDeltas
-      ) {
-        const deltaIdx = POLY_TO_DELTA[dragState.cornerIndex];
-        const newDeltas = dragState.startDeltas.map((d) => ({ ...d }));
-        newDeltas[deltaIdx] = {
-          x: Math.round(dragState.startDeltas[deltaIdx].x + deltaX),
-          y: Math.round(dragState.startDeltas[deltaIdx].y + deltaY),
-        };
-        updateTarget(dragState.targetIndex, { deltas: newDeltas });
-      }
-    },
-    [dragState, scale, template.size, updateTarget],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setDragState(null);
-  }, []);
-
-  const generateYAML = () => {
-    const yamlData = {
-      [template.name]: {
-        size: template.size,
-        targets: template.targets.map((target) => ({
-          friendly_name: target.friendly_name,
-          top_left: target.top_left,
-          size: target.size,
-          ...(target.deltas &&
-            target.deltas.length > 0 && { deltas: target.deltas }),
-        })),
-        file: template.file,
-      },
+  // Keyboard undo/redo.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      if (e.shiftKey) editor.redo();
+      else editor.undo();
     };
-
-    try {
-      return yaml.dump(yamlData, {
-        indent: 2,
-        lineWidth: -1,
-        quotingType: '"',
-        forceQuotes: false,
-      });
-    } catch {
-      return "Error generating YAML.";
-    }
-  };
-
-  const extractTemplateNames = (yamlText: string) => {
-    try {
-      const parsed = yaml.load(yamlText) as Record<string, unknown>;
-      if (!parsed) return [];
-      if (
-        parsed.templates &&
-        typeof parsed.templates === "object" &&
-        parsed.templates !== null
-      ) {
-        return Object.keys(parsed.templates as object);
-      }
-      return Object.keys(parsed).filter((key) => {
-        const val = parsed[key];
-        return (
-          val &&
-          typeof val === "object" &&
-          val !== null &&
-          ("size" in val || "targets" in val)
-        );
-      });
-    } catch {
-      return [];
-    }
-  };
-
-  const loadTemplateFromYAML = (templateName: string) => {
-    try {
-      const parsed = yaml.load(yamlInput) as Record<string, unknown>;
-      if (!parsed) return;
-
-      const templateData =
-        (parsed[templateName] as Record<string, unknown>) ||
-        ((parsed.templates as Record<string, unknown> | undefined)?.[
-          templateName
-        ] as Record<string, unknown>);
-
-      if (!templateData) return;
-
-      setTemplate({
-        name: templateName,
-        size: (templateData.size as Point) || { x: 800, y: 600 },
-        targets: ((templateData.targets as EditorTarget[]) || []).map(
-          (t: EditorTarget) => ({
-            friendly_name: t.friendly_name || "Unnamed Target",
-            top_left: t.top_left || { x: 0, y: 0 },
-            size: t.size || { x: 100, y: 100 },
-            ...(t.deltas && { deltas: t.deltas }),
-          }),
-        ),
-        file: (templateData.file as string) || "",
-      });
-      setSelectedTarget(-1);
-      setImageUrl("");
-    } catch {
-      // ignore parse errors
-    }
-  };
-
-  const handleYAMLImport = () => {
-    setExistingTemplates(extractTemplateNames(yamlInput));
-  };
-
-  const loadSampleYAML = () => {
-    const sampleYAML = `templates:
-  office1:
-    size:
-      x: 1363
-      y: 1524
-    targets:
-      - friendly_name: panel 1
-        top_left:
-          x: 19
-          y: 42
-        size:
-          x: 709
-          y: 505
-        deltas:
-          - x: 195
-            y: 0
-          - x: 0
-            y: -98
-          - x: 0
-            y: 46
-          - x: -173
-            y: 0
-      - friendly_name: panel 2
-        top_left:
-          x: 628
-          y: 112
-        size:
-          x: 954
-          y: 553
-    file: templates/office1.jpg
-  drake1:
-    size:
-      x: 425
-      y: 365
-    targets:
-      - friendly_name: panel 1
-        top_left:
-          x: 217
-          y: 0
-        size:
-          x: 210
-          y: 170
-      - friendly_name: panel 2
-        top_left:
-          x: 217
-          y: 174
-        size:
-          x: 210
-          y: 170
-    file: templates/drake1.jpeg`;
-
-    setYamlInput(sampleYAML);
-    setExistingTemplates(extractTemplateNames(sampleYAML));
-  };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editor]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -405,375 +114,140 @@ const MemeEditor: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Settings Panel */}
         <div className="lg:col-span-1 space-y-6">
-          {/* Preset Templates */}
+          {/* Presets */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Presets
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Presets</h3>
             <div className="flex flex-wrap gap-2">
               {Object.keys(templates).map((name) => (
-                <Button
-                  key={name}
-                  onClick={() => loadPreset(name)}
-                  size="sm"
-                  variant="secondary"
-                >
+                <Button key={name} onClick={() => loadPreset(name)} size="sm" variant="secondary">
                   {name}
                 </Button>
               ))}
             </div>
           </div>
 
-          {/* Template Settings */}
+          {/* Template settings */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Template Settings
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Template Settings</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-name" className="block text-sm font-medium text-gray-700 mb-2">
                   Template Name
                 </label>
                 <input
+                  id="tpl-name"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   value={template.name}
-                  onChange={(e) =>
-                    setTemplate({ ...template, name: e.target.value })
-                  }
+                  onChange={(e) => editor.setName(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-url" className="block text-sm font-medium text-gray-700 mb-2">
                   Image URL
                 </label>
                 <input
+                  id="tpl-url"
                   type="url"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="https://example.com/image.jpg"
                   value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
+                  onChange={(e) => {
+                    setImageUrl(e.target.value);
+                    setImageError(false);
+                  }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-file" className="block text-sm font-medium text-gray-700 mb-2">
                   File Path
                 </label>
                 <input
+                  id="tpl-file"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="templates/image.jpg"
                   value={template.file}
-                  onChange={(e) =>
-                    setTemplate({ ...template, file: e.target.value })
-                  }
+                  onChange={(e) => editor.setFile(e.target.value)}
                 />
               </div>
             </div>
           </div>
 
-          {/* YAML Import */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Import Template
-            </h3>
-            <div className="space-y-4">
-              <Button
-                onClick={loadSampleYAML}
-                size="sm"
-                variant="secondary"
-              >
-                Load Sample YAML
-              </Button>
-              <textarea
-                className="w-full h-32 px-3 py-2 text-sm font-mono bg-gray-50 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Paste YAML here..."
-                value={yamlInput}
-                onChange={(e) => setYamlInput(e.target.value)}
-              />
-              <Button
-                onClick={handleYAMLImport}
-                disabled={!yamlInput.trim()}
-                size="sm"
-                variant="secondary"
-              >
-                Parse Templates
-              </Button>
-              {existingTemplates.length > 0 && (
-                <div className="grid grid-cols-1 gap-2">
-                  {existingTemplates.map((name) => (
-                    <button
-                      key={name}
-                      onClick={() => loadTemplateFromYAML(name)}
-                      className="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-blue-50 border border-gray-200 rounded-lg transition-colors font-medium text-gray-900"
-                    >
-                      {name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <TargetsPanel
+            targets={template.targets}
+            selectedIndex={selectedTarget}
+            onSelect={setSelectedTarget}
+            onAdd={addTarget}
+            onRemove={removeTarget}
+            onUpdate={editor.updateTarget}
+          />
 
-          {/* Targets */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Targets</h3>
-              <Button onClick={addTarget} size="sm" variant="secondary">
-                + Add
-              </Button>
-            </div>
-            <div className="space-y-3">
-              {template.targets.map((target, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                    selectedTarget === index
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setSelectedTarget(index)}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <input
-                      type="text"
-                      className="font-medium bg-transparent border-none outline-none flex-1"
-                      value={target.friendly_name}
-                      onChange={(e) =>
-                        updateTarget(index, {
-                          friendly_name: e.target.value,
-                        })
-                      }
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeTarget(index);
-                      }}
-                      className="text-red-500 hover:text-red-700 text-sm"
-                    >
-                      x
-                    </button>
-                  </div>
-                  <div className="text-xs text-gray-600 grid grid-cols-2 gap-2">
-                    <div>
-                      Pos: {target.top_left.x}, {target.top_left.y}
-                    </div>
-                    <div>
-                      Size: {target.size.x} x {target.size.y}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {template.targets.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <p>No targets yet. Click "+ Add" to start.</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* YAML Export */}
-          <YAMLExport generateYAML={generateYAML} hasTargets={template.targets.length > 0} />
+          <YamlPanel
+            current={template}
+            hasTargets={template.targets.length > 0}
+            onLoadTemplate={(t) => {
+              editor.load(fromTemplate(t));
+              setImageUrl(t.file);
+              setImageLoaded(false);
+              setImageError(false);
+              setSelectedTarget(-1);
+              setSkewMode(t.targets.some((target) => target.deltas != null));
+            }}
+          />
         </div>
 
-        {/* Visual Editor */}
+        {/* Visual editor */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Visual Editor
-              </h3>
-              <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={skewMode}
-                  onChange={(e) => {
-                    const on = e.target.checked;
-                    setSkewMode(on);
-                    if (!on) {
-                      setTemplate((prev) => ({
-                        ...prev,
-                        targets: prev.targets.map((t) => {
-                          const { deltas: _, ...rest } = t;
-                          return rest;
-                        }),
-                      }));
-                    }
-                  }}
-                  className="rounded border-gray-300"
-                />
-                Skew
-              </label>
+            <div className="flex items-center justify-between mb-4 gap-2">
+              <h3 className="text-lg font-semibold text-gray-900">Visual Editor</h3>
+              <div className="flex items-center gap-3">
+                <Button onClick={editor.undo} disabled={!editor.canUndo} size="sm" variant="secondary">
+                  Undo
+                </Button>
+                <Button onClick={editor.redo} disabled={!editor.canRedo} size="sm" variant="secondary">
+                  Redo
+                </Button>
+                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={skewMode}
+                    onChange={(e) => setSkewMode(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  Skew
+                </label>
+              </div>
             </div>
             <div className="border border-gray-300 rounded-lg overflow-hidden bg-gray-100 relative inline-block">
-              {imageUrl ? (
-                <div
-                  ref={canvasRef}
-                  className="relative cursor-crosshair"
-                  onMouseMove={dragState ? handleMouseMove : undefined}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseUp}
-                >
-                  <img
-                    src={imageUrl}
-                    alt="Template"
-                    onLoad={handleImageLoad}
-                    onError={() => setImageLoaded(false)}
-                    className="block max-w-full max-h-96 object-contain"
-                    draggable={false}
-                  />
-                  {imageLoaded && template.size.x > 0 && (
-                    <svg
-                      className="absolute top-0 left-0 w-full h-full cursor-crosshair"
-                      viewBox={`0 0 ${template.size.x} ${template.size.y}`}
-                      preserveAspectRatio="xMidYMid meet"
-                    >
-                      {template.targets.map((target, index) => {
-                        const pts = getTargetPolygon(target);
-                        const pointsStr = pts
-                          .map((p) => `${p.x},${p.y}`)
-                          .join(" ");
-                        const isSelected = selectedTarget === index;
-                        const color = isSelected ? "#3b82f6" : "#ef4444";
-                        // Label position: top-left corner of polygon
-                        const labelPt = pts[0];
-                        return (
-                          <g key={index}>
-                            <polygon
-                              points={pointsStr}
-                              fill={isSelected ? "rgba(59,130,246,0.1)" : "rgba(239,68,68,0.1)"}
-                              stroke={color}
-                              strokeWidth={3 * scale}
-                              className="cursor-move"
-                              onClick={() => setSelectedTarget(index)}
-                              onMouseDown={(e) =>
-                                handleMouseDown(e, index, "move")
-                              }
-                            />
-                            {(() => {
-                              const labelH = 20 * scale;
-                              const labelW =
-                                target.friendly_name.length * 9 * scale;
-                              // Place above TL corner, but flip inside if it would clip
-                              const above = labelPt.y - labelH - 4 * scale >= 0;
-                              const ly = above
-                                ? labelPt.y - labelH - 4 * scale
-                                : labelPt.y + 4 * scale;
-                              return (
-                                <>
-                                  <rect
-                                    x={labelPt.x}
-                                    y={ly}
-                                    width={labelW}
-                                    height={labelH}
-                                    rx={4 * scale}
-                                    fill={color}
-                                  />
-                                  <text
-                                    x={labelPt.x + 6 * scale}
-                                    y={ly + 15 * scale}
-                                    fontSize={13 * scale}
-                                    fontWeight="500"
-                                    fill="white"
-                                    style={{ pointerEvents: "none" }}
-                                  >
-                                    {target.friendly_name}
-                                  </text>
-                                </>
-                              );
-                            })()}
-                            {/* Corner handles for skew adjustment */}
-                            {isSelected &&
-                              skewMode &&
-                              pts.map((pt, ci) => (
-                                <circle
-                                  key={ci}
-                                  cx={pt.x}
-                                  cy={pt.y}
-                                  r={7 * scale}
-                                  fill="#3b82f6"
-                                  stroke="white"
-                                  strokeWidth={2 * scale}
-                                  className="cursor-grab"
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    handleMouseDown(
-                                      e,
-                                      index,
-                                      "skew",
-                                      ci,
-                                    );
-                                  }}
-                                />
-                              ))}
-                          </g>
-                        );
-                      })}
-                    </svg>
-                  )}
-                </div>
-              ) : (
-                <div className="w-full h-64 flex items-center justify-center text-gray-500">
-                  <p>Enter an image URL above to start editing</p>
-                </div>
-              )}
+              <EditorCanvas
+                canvasRef={canvasRef}
+                imageUrl={imageUrl}
+                imageLoaded={imageLoaded}
+                imageError={imageError}
+                onImageLoad={handleImageLoad}
+                onImageError={() => {
+                  setImageLoaded(false);
+                  setImageError(true);
+                }}
+                templateSize={template.size}
+                targets={displayTargets}
+                selectedIndex={selectedTarget}
+                skewMode={skewMode}
+                scale={scale}
+                drag={drag}
+                onSelect={setSelectedTarget}
+              />
             </div>
-            {imageLoaded && (
+            {imageLoaded && !imageError && (
               <div className="mt-4 text-sm text-gray-600">
                 Template Size: {template.size.x} x {template.size.y}px
               </div>
             )}
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-const YAMLExport: React.FC<{
-  generateYAML: () => string;
-  hasTargets: boolean;
-}> = ({ generateYAML, hasTargets }) => {
-  const [yamlText, setYamlText] = useState("");
-  const [showYAML, setShowYAML] = useState(false);
-
-  const handleExport = () => {
-    setYamlText(generateYAML());
-    setShowYAML(true);
-  };
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Export</h3>
-      <div className="space-y-3">
-        <Button onClick={handleExport} disabled={!hasTargets}>
-          Generate YAML
-        </Button>
-        {showYAML && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">
-                YAML Output:
-              </span>
-              <Button
-                onClick={() => navigator.clipboard.writeText(yamlText)}
-                size="sm"
-                variant="secondary"
-              >
-                Copy
-              </Button>
-            </div>
-            <textarea
-              className="w-full h-40 px-3 py-2 text-xs font-mono bg-gray-50 border border-gray-300 rounded-lg resize-none"
-              value={yamlText}
-              readOnly
-            />
-          </div>
-        )}
       </div>
     </div>
   );
