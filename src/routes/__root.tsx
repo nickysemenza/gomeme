@@ -6,22 +6,25 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   return (
-    <div className="min-h-screen bg-gray-50 antialiased">
-      <nav className="bg-white border-b border-gray-200 px-4 py-1.5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link to="/" className="text-sm font-bold text-gray-900">
-            gomeme
+    <div className="min-h-screen antialiased">
+      <nav className="sticky top-0 z-50 border-b border-line bg-paper/80 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
+          <Link
+            to="/"
+            className="font-display text-lg font-extrabold tracking-tight text-ink"
+          >
+            go<span className="text-coral-500">meme</span>
           </Link>
-          <div className="flex gap-3 text-xs">
+          <div className="chip flex items-center gap-1">
             <Link
               to="/"
-              className="text-gray-500 hover:text-gray-900 [&.active]:font-semibold [&.active]:text-gray-900"
+              className="rounded-full px-3 py-1.5 text-slate transition-colors hover:text-ink [&.active]:bg-coral-500/10 [&.active]:text-coral-700"
             >
               Generator
             </Link>
             <Link
               to="/editor"
-              className="text-gray-500 hover:text-gray-900 [&.active]:font-semibold [&.active]:text-gray-900"
+              className="rounded-full px-3 py-1.5 text-slate transition-colors hover:text-ink [&.active]:bg-coral-500/10 [&.active]:text-coral-700"
             >
               Editor
             </Link>

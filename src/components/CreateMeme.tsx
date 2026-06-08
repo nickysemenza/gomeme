@@ -93,7 +93,7 @@ const CreateMeme: React.FC<Props> = ({ template, debug }) => {
         {error && (
           <div
             role="alert"
-            className="p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs"
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
           >
             {error}
           </div>

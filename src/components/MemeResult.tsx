@@ -13,17 +13,17 @@ interface Props {
 const MemeResult: React.FC<Props> = ({ result, loading, debug }) => {
   if (loading && !result) {
     return (
-      <div className="flex items-center justify-center py-8">
+      <div className="flex h-full min-h-32 items-center justify-center gap-3 rounded-xl border border-dashed border-line">
         <LoadingSpinner size="md" />
-        <span className="ml-2 text-sm text-gray-500">Generating...</span>
+        <span className="chip text-slate">Rendering…</span>
       </div>
     );
   }
 
   if (!result) {
     return (
-      <div className="text-center py-6 text-gray-400 text-sm">
-        Hit generate to create a meme
+      <div className="flex h-full min-h-32 items-center justify-center rounded-xl border border-dashed border-line">
+        <span className="chip text-mist">Hit generate →</span>
       </div>
     );
   }
@@ -33,23 +33,21 @@ const MemeResult: React.FC<Props> = ({ result, loading, debug }) => {
       <img
         src={result.imageUrl}
         alt="Generated meme"
-        className="w-full rounded shadow-sm"
+        className="w-full rounded-xl ring-1 ring-line"
       />
 
       {debug && result.opLog.length > 0 && (
-        <div className="space-y-1 max-h-48 overflow-y-auto">
+        <div className="max-h-48 space-y-1 overflow-y-auto">
           {result.opLog.map((entry, idx) => (
             <div
               key={idx}
-              className="text-xs font-mono bg-gray-50 rounded px-2 py-1 border-l-2 border-blue-400"
+              className="rounded-md border-l-2 border-coral-400 bg-paper px-2 py-1 font-mono text-xs"
             >
-              <span className="text-gray-400">#{entry.step}</span>{" "}
-              <span className="font-semibold">{entry.op}</span>{" "}
-              <span className="text-gray-500">{entry.duration}</span>
+              <span className="text-mist">#{entry.step}</span>{" "}
+              <span className="font-semibold text-coral-700">{entry.op}</span>{" "}
+              <span className="text-slate">{entry.duration}</span>
               {entry.args.length > 0 && (
-                <span className="text-gray-400 ml-1">
-                  {entry.args.join(" ")}
-                </span>
+                <span className="ml-1 text-mist">{entry.args.join(" ")}</span>
               )}
             </div>
           ))}

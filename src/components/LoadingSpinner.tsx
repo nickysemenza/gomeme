@@ -6,7 +6,7 @@ interface Props {
 
 const LoadingSpinner: React.FC<Props> = ({
   size = "md",
-  color = "border-blue-500",
+  color = "border-coral-500",
   className = "",
 }) => {
   const sizeClasses = {

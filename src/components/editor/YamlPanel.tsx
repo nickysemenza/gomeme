@@ -69,8 +69,8 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Import Template</h3>
+      <div className="surface p-6">
+        <h3 className="chip mb-4 text-slate">import template</h3>
         <div className="space-y-4">
           <Button onClick={loadSample} size="sm" variant="secondary">
             Load Sample YAML
@@ -80,7 +80,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           </label>
           <textarea
             id="yaml-import"
-            className="w-full h-32 px-3 py-2 text-sm font-mono bg-gray-50 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500"
+            className="field h-32 w-full resize-none px-3 py-2 font-mono text-sm"
             placeholder="Paste YAML here..."
             value={yamlInput}
             onChange={(e) => setYamlInput(e.target.value)}
@@ -90,7 +90,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           </Button>
 
           {errors.length > 0 && (
-            <ul role="alert" className="text-xs text-red-700 space-y-1">
+            <ul role="alert" className="space-y-1 font-mono text-xs text-red-700">
               {errors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}
@@ -104,7 +104,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
                   key={name}
                   type="button"
                   onClick={() => onLoadTemplate(parsed[name])}
-                  className="text-left px-3 py-2 text-sm bg-gray-50 hover:bg-blue-50 border border-gray-200 rounded-lg transition-colors font-medium text-gray-900"
+                  className="rounded-lg border border-line bg-paper px-3 py-2 text-left text-sm font-medium text-ink transition-colors hover:border-coral-400 hover:bg-coral-500/[0.06]"
                 >
                   {name}
                 </button>
@@ -114,8 +114,8 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Export</h3>
+      <div className="surface p-6">
+        <h3 className="chip mb-4 text-slate">export</h3>
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">
             <Button onClick={handleExport} disabled={!hasTargets}>
@@ -128,7 +128,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           {saveMessage && (
             <p
               role="status"
-              className={`text-xs ${saveMessage.ok ? "text-green-700" : "text-red-700"}`}
+              className={`text-xs ${saveMessage.ok ? "text-coral-700" : "text-red-700"}`}
             >
               {saveMessage.text}
             </p>
@@ -136,7 +136,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           {exportText && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">YAML Output:</span>
+                <span className="chip text-slate">yaml output</span>
                 <Button onClick={copyExport} size="sm" variant="secondary">
                   {copied ? "Copied!" : "Copy"}
                 </Button>
@@ -146,7 +146,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
               </label>
               <textarea
                 id="yaml-export"
-                className="w-full h-40 px-3 py-2 text-xs font-mono bg-gray-50 border border-gray-300 rounded-lg resize-none"
+                className="field h-40 w-full resize-none px-3 py-2 font-mono text-xs"
                 value={exportText}
                 readOnly
               />

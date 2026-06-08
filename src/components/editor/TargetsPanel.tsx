@@ -28,7 +28,7 @@ const NumberField: React.FC<NumberFieldProps> = ({ label, value, min, onChange }
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="block text-[11px] text-gray-500">
+      <label htmlFor={id} className="chip block text-mist">
         {label}
       </label>
       <input
@@ -36,7 +36,7 @@ const NumberField: React.FC<NumberFieldProps> = ({ label, value, min, onChange }
         type="number"
         value={value}
         onChange={(e) => onChange(toInt(e.target.value, value, min))}
-        className="w-full px-1.5 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+        className="field mt-1 w-full px-1.5 py-1 text-xs"
       />
     </div>
   );
@@ -50,9 +50,9 @@ const TargetsPanel: React.FC<Props> = ({
   onRemove,
   onUpdate,
 }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-    <div className="flex items-center justify-between mb-4">
-      <h3 className="text-lg font-semibold text-gray-900">Targets</h3>
+  <div className="surface p-6">
+    <div className="mb-4 flex items-center justify-between">
+      <h3 className="chip text-slate">targets</h3>
       <Button onClick={onAdd} size="sm" variant="secondary">
         + Add
       </Button>
@@ -64,24 +64,28 @@ const TargetsPanel: React.FC<Props> = ({
         return (
           <li
             key={index}
-            className={`p-3 rounded-lg border transition-colors ${
-              selected ? "border-blue-500 bg-blue-50" : "border-gray-200"
+            className={`rounded-xl border p-3 transition-colors ${
+              selected
+                ? "border-coral-500/40 bg-coral-500/[0.07]"
+                : "border-line bg-paper"
             }`}
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-2 flex items-center gap-2">
               <button
                 type="button"
                 aria-pressed={selected}
                 aria-label={`Select ${target.friendlyName}`}
                 onClick={() => onSelect(index)}
-                className="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold focus:ring-2 focus:ring-blue-500"
+                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
+                  selected ? "bg-coral-500 text-white" : "bg-line text-slate hover:bg-mist/40"
+                }`}
               >
                 {index + 1}
               </button>
               <input
                 type="text"
                 aria-label={`Name for target ${index + 1}`}
-                className="font-medium bg-transparent border-b border-transparent focus:border-gray-300 outline-none flex-1"
+                className="flex-1 border-b border-transparent bg-transparent font-medium text-ink outline-none focus:border-line"
                 value={target.friendlyName}
                 onFocus={() => onSelect(index)}
                 onChange={(e) =>
@@ -92,7 +96,7 @@ const TargetsPanel: React.FC<Props> = ({
                 type="button"
                 aria-label={`Remove ${target.friendlyName}`}
                 onClick={() => onRemove(index)}
-                className="text-red-500 hover:text-red-700 text-sm focus:ring-2 focus:ring-red-500 rounded px-1"
+                className="rounded px-1 text-sm text-mist transition-colors hover:text-coral-600"
               >
                 ✕
               </button>
@@ -127,7 +131,7 @@ const TargetsPanel: React.FC<Props> = ({
         );
       })}
       {targets.length === 0 && (
-        <li className="text-center py-8 text-gray-500">
+        <li className="py-8 text-center text-sm text-mist">
           <p>No targets yet. Click "+ Add" to start.</p>
         </li>
       )}

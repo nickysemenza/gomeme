@@ -103,21 +103,23 @@ const MemeEditor: React.FC = () => {
   }, [editor]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Meme Template Editor
+    <div className="mx-auto max-w-7xl px-5 py-12">
+      <div className="reveal mb-10">
+        <p className="chip text-coral-600">Template editor</p>
+        <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
+          Author a <span className="text-gradient">template.</span>
         </h1>
-        <p className="text-lg text-gray-600">
-          Create and edit meme templates visually, then export to YAML
+        <p className="mt-3 max-w-lg text-slate">
+          Drag the targets onto your image, tweak the perspective, then export to
+          YAML or save it to your library.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
           {/* Presets */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Presets</h3>
+          <div className="surface p-6">
+            <h3 className="chip mb-4 text-slate">presets</h3>
             <div className="flex flex-wrap gap-2">
               {Object.keys(templates).map((name) => (
                 <Button key={name} onClick={() => loadPreset(name)} size="sm" variant="secondary">
@@ -128,29 +130,29 @@ const MemeEditor: React.FC = () => {
           </div>
 
           {/* Template settings */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Template Settings</h3>
+          <div className="surface p-6">
+            <h3 className="chip mb-4 text-slate">template settings</h3>
             <div className="space-y-4">
               <div>
-                <label htmlFor="tpl-name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-name" className="mb-1.5 block text-sm font-medium text-ink">
                   Template Name
                 </label>
                 <input
                   id="tpl-name"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="field w-full px-3 py-2"
                   value={template.name}
                   onChange={(e) => editor.setName(e.target.value)}
                 />
               </div>
               <div>
-                <label htmlFor="tpl-url" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-url" className="mb-1.5 block text-sm font-medium text-ink">
                   Image URL
                 </label>
                 <input
                   id="tpl-url"
                   type="url"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="field w-full px-3 py-2"
                   placeholder="https://example.com/image.jpg"
                   value={imageUrl}
                   onChange={(e) => {
@@ -160,13 +162,13 @@ const MemeEditor: React.FC = () => {
                 />
               </div>
               <div>
-                <label htmlFor="tpl-file" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="tpl-file" className="mb-1.5 block text-sm font-medium text-ink">
                   File Path
                 </label>
                 <input
                   id="tpl-file"
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="field w-full px-3 py-2"
                   placeholder="templates/image.jpg"
                   value={template.file}
                   onChange={(e) => editor.setFile(e.target.value)}
@@ -200,9 +202,9 @@ const MemeEditor: React.FC = () => {
 
         {/* Visual editor */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <h3 className="text-lg font-semibold text-gray-900">Visual Editor</h3>
+          <div className="surface p-6">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <h3 className="chip text-slate">visual editor</h3>
               <div className="flex items-center gap-3">
                 <Button onClick={editor.undo} disabled={!editor.canUndo} size="sm" variant="secondary">
                   Undo
@@ -210,18 +212,18 @@ const MemeEditor: React.FC = () => {
                 <Button onClick={editor.redo} disabled={!editor.canRedo} size="sm" variant="secondary">
                   Redo
                 </Button>
-                <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-slate">
                   <input
                     type="checkbox"
                     checked={skewMode}
                     onChange={(e) => setSkewMode(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="accent-coral-500"
                   />
                   Skew
                 </label>
               </div>
             </div>
-            <div className="border border-gray-300 rounded-lg overflow-hidden bg-gray-100 relative inline-block">
+            <div className="relative inline-block overflow-hidden rounded-xl border border-line bg-paper">
               <EditorCanvas
                 canvasRef={canvasRef}
                 imageUrl={imageUrl}
@@ -242,8 +244,8 @@ const MemeEditor: React.FC = () => {
               />
             </div>
             {imageLoaded && !imageError && (
-              <div className="mt-4 text-sm text-gray-600">
-                Template Size: {template.size.x} x {template.size.y}px
+              <div className="chip mt-4 text-mist">
+                canvas {template.size.x} × {template.size.y}px
               </div>
             )}
           </div>
