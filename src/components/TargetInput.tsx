@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import { imageFileFromClipboard, readFileAsDataUrl } from "~/lib/clipboard";
 import type { TargetInput } from "~/lib/schemas";
 
 interface Props {
@@ -10,15 +11,6 @@ interface Props {
 }
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = () => reject(new Error("Could not read file"));
-    reader.readAsDataURL(file);
-  });
-}
 
 const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) => {
   const fieldId = useId();
@@ -51,8 +43,15 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const file = imageFileFromClipboard(e);
+    if (!file) return;
+    e.preventDefault();
+    void handleFile(file);
+  };
+
   return (
-    <div className="rounded-xl border border-line bg-paper p-3">
+    <div className="rounded-xl border border-line bg-paper p-3" onPaste={handlePaste}>
       <div className="mb-2 flex items-center gap-2">
         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-coral-500 text-[11px] font-bold text-white">
           {index + 1}
@@ -90,7 +89,7 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
             id={`${fieldId}-url`}
             type="url"
             className="field w-full px-2.5 py-1.5 text-sm"
-            placeholder="https://… or data:image/…"
+            placeholder="https://… or paste an image"
             value={target.url.startsWith("data:") ? "" : target.url}
             onChange={(e) => onUpdate({ ...target, url: e.target.value })}
           />
