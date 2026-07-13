@@ -104,22 +104,19 @@ const MemeEditor: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-12">
-      <div className="reveal mb-10">
-        <p className="chip text-coral-600">Template editor</p>
-        <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-ink md:text-5xl">
-          Author a <span className="text-gradient">template.</span>
-        </h1>
-        <p className="mt-3 max-w-lg text-slate">
-          Drag the targets onto your image, tweak the perspective, then export to
-          YAML or save it to your library.
+      <header className="mb-8">
+        <h1 className="text-xl font-semibold text-ink">Template editor</h1>
+        <p className="mt-1 text-sm text-muted">
+          Drag the targets onto your image, then export to YAML or save it to
+          your library.
         </p>
-      </div>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
           {/* Presets */}
           <div className="surface p-6">
-            <h3 className="chip mb-4 text-slate">presets</h3>
+            <h3 className="mb-4 text-sm font-semibold text-ink">Presets</h3>
             <div className="flex flex-wrap gap-2">
               {Object.keys(templates).map((name) => (
                 <Button key={name} onClick={() => loadPreset(name)} size="sm" variant="secondary">
@@ -131,7 +128,7 @@ const MemeEditor: React.FC = () => {
 
           {/* Template settings */}
           <div className="surface p-6">
-            <h3 className="chip mb-4 text-slate">template settings</h3>
+            <h3 className="mb-4 text-sm font-semibold text-ink">Template settings</h3>
             <div className="space-y-4">
               <div>
                 <label htmlFor="tpl-name" className="mb-1.5 block text-sm font-medium text-ink">
@@ -204,7 +201,7 @@ const MemeEditor: React.FC = () => {
         <div className="lg:col-span-2">
           <div className="surface p-6">
             <div className="mb-4 flex items-center justify-between gap-2">
-              <h3 className="chip text-slate">visual editor</h3>
+              <h3 className="text-sm font-semibold text-ink">Visual editor</h3>
               <div className="flex items-center gap-3">
                 <Button onClick={editor.undo} disabled={!editor.canUndo} size="sm" variant="secondary">
                   Undo
@@ -212,18 +209,18 @@ const MemeEditor: React.FC = () => {
                 <Button onClick={editor.redo} disabled={!editor.canRedo} size="sm" variant="secondary">
                   Redo
                 </Button>
-                <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-slate">
+                <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-muted">
                   <input
                     type="checkbox"
                     checked={skewMode}
                     onChange={(e) => setSkewMode(e.target.checked)}
-                    className="accent-coral-500"
+                    className="accent-primary"
                   />
                   Skew
                 </label>
               </div>
             </div>
-            <div className="relative inline-block overflow-hidden rounded-xl border border-line bg-paper">
+            <div className="relative inline-block overflow-hidden rounded-lg border border-line bg-well">
               <EditorCanvas
                 canvasRef={canvasRef}
                 imageUrl={imageUrl}
@@ -244,7 +241,7 @@ const MemeEditor: React.FC = () => {
               />
             </div>
             {imageLoaded && !imageError && (
-              <div className="chip mt-4 text-mist">
+              <div className="mt-4 font-mono text-xs text-muted">
                 canvas {template.size.x} × {template.size.y}px
               </div>
             )}

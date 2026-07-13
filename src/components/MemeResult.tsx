@@ -13,17 +13,17 @@ interface Props {
 const MemeResult: React.FC<Props> = ({ result, loading, debug }) => {
   if (loading && !result) {
     return (
-      <div className="flex h-full min-h-32 items-center justify-center gap-3 rounded-xl border border-dashed border-line">
+      <div className="flex h-full min-h-32 items-center justify-center gap-3 rounded-lg border border-dashed border-line">
         <LoadingSpinner size="md" />
-        <span className="chip text-slate">Rendering…</span>
+        <span className="text-sm text-muted">Rendering…</span>
       </div>
     );
   }
 
   if (!result) {
     return (
-      <div className="flex h-full min-h-32 items-center justify-center rounded-xl border border-dashed border-line">
-        <span className="chip text-mist">Hit generate →</span>
+      <div className="flex h-full min-h-32 items-center justify-center rounded-lg border border-dashed border-line">
+        <span className="text-sm text-muted">Your meme will render here.</span>
       </div>
     );
   }
@@ -33,7 +33,7 @@ const MemeResult: React.FC<Props> = ({ result, loading, debug }) => {
       <img
         src={result.imageUrl}
         alt="Generated meme"
-        className="w-full rounded-xl ring-1 ring-line"
+        className="w-full rounded-lg ring-1 ring-line"
       />
 
       {debug && result.opLog.length > 0 && (
@@ -41,13 +41,13 @@ const MemeResult: React.FC<Props> = ({ result, loading, debug }) => {
           {result.opLog.map((entry, idx) => (
             <div
               key={idx}
-              className="rounded-md border-l-2 border-coral-400 bg-paper px-2 py-1 font-mono text-xs"
+              className="rounded bg-well px-2 py-1 font-mono text-xs"
             >
-              <span className="text-mist">#{entry.step}</span>{" "}
-              <span className="font-semibold text-coral-700">{entry.op}</span>{" "}
-              <span className="text-slate">{entry.duration}</span>
+              <span className="text-muted">#{entry.step}</span>{" "}
+              <span className="font-semibold text-ink">{entry.op}</span>{" "}
+              <span className="text-muted">{entry.duration}</span>
               {entry.args.length > 0 && (
-                <span className="ml-1 text-mist">{entry.args.join(" ")}</span>
+                <span className="ml-1 text-muted">{entry.args.join(" ")}</span>
               )}
             </div>
           ))}

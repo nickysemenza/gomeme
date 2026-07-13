@@ -56,7 +56,7 @@ const EditorCanvas: React.FC<Props> = ({
   if (!imageUrl) {
     return (
       <div className="flex h-64 w-full items-center justify-center px-6 text-center">
-        <p className="chip text-mist">enter an image url or load a preset →</p>
+        <p className="text-sm text-muted">Enter an image URL or load a preset.</p>
       </div>
     );
   }
@@ -81,7 +81,7 @@ const EditorCanvas: React.FC<Props> = ({
       {imageError && (
         <div
           role="alert"
-          className="absolute inset-0 flex items-center justify-center bg-paper/85 p-4 text-center text-sm text-red-700 backdrop-blur-sm"
+          className="absolute inset-0 flex items-center justify-center bg-bg/90 p-4 text-center text-sm text-red-700"
         >
           Could not load this image. Check the URL or file path.
         </div>
@@ -97,19 +97,18 @@ const EditorCanvas: React.FC<Props> = ({
             const pts = getTargetPolygon(target.topLeft, target.size, target.deltas);
             const pointsStr = pts.map((p) => `${p.x},${p.y}`).join(" ");
             const isSelected = selectedIndex === index;
-            const color = isSelected ? "#ea5a3d" : "#3f6cd6";
-            // Both label fills are saturated, so white label text reads on either.
-            const labelText = "#ffffff";
+            // Both target colors are saturated, so white label text reads on either.
+            const targetColor = isSelected ? "stroke-primary" : "stroke-accent";
+            const targetFill = isSelected ? "fill-primary/15" : "fill-accent/15";
+            const labelFill = isSelected ? "fill-primary" : "fill-accent";
             const label = computeLabelLayout(pts[0], target.friendlyName, scale);
 
             return (
               <g key={index}>
                 <polygon
                   points={pointsStr}
-                  fill={isSelected ? "rgba(234,90,61,0.16)" : "rgba(63,108,214,0.14)"}
-                  stroke={color}
                   strokeWidth={3 * scale}
-                  className="cursor-move"
+                  className={`cursor-move ${targetFill} ${targetColor}`}
                   onPointerDown={(e) => drag.beginDrag(e, index, "move")}
                 />
                 <rect
@@ -118,7 +117,7 @@ const EditorCanvas: React.FC<Props> = ({
                   width={label.width}
                   height={label.height}
                   rx={4 * scale}
-                  fill={color}
+                  className={labelFill}
                   style={{ pointerEvents: "none" }}
                 />
                 <text
@@ -126,7 +125,7 @@ const EditorCanvas: React.FC<Props> = ({
                   y={label.y + 15 * scale}
                   fontSize={13 * scale}
                   fontWeight="600"
-                  fill={labelText}
+                  className="fill-white"
                   style={{ pointerEvents: "none" }}
                 >
                   {target.friendlyName}
@@ -139,10 +138,8 @@ const EditorCanvas: React.FC<Props> = ({
                     y={pts[2].y - 7 * scale}
                     width={14 * scale}
                     height={14 * scale}
-                    fill="#ea5a3d"
-                    stroke="#ffffff"
                     strokeWidth={2 * scale}
-                    className="cursor-nwse-resize"
+                    className="cursor-nwse-resize fill-primary stroke-white"
                     onPointerDown={(e) => drag.beginDrag(e, index, "resize")}
                   />
                 )}
@@ -156,10 +153,8 @@ const EditorCanvas: React.FC<Props> = ({
                       cx={pt.x}
                       cy={pt.y}
                       r={7 * scale}
-                      fill="#ea5a3d"
-                      stroke="#ffffff"
                       strokeWidth={2 * scale}
-                      className="cursor-grab"
+                      className="cursor-grab fill-primary stroke-white"
                       onPointerDown={(e) => drag.beginDrag(e, index, "skew", ci)}
                     />
                   ))}

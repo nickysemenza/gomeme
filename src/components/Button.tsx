@@ -17,25 +17,21 @@ const Button: React.FC<Props> = ({
   ...props
 }) => {
   const baseClasses =
-    "relative inline-flex items-center justify-center font-medium rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper active:scale-[0.97]";
+    "relative inline-flex items-center justify-center font-medium rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-bg";
 
   const variantClasses = {
-    primary:
-      "bg-coral-500 text-white font-semibold hover:bg-coral-600 hover:shadow-[0_10px_30px_-10px] hover:shadow-coral-500/60",
-    secondary:
-      "bg-card text-ink border border-line hover:border-coral-400 hover:text-coral-700",
-    danger:
-      "bg-coral-500/10 text-coral-700 border border-coral-500/20 hover:bg-coral-500/20",
+    primary: "bg-primary text-white font-semibold hover:bg-primary-deep",
+    secondary: "bg-bg text-ink border border-line hover:bg-well",
+    danger: "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100",
   };
 
   const sizeClasses = {
-    sm: "px-3.5 py-1.5 text-sm",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-7 py-4 text-base",
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-5 py-2.5 text-base",
   };
 
-  const disabledClasses =
-    "disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 disabled:hover:shadow-none";
+  const disabledClasses = "disabled:opacity-40 disabled:cursor-not-allowed";
 
   const allClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${className}`;
 

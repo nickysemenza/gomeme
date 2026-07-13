@@ -28,7 +28,7 @@ const NumberField: React.FC<NumberFieldProps> = ({ label, value, min, onChange }
   const id = useId();
   return (
     <div>
-      <label htmlFor={id} className="chip block text-mist">
+      <label htmlFor={id} className="block font-mono text-[11px] text-muted">
         {label}
       </label>
       <input
@@ -52,7 +52,7 @@ const TargetsPanel: React.FC<Props> = ({
 }) => (
   <div className="surface p-6">
     <div className="mb-4 flex items-center justify-between">
-      <h3 className="chip text-slate">targets</h3>
+      <h3 className="text-sm font-semibold text-ink">Targets</h3>
       <Button onClick={onAdd} size="sm" variant="secondary">
         + Add
       </Button>
@@ -64,10 +64,10 @@ const TargetsPanel: React.FC<Props> = ({
         return (
           <li
             key={index}
-            className={`rounded-xl border p-3 transition-colors ${
+            className={`rounded-lg border p-3 transition-colors ${
               selected
-                ? "border-coral-500/40 bg-coral-500/[0.07]"
-                : "border-line bg-paper"
+                ? "border-primary/40 bg-primary-tint"
+                : "border-line bg-well"
             }`}
           >
             <div className="mb-2 flex items-center gap-2">
@@ -77,7 +77,7 @@ const TargetsPanel: React.FC<Props> = ({
                 aria-label={`Select ${target.friendlyName}`}
                 onClick={() => onSelect(index)}
                 className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
-                  selected ? "bg-coral-500 text-white" : "bg-line text-slate hover:bg-mist/40"
+                  selected ? "bg-primary text-white" : "bg-line text-muted hover:bg-muted/30"
                 }`}
               >
                 {index + 1}
@@ -96,9 +96,21 @@ const TargetsPanel: React.FC<Props> = ({
                 type="button"
                 aria-label={`Remove ${target.friendlyName}`}
                 onClick={() => onRemove(index)}
-                className="rounded px-1 text-sm text-mist transition-colors hover:text-coral-600"
+                className="rounded px-1 text-sm text-muted transition-colors hover:text-red-700"
               >
-                ✕
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="2" y1="2" x2="12" y2="12" />
+                  <line x1="12" y1="2" x2="2" y2="12" />
+                </svg>
               </button>
             </div>
             <div className="grid grid-cols-4 gap-2" onFocus={() => onSelect(index)}>
@@ -131,7 +143,7 @@ const TargetsPanel: React.FC<Props> = ({
         );
       })}
       {targets.length === 0 && (
-        <li className="py-8 text-center text-sm text-mist">
+        <li className="py-8 text-center text-sm text-muted">
           <p>No targets yet. Click "+ Add" to start.</p>
         </li>
       )}

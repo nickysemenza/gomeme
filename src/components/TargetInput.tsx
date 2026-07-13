@@ -21,7 +21,7 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
   const setMode = (kind: "image" | "text") => {
     if (kind === target.kind) return;
     if (kind === "image") onUpdate({ kind: "image", url: "", stretch: false });
-    else onUpdate({ kind: "text", text: "", color: "#ea5a3d" });
+    else onUpdate({ kind: "text", text: "", color: "#b45309" });
   };
 
   const handleFile = async (file: File | undefined) => {
@@ -51,14 +51,14 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
   };
 
   return (
-    <div className="rounded-xl border border-line bg-paper p-3" onPaste={handlePaste}>
+    <div className="rounded-lg border border-line bg-well p-3" onPaste={handlePaste}>
       <div className="mb-2 flex items-center gap-2">
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-coral-500 text-[11px] font-bold text-white">
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
           {index + 1}
         </div>
         <span className="flex-1 truncate text-sm font-medium text-ink">{label}</span>
         <div
-          className="inline-flex overflow-hidden rounded-full border border-line"
+          className="inline-flex overflow-hidden rounded-md border border-line"
           role="group"
           aria-label="Input type"
         >
@@ -68,10 +68,10 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
               type="button"
               aria-pressed={target.kind === kind}
               onClick={() => setMode(kind)}
-              className={`chip px-2.5 py-1 transition-colors ${
+              className={`px-2.5 py-1 text-xs font-medium transition-colors ${
                 target.kind === kind
-                  ? "bg-coral-500 text-white"
-                  : "bg-card text-slate hover:bg-paper hover:text-ink"
+                  ? "bg-ink text-white"
+                  : "bg-bg text-muted hover:text-ink"
               }`}
             >
               {kind}
@@ -97,7 +97,7 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="chip rounded-full border border-line px-3 py-1 text-slate transition-colors hover:border-coral-400 hover:text-ink"
+              className="rounded-md border border-line bg-bg px-2.5 py-1 text-xs font-medium text-ink transition-colors hover:bg-well"
             >
               Upload
             </button>
@@ -109,12 +109,12 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
               aria-label={`Upload image for ${label}`}
               onChange={(e) => handleFile(e.target.files?.[0])}
             />
-            <label className="flex cursor-pointer select-none items-center gap-1.5 text-xs text-slate">
+            <label className="flex cursor-pointer select-none items-center gap-1.5 text-xs text-muted">
               <input
                 type="checkbox"
                 checked={target.stretch}
                 onChange={(e) => onUpdate({ ...target, stretch: e.target.checked })}
-                className="accent-coral-500"
+                className="accent-primary"
               />
               Stretch to fit
             </label>
@@ -124,7 +124,7 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
             <img
               src={target.url}
               alt={`Preview of ${label}`}
-              className="h-16 rounded-lg object-contain ring-1 ring-line"
+              className="h-16 rounded-md object-contain ring-1 ring-line"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
@@ -150,7 +150,7 @@ const TargetInputView: React.FC<Props> = ({ target, index, label, onUpdate }) =>
               aria-label="Choose text color"
               aria-expanded={pickerOpen}
               onClick={() => setPickerOpen((o) => !o)}
-              className="h-7 w-7 flex-shrink-0 rounded-full border border-line focus-visible:ring-2 focus-visible:ring-coral-500"
+              className="h-7 w-7 flex-shrink-0 rounded-full border border-line focus-visible:ring-2 focus-visible:ring-primary"
               style={{ backgroundColor: target.color }}
             />
             <label htmlFor={`${fieldId}-hex`} className="sr-only">

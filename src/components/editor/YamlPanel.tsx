@@ -70,7 +70,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
   return (
     <div className="space-y-6">
       <div className="surface p-6">
-        <h3 className="chip mb-4 text-slate">import template</h3>
+        <h3 className="mb-4 text-sm font-semibold text-ink">Import template</h3>
         <div className="space-y-4">
           <Button onClick={loadSample} size="sm" variant="secondary">
             Load Sample YAML
@@ -104,7 +104,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
                   key={name}
                   type="button"
                   onClick={() => onLoadTemplate(parsed[name])}
-                  className="rounded-lg border border-line bg-paper px-3 py-2 text-left text-sm font-medium text-ink transition-colors hover:border-coral-400 hover:bg-coral-500/[0.06]"
+                  className="rounded-md border border-line bg-well px-3 py-2 text-left text-sm font-medium text-ink transition-colors hover:border-primary hover:bg-primary-tint"
                 >
                   {name}
                 </button>
@@ -115,7 +115,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
       </div>
 
       <div className="surface p-6">
-        <h3 className="chip mb-4 text-slate">export</h3>
+        <h3 className="mb-4 text-sm font-semibold text-ink">Export</h3>
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">
             <Button onClick={handleExport} disabled={!hasTargets}>
@@ -128,7 +128,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           {saveMessage && (
             <p
               role="status"
-              className={`text-xs ${saveMessage.ok ? "text-coral-700" : "text-red-700"}`}
+              className={`text-xs ${saveMessage.ok ? "text-primary-deep" : "text-red-700"}`}
             >
               {saveMessage.text}
             </p>
@@ -136,7 +136,7 @@ const YamlPanel: React.FC<Props> = ({ current, hasTargets, onLoadTemplate }) => 
           {exportText && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="chip text-slate">yaml output</span>
+                <span className="font-mono text-xs text-muted">YAML output</span>
                 <Button onClick={copyExport} size="sm" variant="secondary">
                   {copied ? "Copied!" : "Copy"}
                 </Button>
