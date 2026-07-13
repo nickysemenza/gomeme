@@ -76,6 +76,36 @@ const raw: Record<string, Template> = {
       },
     ],
   },
+  jarvis: {
+    // "Hi! My name is Jason" / Jenkins Comic brain-filing meme.
+    // https://knowyourmeme.com/memes/hi-my-name-is-jason-remembering-peoples-names
+    name: "jarvis",
+    size: { x: 680, y: 705 },
+    file: "/templates/jarvis.png",
+    targets: [
+      {
+        // panel 3: the large tilted yellow "memory" block inside the brain.
+        friendlyName: "memory block",
+        topLeft: { x: 58, y: 428 },
+        size: { x: 272, y: 104 },
+        // Skew the filled content to match the block's clockwise tilt (the top
+        // edge descends left-to-right). Order is DELTA_ORDER = [TL, BL, TR, BR];
+        // values tuned in the editor's skew mode.
+        deltas: [
+          { x: 56, y: -4 }, // TL
+          { x: 26, y: -30 }, // BL
+          { x: -27, y: 38 }, // TR
+          { x: -53, y: 15 }, // BR
+        ],
+      },
+      {
+        // panel 4: the punchline speech bubble (below the baked-in "Say Jarvis,").
+        friendlyName: "punchline",
+        topLeft: { x: 368, y: 415 },
+        size: { x: 282, y: 55 },
+      },
+    ],
+  },
 };
 
 // Validate all templates at import time
