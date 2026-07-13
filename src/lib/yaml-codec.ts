@@ -108,8 +108,7 @@ export function serializeTemplates(templates: Template[]): string {
   return yaml.dump(doc, {
     indent: 2,
     lineWidth: -1,
-    quotingType: '"',
-    forceQuotes: false,
+    quoteStyle: "double",
   });
 }
 
