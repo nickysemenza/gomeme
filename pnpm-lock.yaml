@@ -25,7 +25,7 @@ importers:
         version: 19.2.8
       react-colorful:
         specifier: ^5.7.0
-        version: 5.8.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 5.8.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react-dom:
         specifier: ^19.2.6
         version: 19.2.8(react@19.2.8)
@@ -1218,8 +1218,8 @@ packages:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  react-colorful@5.8.0:
-    resolution: {integrity: sha512-Wy9OzPfjSN9bF12OB8N7UQvlsZ0I+7wHxpN+bV5BjNQGxOj6IiwkRjevJK9yOBjJWGQvAaf1OXtn8rUeEatAng==}
+  react-colorful@5.8.1:
+    resolution: {integrity: sha512-oz68bhsnFWnpDf1ZR8daiQbYpXUnM2h2J6hl9Zg2rTpM/DU6vCqe1E+CpqmqLnJucMZetHZeifSAfJ+geN9lcA==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -2274,7 +2274,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  react-colorful@5.8.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  react-colorful@5.8.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
