@@ -21,9 +21,38 @@ export interface MemeResult {
   opLog: OpLogEntry[];
 }
 
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+): string[] {
+  return text.split(/\r\n|\r|\n/).flatMap((paragraph) => {
+    const lines: string[] = [];
+    let line = "";
+    for (const word of paragraph.trim().split(/\s+/)) {
+      const candidate = line ? `${line} ${word}` : word;
+      if (ctx.measureText(candidate).width <= maxWidth) {
+        line = candidate;
+        continue;
+      }
+      if (line) lines.push(line);
+      line = "";
+      for (const character of word) {
+        if (line && ctx.measureText(line + character).width > maxWidth) {
+          lines.push(line);
+          line = "";
+        }
+        line += character;
+      }
+    }
+    lines.push(line);
+    return lines;
+  });
+}
+
 /**
  * Renders text onto a transparent PNG using the Canvas API (main thread only —
- * the WASM build ships no fonts). Auto-scales font size to fit, centered.
+ * the WASM build ships no fonts). Wraps and scales text to fit, centered.
  */
 function renderTextToBytes(
   text: string,
@@ -37,19 +66,29 @@ function renderTextToBytes(
   const ctx = canvas.getContext("2d")!;
 
   const fontFamily = "Impact, Arial Black, sans-serif";
-  let fontSize = Math.min(width, height);
+  let fontSize = Math.max(1, Math.floor(Math.min(width, height)));
+  let lines: string[];
+  let lineHeight: number;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  do {
+  while (true) {
     ctx.font = `bold ${fontSize}px ${fontFamily}`;
-    const metrics = ctx.measureText(text);
-    if (metrics.width <= width * 0.9 && fontSize <= height * 0.9) break;
-    fontSize -= 2;
-  } while (fontSize > 10);
+    lines = wrapText(ctx, text, width * 0.9);
+    lineHeight = fontSize * 1.2;
+    if (
+      (lines.length * lineHeight <= height * 0.9 &&
+        lines.every((line) => ctx.measureText(line).width <= width * 0.9)) ||
+      fontSize === 1
+    ) break;
+    fontSize = Math.max(1, fontSize - 2);
+  }
 
   ctx.fillStyle = color;
-  ctx.fillText(text, width / 2, height / 2, width * 0.95);
+  const firstLineY = (height - (lines.length - 1) * lineHeight) / 2;
+  lines.forEach((line, index) => {
+    ctx.fillText(line, width / 2, firstLineY + index * lineHeight);
+  });
 
   const dataUrl = canvas.toDataURL("image/png");
   const base64 = dataUrl.split(",")[1];
