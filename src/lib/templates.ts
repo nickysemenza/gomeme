@@ -106,6 +106,20 @@ const raw: Record<string, Template> = {
       },
     ],
   },
+  tim_robinson_zipline: {
+    // Tim Robinson, "I Think You Should Leave" season 3 zipline sketch.
+    name: "tim_robinson_zipline",
+    size: { x: 1200, y: 800 },
+    file: "/templates/tim_robinson_zipline.jpg",
+    targets: [
+      {
+        // The uncluttered upper-right wall leaves room for a two-line caption.
+        friendlyName: "caption",
+        topLeft: { x: 458, y: 7 },
+        size: { x: 676, y: 89 },
+      },
+    ],
+  },
 };
 
 // Validate all templates at import time

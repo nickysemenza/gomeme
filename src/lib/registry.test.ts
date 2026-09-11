@@ -5,7 +5,13 @@ import type { Template } from "./schemas";
 describe("template registry", () => {
   it("lists the built-in templates", () => {
     expect(Object.keys(listTemplates())).toEqual(
-      expect.arrayContaining(["office1", "drake1", "bernie", "trade_deal"]),
+      expect.arrayContaining([
+        "office1",
+        "drake1",
+        "bernie",
+        "trade_deal",
+        "tim_robinson_zipline",
+      ]),
     );
   });
 
