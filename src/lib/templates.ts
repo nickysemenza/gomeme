@@ -113,10 +113,11 @@ const raw: Record<string, Template> = {
     file: "/templates/tim_robinson_zipline.jpg",
     targets: [
       {
-        // The uncluttered upper-right wall leaves room for a two-line caption.
+        // The dark pool foreground gives a long caption enough contrast and
+        // keeps it clear of Tim and the party in the background.
         friendlyName: "caption",
-        topLeft: { x: 458, y: 7 },
-        size: { x: 676, y: 89 },
+        topLeft: { x: 132, y: 675 },
+        size: { x: 936, y: 110 },
       },
     ],
   },
