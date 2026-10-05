@@ -193,7 +193,7 @@ importers:
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.37.2
-        version: 1.62.5(@types/node@25.9.9)(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))(wrangler@4.146.0(@types/node@25.9.9))
+        version: 1.62.5(@types/node@25.9.9)(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))(wrangler@4.147.0(@types/node@25.9.9))
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.3(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))
@@ -229,7 +229,7 @@ importers:
         version: 5.0.3(@types/node@25.9.9)(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))
       wrangler:
         specifier: ^4.93.0
-        version: 4.146.0(@types/node@25.9.9)
+        version: 4.147.0(@types/node@25.9.9)
 
 packages:
 
@@ -1534,8 +1534,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.146.0:
-    resolution: {integrity: sha512-c27eHUH0Isr8HTmgZ6cLtLr/0cxtiBoLren6ywBeTW8ZIzj/dINVNBcqsbZc+iETnI5jrzO7E7Z8mLgLZ/l9iw==}
+  wrangler@4.147.0:
+    resolution: {integrity: sha512-pQYRoiq8PTAxphaG69z8+GC1DkSGd19EDZehQ8zxjo/Ko3mRB6Qs1mTrd8ZuKAarLklIjTqr1lUdCK9r4q2hUg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -1575,14 +1575,14 @@ snapshots:
     optionalDependencies:
       workerd: 1.20261001.1
 
-  '@cloudflare/vite-plugin@1.62.5(@types/node@25.9.9)(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))(wrangler@4.146.0(@types/node@25.9.9))':
+  '@cloudflare/vite-plugin@1.62.5(@types/node@25.9.9)(vite@8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0))(wrangler@4.147.0(@types/node@25.9.9))':
     dependencies:
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261001.1)
       miniflare: 5.20261001.0-alpha(@types/node@25.9.9)
       unenv: 2.0.0-rc.24
       vite: 8.3.2(@types/node@25.9.9)(esbuild@0.28.1)(jiti@2.7.0)
       workerd: 1.20261001.1
-      wrangler: 4.146.0(@types/node@25.9.9)
+      wrangler: 4.147.0(@types/node@25.9.9)
       ws: 8.21.0
     transitivePeerDependencies:
       - '@types/node'
@@ -2501,7 +2501,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20261001.1
       '@cloudflare/workerd-windows-64': 1.20261001.1
 
-  wrangler@4.146.0(@types/node@25.9.9):
+  wrangler@4.147.0(@types/node@25.9.9):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261001.1)
