@@ -1,6 +1,6 @@
 {
   "name": "gomeme",
-  "packageManager": "pnpm@12.10.1",
+  "packageManager": "pnpm@12.11.2",
   "private": true,
   "type": "module",
   "scripts": {
