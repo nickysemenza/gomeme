@@ -1,19 +1,30 @@
 {
-  "extends": [
-    "config:recommended"
-  ],
+  "extends": ["config:recommended"],
   "minimumReleaseAge": "3 days",
   "internalChecksFilter": "strict",
   "packageRules": [
     {
+      "description": "Automerge dependency updates only through a PR with passing checks",
       "matchUpdateTypes": [
+        "major",
         "minor",
         "patch",
         "pin",
-        "digest"
+        "digest",
+        "pinDigest",
+        "lockFileMaintenance"
       ],
-      "automergeType": "branch",
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automergeType": "pr",
       "automerge": true
     }
-  ]
+  ],
+  "automerge": false,
+  "automergeType": "pr",
+  "platformAutomerge": false,
+  "ignoreTests": false,
+  "internalChecksAsSuccess": false
 }
