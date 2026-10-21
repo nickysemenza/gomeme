@@ -167,8 +167,8 @@ importers:
   .:
     dependencies:
       '@imagemagick/magick-wasm':
-        specifier: ^0.0.44
-        version: 0.0.44
+        specifier: ^0.0.45
+        version: 0.0.45
       '@tanstack/react-router':
         specifier: ^1.170.4
         version: 1.170.45(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -446,8 +446,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@imagemagick/magick-wasm@0.0.44':
-    resolution: {integrity: sha512-J6oieSjlJzamANwtrNAlO+DKnRm49ILtSIWDhtkGn35f/5zS99AXta2gPsZuG9m2JvQbsu3h3CHe14ViXrFD/Q==}
+  '@imagemagick/magick-wasm@0.0.45':
+    resolution: {integrity: sha512-ef8FHka4xLWo5/tGTV6P45bPjTvnKZz/oHN6sCDTbY8zaCdM2MeaoQHLsy9IHuiVHQhomG3TQ6ErgTnEDyuzvw==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1702,7 +1702,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@imagemagick/magick-wasm@0.0.44': {}
+  '@imagemagick/magick-wasm@0.0.45': {}
 
   '@img/colour@1.1.0': {}
 
